@@ -233,7 +233,8 @@ while true; do
 done
 SL1
 
-     #=# PLACEHOLDER REMINDER : Bake in to while loop above
+     #=# PLACEHOLDER REMINDER
+     # Bake in to while loop above. Inefficient code.
 
 # Double-checking tarball exists
 if ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
@@ -339,16 +340,20 @@ if [[ $INSTALL = upgrade ]]; then
 
   TIME=$(date +%y-%m-%d_%H-%M)
   BKPATH="${BKROOT}/${TIME}"
-
-  mkdir -p "${BKPATH}"  
-  cp $NBROOT/{local_requirements.txt,gunicorn.py} "${BKPATH}/"
-  cp $NBROOT/netbox/netbox/{configuration.py,ldap_config.py} "${BKPATH}/"
+  mkdir -p "${BKPATH}"
+       #=# PLACEHOLDER REMINDER
+       # File presence validations before copy eg ldap
+  cp $NBROOT/local_requirements.txt "${BKPATH}/"
+  cp $NBROOT/gunicorn.py "${BKPATH}/"
+  cp $NBROOT/netbox/netbox/configuration.py "${BKPATH}/"
+  cp $NBROOT/netbox/netbox/ldap_config.py "${BKPATH}/"
   txt_info "Backed up files here: "
   ls -lah "${BKPATH}"/
-       #=# PLACEHOLDER REMINDER : COME BACK TO THIS FOR DB BACKUP ETC
-  txt_warn "TODO: DATABASE BACKUP STUFF HERE"
-  txt_warn "TODO: TAR FILES HERE"
-  txt_warn "TODO: DELETE SOURCE FILES ONCE TAR'd"
+       #=# PLACEHOLDER REMINDER
+       # Come back to this for database backup etc
+  #txt_warn "TODO: DATABASE BACKUP STUFF HERE"
+  #txt_warn "TODO: TAR FILES HERE"
+  #txt_warn "TODO: DELETE SOURCE FILES ONCE TAR'd"
 txt_header "+++ STAGE3 COMPLETE +++"
 unset TIME
 fi
@@ -360,31 +365,29 @@ fi
 #################################################################################################
 
 
-
-
-
 if [[ $INSTALL = upgrade ]]; then
-  txt_header "+++ STAGE4 : COPY FILES TO NEW NETBOX VERSION +++"
+  txt_header "+++ UPGRADE COPY : FILES TO NEW NETBOX DIR +++"
 
   WILL_YOU_CONTINUE
-
-  cp $NBROOT/{local_requirements.txt,gunicorn.py} "${NBROOT}-${NEWVER}/"
-  cp $NBROOT/netbox/netbox/{configuration.py,ldap_config.py} "${NBROOT}-${NEWVER}/netbox/netbox/"
+  #
+       #=# PLACEHOLDER REMINDER
+       # Check files exist before copying
+       # eg ldap and gunicorn might not
+  cp $NBROOT/local_requirements.txt "${NBROOT}-${NEWVER}/"
+  cp $NBROOT/gunicorn.py "${NBROOT}-${NEWVER}/"
+  cp $NBROOT/netbox/netbox/configuration.py "${NBROOT}-${NEWVER}/netbox/netbox/"
+  cp $NBROOT/netbox/netbox/ldap_config.py "${NBROOT}-${NEWVER}/netbox/netbox/"
+       #=# PLACEHOLDER REMINDER
+       # Add below in to presence validation and backup if so.
+       # Consider adding filesize validation too.
   # cp -pr $NBROOT-$OLDVER/netbox/media/ $NBROOT/netbox/
   # cp -r $NBROOT-$OLDVER/netbox/scripts $NBROOT/netbox/
   # cp -r $NBROOT-$OLDVER/netbox/reports $NBROOT/netbox/
 
-  txt_header "+++ STAGE4 COMPLETE +++"
-elif [[ $INSTALL = git ]]; then
-       #=# PLACEHOLDER REMINDER : COME BACK TO THIS
-  txt_err "Git installs not yet supported. Script cannot continue ..."
-  GAME_OVER
+  txt_header "+++ UPGRADE COPY : COMPLETE +++"
 fi
 
 SL2
-
-
-
 
 
 #################################################################################################
@@ -429,12 +432,12 @@ if [[ $INSTALL = upgrade ]]; then
   fi
   CR1; SL1
   txt_info "Comparing current (${OLDVER}) to installing (${NEWVER})"
-       #=# PLACEHOLDER REMINDER : Figure out this syntax.
+       #=# PLACEHOLDER REMINDER : Figure out this syntax. Needs more observation.
   #https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
   #if awk "BEGIN {exit !($NEWVER >= $OLDVER)}"; then
   #if [[ awk "BEGIN {exit !($NEWVER >= $OLDVER)}" == 1 ]]; then
   if [[ $(echo "${NEWVER} ${OLDVER}" | awk '{print ($1 >= $2)}') == 0 ]]; then
-    txt_err "Current version (${OLDVER}) looks to be newer than the installing version (${NEWVER}) !"
+    txt_err "Current version (${OLDVER}) same or newer than installing version (${NEWVER}) !"
     GAME_OVER
   fi
 fi
@@ -446,16 +449,19 @@ elif [[ $INSTALL = git ]]; then
   GAME_OVER
 elif [[ $INSTALL = upgrade ]]; then
   systemctl stop netbox netbox-rq
-       #=# PLACEHOLDER REMINDER : validate they have actually stopped
+       #=# PLACEHOLDER REMINDER
+       # Validate processes have actually stopped
   txt_ok "Processes netbox and netbox-rq stopped ..."
   SL1
-  sudo ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
+  ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
   txt_info "Backed up files here: "
+       #=# PLACEHOLDER REMINDER
+       # Finish this off
 fi
 
-if [[ $INSTALL = git ]] || [[ $INSTALL = upgrade ]]; then
+if [[ $INSTALL = upgrade ]]; then
   txt_info "Symlinking New ${NEWVER} to ${NBROOT}"
-  sudo ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
+  ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
 fi
 
 
@@ -486,6 +492,10 @@ if [[ $INSTALL = new ]]; then
        #=# PLACEHOLDER REMINDER : Will make this a choice later.
   DB_USER=netbox
   DB_NAME=netbox
+  
+       #=# PLACEHOLDER REMINDER
+       # Wrap this up in a loop with user input for self-generation.
+       # Will need to validate secret password since Netbox requires 50+ characters.             
   #DB_PASS=$(openssl rand -base64 51)
   DB_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
   SC_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
@@ -493,8 +503,7 @@ if [[ $INSTALL = new ]]; then
   
        #=# PLACEHOLDER REMINDER : Check for password file before regen."
   txt_info "Displaying password ..."
-  SL1
-  CR1
+  CR1; SL1
   txt_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
   CR1
   txt_info "Database Password"
@@ -503,9 +512,12 @@ if [[ $INSTALL = new ]]; then
   txt_info "Netbox Secret Password"
   echo "$SC_PASS" | tee .SC_PASS
   txt_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
+  txt_ok "Password files .DB_PASS and .SC_PASS are available here :"
+  txt_nindent "$(pwd)"
   CR2; SL2
   
-       #=# PLACEHOLDER REMINDER : Validate database creation before trying again.
+       #=# PLACEHOLDER REMINDER
+       # Validate database creation before trying again.
        
   txt_info "Modifying database."
   su postgres <<EOF
@@ -514,19 +526,19 @@ psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
 psql -c "ALTER DATABASE $DB_NAME OWNER TO $DB_USER;"
 EOF
   
-       #=# PLACEHOLDER REMINDER : Integrate these in to conditionals.  
-  # the next two commands are needed on PostgreSQL 15 and later
+       #=# PLACEHOLDER REMINDER
+       # Integrate these in to conditionals.  
+
+  ##The next two commands are needed on PostgreSQL 15 and later
   #su postgres <<EOF
-  #psql -c "\connect $DB_USER";
-  #psql -c "GRANT CREATE ON SCHEMA public TO $DB_USER";
-  #EOF
+#psql -c "\connect $DB_USER";
+#psql -c "GRANT CREATE ON SCHEMA public TO $DB_USER";
+#EOF
 
   txt_ok "PostgreSQL database setup done."
   SL1
  txt_header "+++ STAGEa DONE +++"
  SL2
-else
-  txt_warn "New installs only. Skipping..."
 fi
 
      #=# PLACEHOLDER REMINDER : Perhaps integrate this in to script.
@@ -543,12 +555,12 @@ fi
    # netbox=> \q
 
 
-
 #################################################################################################
 
 
 if [[ $INSTALL = new ]]; then
   txt_header "+++ STAGEb - SETUP REDIS +++"
+  
   WILL_YOU_CONTINUE
   
   txt_info "Installing packages for Redis"
@@ -558,6 +570,8 @@ if [[ $INSTALL = new ]]; then
   txt_info "Redis checks..."
   SL1
   
+       #=# PLACEHOLDER REMINDER
+       # Add auto-validation to capture the PONG to the ping. Consider intervention if not.
   redis-server -v
   redis-cli ping
   
@@ -579,8 +593,11 @@ if [[ $INSTALL = new ]]; then
   
   $PMGET $PKG_NETBOX
   
-  sudo ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
-  
+  ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
+
+       #=# PLACEHOLDER REMINDER
+       # Refactor this to align with operating system commands.
+       # Below is Debian-based distros
   adduser --system --group netbox
   chown --recursive netbox $NBMEDIA
   chown --recursive netbox $NBREPORTS
@@ -589,7 +606,11 @@ if [[ $INSTALL = new ]]; then
   cd "${NBROOT}/netbox/netbox/"
   cp configuration_example.py configuration.py
   
-       #=# PLACEHOLDER REMINDER : Validate files before editing (for concurrent runs).
+       #=# PLACEHOLDER REMINDER :
+       # Validate files before editing (for concurrent runs).
+       #
+       # Also evaluate making this user input choice using the likes of nano.
+       
   txt_info "Updating configuration.py ..."
   CR1; SL1
   
@@ -625,7 +646,8 @@ if [[ $INSTALL = new ]]; then
   # Hint: Square brackets '[]' need escaping '\[\]'. Possibly others.
   # sed -i "s|VARIABLE1|VARIABLE2|g" file.txt
   
-       #=# PLACEHOLDER REMINDER : Come back to this to possibly do conditionals/prompts
+       #=# PLACEHOLDER REMINDER
+       # Come back to this to possibly do conditionals/prompts
   
   ## OPTIONAL : This will change the media, reports and scripts paths. Here for reference. Might make it a choice later.
   
@@ -659,7 +681,8 @@ if [[ $INSTALL = new ]]; then
 
   SL1
   txt_info "Adding dulwich to local_requirements.txt for Git source capability"
-       #=# PLACEHOLDER REMINDER : Change this to version conditional just in case v3.5.x
+       #=# PLACEHOLDER REMINDER
+       # Change this to version conditional - only needed for git on v3.6.0+
   echo 'dulwich' >> "${NBROOT}/local_requirements.txt"
   
   txt_info "Adding Housekeeping to cron tasks"
@@ -683,6 +706,9 @@ if [[ $INSTALL = new ]]; then
   systemctl daemon-reload
   systemctl start netbox netbox-rq
   systemctl enable netbox netbox-rq
+  SL2
+       #=# PLACEHOLDER REMINDER
+       # Add service start validation. Perhaps make a counter loop.
   systemctl status netbox.service
 
   txt_header "+++ STAGEd DONE +++"
@@ -692,42 +718,48 @@ fi
 
 #################################################################################################
 
-     #=# PLACEHOLDER REMINDER : Make this a choice between Nginx and Apache
-# https://docs.netbox.dev/en/stable/installation/5-http-server/
+     #=# PLACEHOLDER REMINDER
+     # Make this a choice between Nginx and Apache
+     # https://docs.netbox.dev/en/stable/installation/5-http-server/
 
 if [[ $INSTALL = new ]]; then
-  txt_header "+++ STAGEe - SETUP NGINX +++"
-  
-  SL0
-  WILL_YOU_CONTINUE
-  
-       #=# PLACEHOLDER REMINDER : Place options, including use certbot to properly do this
-  
-  txt_info "Create certs..."
-  
-  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout /etc/ssl/private/netbox.key \
-  -out /etc/ssl/certs/netbox.crt
-  
-  txt_ok "... done"
-  $PMGET $PKG_WWW
-  
-  cp $NBROOT/contrib/nginx.conf /etc/nginx/sites-available/netbox
-  
   NB_DNS=netbox.local
   WWW=nginx
+
+  $PMGET $PKG_WWW
+
+  if [[ "${WWW}" = nginx ]]; then
+    txt_header "+++ STAGEe - SETUP NGINX +++"
+    SL0
+
+    WILL_YOU_CONTINUE
   
-  txt_info "Adjusting ${WWW} config server name"
-  printf '%b\n' "$(cat /etc/nginx/sites-available/netbox) | $(grep -F "server_name")"
-  sed -i "s|netbox.example.com|$NB_DNS|g" /etc/nginx/sites-available/netbox
-  SL1
-  printf '%b\n' "$(cat /etc/nginx/sites-available/netbox) | $(grep -F "server_name")"
+       #=# PLACEHOLDER REMINDER
+       # Place options, including use certbot to properly do this
+    txt_info "Create certs..."
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/ssl/private/netbox.key \
+    -out /etc/ssl/certs/netbox.crt
+    txt_ok "... done"
   
-  rm /etc/nginx/sites-enabled/default
-  ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
+    cp $NBROOT/contrib/nginx.conf /etc/nginx/sites-available/netbox
+       #=# PLACEHOLDER REMINDER
+       # Make this interactive
+
+    txt_info "Adjusting ${WWW} config server name"
+    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox) | $(grep -F "server_name")"
+      sed -i "s|netbox.example.com|$NB_DNS|g" /etc/nginx/sites-available/netbox
+    SL1
+    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox) | $(grep -F "server_name")"
   
-  systemctl restart nginx
+    rm /etc/nginx/sites-enabled/default
+    ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
+
+    #=# PLACEHOLDER REMINDER
+    # Add start validation
+    systemctl restart nginx
   
+  fi
   txt_header "+++ STAGEe DONE +++"
   SL2
 fi
@@ -739,27 +771,34 @@ fi
 
 
 #################################################################################################
-txt_header "+++ STAGEx - RUN INSTALL SCRIPT AND/OR STARTING NETBOX +++"
 
+txt_header "+++ RUN INSTALL SCRIPT AND STARTING NETBOX +++"
+     #=# PLACEHOLDER REMINDER
+     # This applies to new/git installs also. Consider conolidating code.
+txt_info "Running the Netbox upgrade script..."
 
-if [[ $INSTALL = upgrade ]]; then
-  txt_info "Running the Netbox upgrade script..."
+     #=# PLACEHOLDER REMINDER
+     # Adjust git for git-upgrade vs git-new install
+if [[ $INSTALL = upgrade ]] || [[ $INSTALL = git ]]; then
   txt_warn "Likely no going back after this !"
-  
   WILL_YOU_CONTINUE
-  
-  bash "${NBROOT}/upgrade.sh" | tee "upgrade_$(date +%y-%m-%d_%H-%M).log"
-  txt_ok "Script has been run"
 fi
 
-txt_info "Starting Netbox processes ..."
+bash "${NBROOT}/upgrade.sh" | tee "upgrade_$(date +%y-%m-%d_%H-%M).log"
+txt_ok "Netbox upgrade.sh has been run"
 
+txt_info "Starting Netbox processes ..."
+     #=# PLACEHOLDER REMINDER
+     # Make this a better choice.
 WILL_YOU_CONTINUE
 
+     #=# PLACEHOLDER REMINDER
+     # Add process start validation.
 systemctl start netbox netbox-rq
-txt_ok "Processes restarted"
-
+txt_ok "Processes started"
 SL2
+systemctl status netbox netbox-rq
+
 txt_header "+++ STAGEx COMPLETE +++"
 SL2
 
@@ -791,6 +830,7 @@ SL2
 #   https://www.putorius.net/using-trap-to-exit-bash-scripts-cleanly.html
 # for loop count:
 #   https://stackoverflow.com/questions/10515964/counter-increment-in-bash-loop-not-working
+#   https://linuxize.com/post/bash-increment-decrement-variable/
 # check for files and symlinks etc
 #   https://stackoverflow.com/questions/5767062/how-to-check-if-a-symlink-exists
 #   https://devconnected.com/how-to-check-if-file-or-directory-exists-in-bash/
@@ -827,10 +867,13 @@ SL2
 # postgres bash
 #   https://stackfame.com/creating-user-database-and-adding-access-on-postgresql
 #
-#
 # Python venv in Shell
 #   https://stackoverflow.com/questions/13122137/how-to-source-virtualenv-activate-in-a-bash-script
-
-
+#
+# Password gen
+#   https://unix.stackexchange.com/questions/230673/how-to-generate-a-random-string
+#   https://www.atatus.com/blog/generating-secure-passwords-for-your-linux-server/
+#   https://unix.stackexchange.com/questions/230673/how-to-generate-a-random-string
+#   https://stackoverflow.com/questions/5155422/regex-for-1-or-2-digits-optional-non-alphanumeric-2-known-alphas
 
 #################################################################################################
