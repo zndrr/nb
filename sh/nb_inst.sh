@@ -171,38 +171,19 @@ cd "${ROOT}"
 
 SL2
 
-     #=#PLACEHOLDER REMINDER : COME BACK TO THIS
-##
-##  if ! [[ $OLDVER =~ $REGEXVER ]]; then
-##    if [[ $ATTEMPTS > 1 ]]; then
-##      txt_err "... Three incorrect attempts made."
-##      GAME_OVER
-##    fi
-##    txt_err "Selection '${OLDVER}' format STILL not valid (eg 3.6.0). Try again ..."
-##    ATTEMPTS=$(( ATTEMPTS +1 ))
-##    SL1
-##    continue
-
-
-
-     #=# PLACEHOLDER REMINDER : Refactor wget to curl
-# https://matthewsetter.com/check-if-file-is-available-with-curl/
-# https://reqbin.com/req/c-bvijc9he/curl-follow-redirect
-# curl -o /dev/null --silent -ILw '%{http_code}' $URLD
-# curl -o /dev/null --silent -Iw '%{http_code}' $URLD # without redirects, likely get http302
-
 
 while true; do
-  echo
+  COUNT=0
+  CR1
   read -p "Please enter desired Netbox release (eg 3.6.0) and press Enter: " NEWVER
   URLD="https://github.com/netbox-community/netbox/archive/v${NEWVER}.tar.gz"
   if ! [[ $NEWVER =~ $REGEXVER ]]; then
-    if [[ $ATTEMPTS -gt 1 ]]; then
+    if [[ "${COUNT}" -gt 2 ]]; then
       txt_err "... Too many incorrect attempts made."
       GAME_OVER
     fi
     txt_warn "Selection '${NEWVER}' not valid (eg 3.6.0). Try again ..."
-    ATTEMPTS=$(( ATTEMPTS +1 ))
+    ((COUNT++))
     SL1
     continue
   elif [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
@@ -429,21 +410,21 @@ if [[ $INSTALL = upgrade ]]; then
     txt_info "Directory list here:"
     ls -ld "${NBROOT}" | grep netbox
     while true; do
+      COUNT=0
       read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " OLDVER
       if ! [[ $OLDVER =~ $REGEXVER ]]; then
-        if [[ $ATTEMPTS -gt 1 ]]; then
+        if [[ "${COUNT}" -gt 2 ]]; then
           txt_err "... Three incorrect attempts made.${CLR}"
           GAME_OVER
         fi
         txt_warn "Selection '${OLDVER}' format STILL not valid (eg 3.6.0). Try again ..."
-        ATTEMPTS=$(( ATTEMPTS +1 ))
+        ((COUNT++))
         SL1
         continue
       elif [[ $OLDVER =~ $REGEXVER ]]; then
         txt_ok "Selection '${OLDVER}' looks to be valid ..."
         break
       fi
-      unset ATTEMPTS
     done
   fi
   CR1; SL1
