@@ -1,0 +1,72 @@
+#################################################################################################
+#################################################################################################
+# Resources
+#------------------------------------------------------------------------------------------------
+#
+# sh checker -- thanks to colleague Blair for showing this
+#   https://www.shellcheck.net/
+#
+# banner gen:
+#   https://manytools.org/hacker-tools/ascii-banner/
+# wget:
+#   https://unix.stackexchange.com/questions/474805/verify-if-a-url-exists
+# bash exit codes:
+#   https://www.cyberciti.biz/faq/linux-bash-exit-status-set-exit-statusin-bash/
+# Bash inputs:
+#   https://ryanstutorials.net/bash-scripting-tutorial/bash-input.php
+# bash colours:
+# tput colours:
+#   https://linuxcommand.org/lc3_adv_tput.php
+#   https://unix.stackexchange.com/questions/269077/tput-setaf-color-table-how-to-determine-color-codes
+#   https://stackoverflow.com/questions/54838578/color-codes-for-tput-setf
+# interrupts:
+#   https://www.putorius.net/using-trap-to-exit-bash-scripts-cleanly.html
+# for loop count:
+#   https://stackoverflow.com/questions/10515964/counter-increment-in-bash-loop-not-working
+#   https://linuxize.com/post/bash-increment-decrement-variable/
+# check for files and symlinks etc
+#   https://stackoverflow.com/questions/5767062/how-to-check-if-a-symlink-exists
+#   https://devconnected.com/how-to-check-if-file-or-directory-exists-in-bash/
+# check for sudo/root
+#   https://electrictoolbox.com/check-user-root-sudo-before-running/
+# break out of bash if condition (inconclusive)
+#   https://stackoverflow.com/questions/21011010/how-to-break-out-of-an-if-loop-in-bash
+# prompts
+#   https://stackoverflow.com/questions/1885525/how-do-i-prompt-a-user-for-confirmation-in-bash-script
+# awk decimal compare
+#   https://stackoverflow.com/questions/11237794/how-to-compare-two-decimal-numbers-in-bash-awk
+# awk filename sort
+#   https://stackoverflow.com/questions/13078490/extracting-version-number-from-a-filename
+# while loops
+#   https://stackoverflow.com/questions/24896455/goto-beginning-of-if-statement
+#   https://stackoverflow.com/questions/7955984/bash-if-return-code-1-re-run-script-start-at-the-beginning
+# printf
+#   https://stackoverflow.com/questions/27464569/bash-result-of-multiple-echo-commands-with-a-delay-on-one-line
+# printf colours
+#   https://stackoverflow.com/questions/5412761/using-colors-with-printf
+# functions" eg FUNCTION() { stuff; some_more_stuff; }
+#   https://phoenixnap.com/kb/bash-function
+#   https://linuxize.com/post/bash-functions/
+#   https://phoenixnap.com/kb/bash-function
+#   https://www.baeldung.com/linux/bash-pass-function-arg
+# alpha characters in conditionals
+#   https://unix.stackexchange.com/questions/416108/how-to-check-if-string-contain-alphabetic-characters-or-alphabetic-characters-an
+# regex:
+#   https://stackoverflow.com/questions/18709962/regex-matching-in-a-bash-if-statement
+#   https://www.baeldung.com/linux/regex-inside-if-clause
+# unset var
+#   https://www.cyberciti.biz/faq/linux-osx-bsd-unix-bash-undefine-environment-variable/
+#
+# postgres bash
+#   https://stackfame.com/creating-user-database-and-adding-access-on-postgresql
+#
+# Python venv in Shell
+#   https://stackoverflow.com/questions/13122137/how-to-source-virtualenv-activate-in-a-bash-script
+#
+# Password gen
+#   https://unix.stackexchange.com/questions/230673/how-to-generate-a-random-string
+#   https://www.atatus.com/blog/generating-secure-passwords-for-your-linux-server/
+#   https://unix.stackexchange.com/questions/230673/how-to-generate-a-random-string
+#   https://stackoverflow.com/questions/5155422/regex-for-1-or-2-digits-optional-non-alphanumeric-2-known-alphas
+
+#################################################################################################
