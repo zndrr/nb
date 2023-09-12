@@ -44,7 +44,7 @@ EOF
 #################################################################################################
 
 # Local path variables
-#=# PLACEHOLDER REMINDER : Change these to choices, with defaults.
+     #=# PLACEHOLDER REMINDER : Change these to choices, with defaults.
 ROOT=/opt
 NBROOT=$ROOT/netbox
 BKROOT=$ROOT/nb-backup
@@ -71,17 +71,17 @@ URLN="https://docs.netbox.dev/en/stable/installation/"
 URLR="https://github.com/netbox-community/netbox/releases/"
 URLC="https://github.com/netbox-community/"
 
-# Required packages for Netbox. Noted as of v3.6.2
 
+# Packages managers. Tentatively covers apt (Debian) or CentOS (yum) only.
+     #=# PLACEHOLDER REMINDER : To work on autodiscover and/or user input.
 PM=apt
 #PM=yum
 PMU="${PM} update"
 PMGET="${PM} install -y"
 
-PKG_MGR="apt install -y"
-#PKG_MGR="yum install -y"
-
-PKG_SCRIPT="wget tar"
+# Packages in various stages.
+     #=# PLACEHOLDER REMINDER : Plan on making this interactive.
+PKG_SCRIPT="wget tar nano openssl"
 PKG_GIT="git"
 PKG_PSQL="postgresql"
 PKG_REDIS="redis-server"
@@ -171,7 +171,7 @@ cd "${ROOT}"
 
 SL2
 
-#=# PLACEHOLDER REMINDER : COME BACK TO THIS
+     #=#PLACEHOLDER REMINDER : COME BACK TO THIS
 ##
 ##  if ! [[ $OLDVER =~ $REGEXVER ]]; then
 ##    if [[ $ATTEMPTS > 1 ]]; then
@@ -185,7 +185,7 @@ SL2
 
 
 
-#=# PLACEHOLDER REMINDER : Refactor wget to curl
+     #=# PLACEHOLDER REMINDER : Refactor wget to curl
 # https://matthewsetter.com/check-if-file-is-available-with-curl/
 # https://reqbin.com/req/c-bvijc9he/curl-follow-redirect
 # curl -o /dev/null --silent -ILw '%{http_code}' $URLD
@@ -252,7 +252,7 @@ while true; do
 done
 SL1
 
-#=# PLACEHOLDER REMINDER : Bake in to while loop above
+     #=# PLACEHOLDER REMINDER : Bake in to while loop above
 
 # Double-checking tarball exists
 if ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
@@ -297,7 +297,7 @@ if ! [ -d $NBROOT ]; then
   fi
 elif [ -d $NBROOT ]; then
   if [ -e $NBROOT/.git ]; then
-    #=# PLACEHOLDER REMINDER
+         #=# PLACEHOLDER REMINDER
     # ADD GIT COMMANDS IN HERE
     txt_warn "Netbox directory exists but appears to be a Git install ..."
     txt_err "Git installs not yet supported. Script cannot continue ..."
@@ -316,7 +316,7 @@ SL2
 # Will extract tar file as long as destination doesn't exist.
 NBPATH=$NBROOT-$NEWVER
 
-#=# PLACEHOLDER REMINDER
+     #=# PLACEHOLDER REMINDER
 # Look to change this to a while loop
 
 if [ -d "${NBPATH}" ]; then
@@ -346,7 +346,7 @@ CR2; SL2
 #################################################################################################
 
 
-#=# PLACEHOLDER REMINDER : Revise code. Some redundant, at least at this stage.
+     #=# PLACEHOLDER REMINDER : Revise code. Some redundant, at least at this stage.
 #elif [[ $INSTALL = git ]]; then
 #  txt_err "Git installs not yet supported. Script cannot continue ..."
 #  GAME_OVER
@@ -364,7 +364,7 @@ if [[ $INSTALL = upgrade ]]; then
   cp $NBROOT/netbox/netbox/{configuration.py,ldap_config.py} "${BKPATH}/"
   txt_info "Backed up files here: "
   ls -lah "${BKPATH}"/
-  #=# PLACEHOLDER REMINDER : COME BACK TO THIS FOR DB BACKUP ETC
+       #=# PLACEHOLDER REMINDER : COME BACK TO THIS FOR DB BACKUP ETC
   txt_warn "TODO: DATABASE BACKUP STUFF HERE"
   txt_warn "TODO: TAR FILES HERE"
   txt_warn "TODO: DELETE SOURCE FILES ONCE TAR'd"
@@ -395,7 +395,7 @@ if [[ $INSTALL = upgrade ]]; then
 
   txt_header "+++ STAGE4 COMPLETE +++"
 elif [[ $INSTALL = git ]]; then
-  #=# PLACEHOLDER REMINDER : COME BACK TO THIS
+       #=# PLACEHOLDER REMINDER : COME BACK TO THIS
   txt_err "Git installs not yet supported. Script cannot continue ..."
   GAME_OVER
 fi
@@ -413,7 +413,7 @@ txt_warn "Caution: This will make Netbox unavailable!"
 
 WILL_YOU_CONTINUE
 
-#=# PLACEHOLDER REMINDER
+     #=# PLACEHOLDER REMINDER
 # look to change to a while loop
 # look to optimise counter vars
 
@@ -448,7 +448,7 @@ if [[ $INSTALL = upgrade ]]; then
   fi
   CR1; SL1
   txt_info "Comparing current (${OLDVER}) to installing (${NEWVER})"
-  #=# PLACEHOLDER REMINDER : Figure out this syntax.
+       #=# PLACEHOLDER REMINDER : Figure out this syntax.
   #https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
   #if awk "BEGIN {exit !($NEWVER >= $OLDVER)}"; then
   #if [[ awk "BEGIN {exit !($NEWVER >= $OLDVER)}" == 1 ]]; then
@@ -465,7 +465,7 @@ elif [[ $INSTALL = git ]]; then
   GAME_OVER
 elif [[ $INSTALL = upgrade ]]; then
   systemctl stop netbox netbox-rq
-  #=# PLACEHOLDER REMINDER : validate they have actually stopped
+       #=# PLACEHOLDER REMINDER : validate they have actually stopped
   txt_ok "Processes netbox and netbox-rq stopped ..."
   SL1
   sudo ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
@@ -502,7 +502,7 @@ if [[ $INSTALL = new ]]; then
   # These options are here, but highly recommended to stick with the static vars.
   #read -p "Enter owner database name (suggested: 'netbox'): " DB_USER
   #read -p "Enter database name (suggested: 'netbox'): " DB_NAME
-  #=# PLACEHOLDER REMINDER : Will make this a choice later.
+       #=# PLACEHOLDER REMINDER : Will make this a choice later.
   DB_USER=netbox
   DB_NAME=netbox
   #DB_PASS=$(openssl rand -base64 51)
@@ -510,7 +510,7 @@ if [[ $INSTALL = new ]]; then
   SC_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
   
   
-  #=# PLACEHOLDER REMINDER : Check for password file before regen."
+       #=# PLACEHOLDER REMINDER : Check for password file before regen."
   txt_info "Displaying password ..."
   SL1
   CR1
@@ -524,7 +524,8 @@ if [[ $INSTALL = new ]]; then
   txt_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
   CR2; SL2
   
-  #=# PLACEHOLDER REMINDER : Validate database creation before trying again.
+       #=# PLACEHOLDER REMINDER : Validate database creation before trying again.
+       
   txt_info "Modifying database."
   su postgres <<EOF
 psql -c "CREATE DATABASE $DB_NAME;"
@@ -532,7 +533,7 @@ psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
 psql -c "ALTER DATABASE $DB_NAME OWNER TO $DB_USER;"
 EOF
   
-  #=# PLACEHOLDER REMINDER : Integrate these in to conditionals.  
+       #=# PLACEHOLDER REMINDER : Integrate these in to conditionals.  
   # the next two commands are needed on PostgreSQL 15 and later
   #su postgres <<EOF
   #psql -c "\connect $DB_USER";
@@ -547,7 +548,7 @@ else
   txt_warn "New installs only. Skipping..."
 fi
 
-#=# PLACEHOLDER REMINDER : Perhaps integrate this in to script.
+     #=# PLACEHOLDER REMINDER : Perhaps integrate this in to script.
 ## TO VERIFY
    # $ psql --username netbox --password --host localhost netbox
    # Password for user netbox: 
@@ -607,7 +608,7 @@ if [[ $INSTALL = new ]]; then
   cd "${NBROOT}/netbox/netbox/"
   cp configuration_example.py configuration.py
   
-  #=# PLACEHOLDER REMINDER : Validate files before editing (for concurrent runs).
+       #=# PLACEHOLDER REMINDER : Validate files before editing (for concurrent runs).
   txt_info "Updating configuration.py ..."
   CR1; SL1
   
@@ -643,7 +644,7 @@ if [[ $INSTALL = new ]]; then
   # Hint: Square brackets '[]' need escaping '\[\]'. Possibly others.
   # sed -i "s|VARIABLE1|VARIABLE2|g" file.txt
   
-  #=# PLACEHOLDER REMINDER : Come back to this to possibly do conditionals/prompts
+       #=# PLACEHOLDER REMINDER : Come back to this to possibly do conditionals/prompts
   
   ## OPTIONAL : This will change the media, reports and scripts paths. Here for reference. Might make it a choice later.
   
@@ -667,7 +668,7 @@ if [[ $INSTALL = new ]]; then
   python3 ../generate_secret_key.py | tee .NB_PASS
   CR2; SL1
   
-  #=# PLACEHOLDER REMINDER : Code duplicity with upgrade section above. Consolidate...
+       #=# PLACEHOLDER REMINDER : Code duplicity with upgrade section above. Consolidate...
   txt_info "Run Netbox upgrade script ..."
   bash "${NBROOT}/upgrade.sh"
   CR2; SL2
@@ -677,7 +678,7 @@ if [[ $INSTALL = new ]]; then
 
   SL1
   txt_info "Adding dulwich to local_requirements.txt for Git source capability"
-  #=# PLACEHOLDER REMINDER : Change this to version conditional just in case v3.5.x
+       #=# PLACEHOLDER REMINDER : Change this to version conditional just in case v3.5.x
   echo 'dulwich' >> "${NBROOT}/local_requirements.txt"
   
   txt_info "Adding Housekeeping to cron tasks"
@@ -710,7 +711,7 @@ fi
 
 #################################################################################################
 
-#=# PLACEHOLDER REMINDER : Make this a choice between Nginx and Apache
+     #=# PLACEHOLDER REMINDER : Make this a choice between Nginx and Apache
 # https://docs.netbox.dev/en/stable/installation/5-http-server/
 
 if [[ $INSTALL = new ]]; then
@@ -719,7 +720,7 @@ if [[ $INSTALL = new ]]; then
   SL0
   WILL_YOU_CONTINUE
   
-  #=# PLACEHOLDER REMINDER : Place options, including use certbot to properly do this
+       #=# PLACEHOLDER REMINDER : Place options, including use certbot to properly do this
   
   txt_info "Create certs..."
   
@@ -752,7 +753,7 @@ fi
 
 #################################################################################################
 
-## PLACEHOLDER REMINDER : Perform this process.
+     ## PLACEHOLDER REMINDER : Perform this process.
 # txt_header "+++ STAGEf - SETUP CERTIFICATES +++"
 
 
