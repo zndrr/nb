@@ -93,20 +93,13 @@ PKG_WWW="nginx"
 
 clear
 
-# Check for sudo privileges. Exit if not.
-txt_info "Checking root privileges ..."
-SL2
-if ! [ "$(whoami)" = root ]; then
-  txt_err "Please run this script as root or using sudo ..."
-  GAME_OVER
-else
-  txt_ok "Root privileges confirmed. Continuing ..."
-fi
+# Checks you are root or sudo
+ROOT_CHECK
+
 CR2; SL1
 
 
 # Check critical packages installed. Exit if not.
-
 txt_info "Running a package update..."
 $PMU
 CR2; SL1
