@@ -97,6 +97,17 @@ while true; do
   SL1
   continue
 done
-echo
+CR1
 txt_ok "Continuing ..."
+}
+
+ROOT_CHECK() {
+txt_info "Checking root privileges ..."
+SL2
+if ! [ "$(whoami)" = root ]; then
+  txt_err "Please run this script as root or using sudo ..."
+  GAME_OVER
+else
+  txt_ok "Root privileges confirmed. Continuing ..."
+fi
 }
