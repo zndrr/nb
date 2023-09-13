@@ -1,6 +1,7 @@
 #!/bin/bash
 
-printf '/n%b' "!! env file, execution not supported"; exit 1
+# THIS IS INTENDED AS AN ENV FILE ONLY
+# DEFINITIONS ONLY, NO EXECUTION
 
 BIG_NAME_IS_BIG() {
   cat <<"EOF"
@@ -31,7 +32,7 @@ CYANB=$(tput bold setaf 6)
 CLR=$(tput sgr0)
 
 
-## Defining terminal text formatting
+## Terminal text colouration for readability
 txt_norm() { local msg="$1"; printf '%b\n' "${msg}"; }
 txt_nindent() { local msg="$1"; printf '%b\n' "  ${msg}"; }
 
@@ -44,14 +45,16 @@ txt_header() { local msg="$1"; printf '\n%b\n' "${CYANB}${msg}${CLR}"; SL1; }
 txt_url() { local msg="$1"; printf '%b\n' "${BLUU}${msg}${CLR}"; }
 
 
-## Core functions
+## Delay, carriage returns, spacing
 SL0() { sleep 0.5; }
 SL1() { sleep 1; }
 SL2() { sleep 2; }
 CR1() { printf '\n'; }
 CR2() { printf '\n\n'; }
+SP1() { printf " ";}
+SP2() { printf "  ";}
 
-# Graceful exit on interrupt
+## Graceful exit on interrupt
 trap STAGE_LEFT SIGINT
 STAGE_LEFT() {
   CR1
@@ -59,21 +62,17 @@ STAGE_LEFT() {
   exit
 }
 
+## Fancy animated output
 DOT() { printf "."; }
-DOTZ() { SL1; DOT; SL1; DOT; SL1; DOT; }
-
-# START_OVER() {
-#   printf '\n%b' "Restarting script from beginning"; SL1; printf "."; SL1; printf "."; SL1; printf '%b\n' "."; clear
-#   exec bash "$0"
-# }
+DOTZ() { SL0; DOT; SL0; DOT; SL0; DOT; SL0; DOT; SL0; }
 
 START_OVER() {
-  printf '\n%b' "Restarting script from beginning"; SL1; printf "."; SL1; printf "."; SL1; printf '%b\n' "."; clear
+  printf '\n%b' "Restarting script from beginning"; DOTZ; CR1; clear
   exec bash "$0"
 }
 
 GAME_OVER() {
-  printf '\n\n%b' "Ending the script"; SL1; printf "."; SL1; printf "."; SL1; printf '%b\n' "."
+  printf '\n\n%b' "Ending the script"; DOTZ; CR1;
   exit 1
 }
 
