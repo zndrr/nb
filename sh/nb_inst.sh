@@ -40,6 +40,12 @@ SPEW_INTRO() {
 EOF
 }
 
+# LET'S GO!
+clear
+
+# Checks you are root or sudo and pkg manager, quits if no sudo and/or no apt/yum.
+ROOT_CHECK
+PKG_MGR_CHECK
 
 #################################################################################################
 
@@ -58,7 +64,7 @@ nbv() { source $NBROOT/venv/bin/activate; }
 nbmg() { nbv; python3 $NBROOT/netbox/manage.py $1; }
 nbs() { nbv; python3 $NBROOT/netbox/manage.py nbshell; }
 
-# Variables to validate release version inputs etc.
+# Variables to validate Netbox release version inputs etc.
 # Check and update periodically as newer releases roll around.
 REGEXVER="^[0-9].[0-9].[0-9]{1,2}$"
 MINOR1=3.6.0
@@ -72,12 +78,9 @@ URLR="https://github.com/netbox-community/netbox/releases/"
 URLC="https://github.com/netbox-community/"
 
 
-# Packages managers. Tentatively covers apt (Debian) or CentOS (yum) only.
-     #=# PLACEHOLDER REMINDER : To work on autodiscover and/or user input.
-PM=apt
-#PM=yum
-PMU="${PM} update"
-PMGET="${PM} install -y"
+# Packages manager install syntax.
+PUPD="${PM} update"
+PGET="${PM} install -y"
 
 # Packages in various stages.
      #=# PLACEHOLDER REMINDER : Plan on making this interactive.
@@ -89,12 +92,10 @@ PKG_NETBOX="python3 python3-pip python3-venv python3-dev build-essential libxml2
 PKG_WWW="nginx"
 
 #################################################################################################
-# Sanity checks for successful script execution
 
-clear
 
-# Checks you are root or sudo
-ROOT_CHECK
+
+
 
 CR2; SL1
 
