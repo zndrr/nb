@@ -194,14 +194,14 @@ while true; do
     break
   elif ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
     if [[ $(echo "$NEWVER $MAJOR1" | awk '{print ($1 < $2)}') == 1 ]]; then
-      txt_err "Selection (${NEWVER}) at least 1 major release older than (${MAJOR1}) in Netbox project!"
+      txt_err "Selection (${NEWVER}) at least 1 MAJOR release behind Netbox project (${MAJOR1})!"
       txt_err "Selection too old! Select again ..."
       continue
     elif [[ $(echo "$NEWVER $MINOR2" | awk '{print ($1 < $2)}') == 1 ]]; then
-      txt_warn "Selection (${NEWVER}) at least 2 minor releases older than (${MINOR2}) in Netbox project!"
+      txt_warn "Selection (${NEWVER}) at least 2 minor releases behind Netbox project (${MINOR2})!"
       txt_warn "Highly recommended to select a newer release!"
     elif [[ $(echo "$NEWVER $MINOR1" | awk '{print ($1 < $2)}') == 1 ]]; then
-      txt_warn "Selected (${NEWVER}) at least 1 minor release older than (${MINOR1}) in Netbox project!"
+      txt_warn "Selection '${NEWVER}' at least 1 minor release behind '${MINOR1}' in Netbox project!"
     SL1
     fi
     txt_info "Checking availability ..."
