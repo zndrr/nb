@@ -118,16 +118,18 @@ local DSTRO=0
 txt_info "Checking package manager..."
 SL2
 if [[ $(which apt) ]]; then
-  PM="apt"
+  PMGR="apt"
   DSTRO="Debian/Ubuntu"
 elif [[ $(which yum) ]]; then
-  PM="yum"
+  PMGR="yum"
   DSTRO="CentOS"
 else
   txt_err "Package manager not APT(Debian/Ubuntu) or YUM(RHEL/CentOS)"
   txt_err "Script doesn't support other types ..."
   GAME_OVER
 fi
-txt_ok "Package manager identified as ${PM} (${DSTRO})"
+txt_ok "Package manager identified as ${PMGR} (${DSTRO})"
+PMUPD="${PMGR} update"
+PMGET="${PMGR} install -y"
 SL0
 }
