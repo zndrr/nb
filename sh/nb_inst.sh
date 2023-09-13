@@ -47,6 +47,8 @@ clear
 ROOT_CHECK
 PKG_MGR_CHECK
 
+
+
 #################################################################################################
 
 # Local path variables
@@ -59,10 +61,12 @@ NBMEDIA=$NBROOT/netbox/media/
 NBREPORTS=$NBROOT/netbox/reports/
 NBSCRIPTS=$NBROOT/netbox/scripts/
 
-# Local functions
+
+# Local Netbox functions
 nbv() { source $NBROOT/venv/bin/activate; }
 nbmg() { nbv; python3 $NBROOT/netbox/manage.py $1; }
 nbs() { nbv; python3 $NBROOT/netbox/manage.py nbshell; }
+
 
 # Variables to validate Netbox release version inputs etc.
 # Check and update periodically as newer releases roll around.
@@ -71,16 +75,13 @@ MINOR1=3.6.0
 MINOR2=3.5.0
 MAJOR1=3.0.0
 
+
 # URL variables for text output. Update if they change.
 URLU="https://docs.netbox.dev/en/stable/installation/upgrading/"
 URLN="https://docs.netbox.dev/en/stable/installation/"
 URLR="https://github.com/netbox-community/netbox/releases/"
 URLC="https://github.com/netbox-community/"
 
-
-# Packages manager install syntax.
-PUPD="${PM} update"
-PGET="${PM} install -y"
 
 # Packages in various stages.
      #=# PLACEHOLDER REMINDER : Plan on making this interactive.
@@ -91,18 +92,16 @@ PKG_REDIS="redis-server"
 PKG_NETBOX="python3 python3-pip python3-venv python3-dev build-essential libxml2-dev libxslt1-dev libffi-dev libpq-dev libssl-dev zlib1g-dev"
 PKG_WWW="nginx"
 
-#################################################################################################
-
-
-
-
-
 CR2; SL1
+
+
+
+#################################################################################################
 
 
 # Check critical packages installed. Exit if not.
 txt_info "Running a package update..."
-$PMU
+$PMUPD
 CR2; SL1
 
 txt_info "Checking packages required for script ..."
@@ -124,8 +123,11 @@ fi
 txt_ok "Packages okay. Continuing ..."
 CR2; SL1
 
+
+
 #################################################################################################
-# Make deterministic choice
+# Make deterministic choice of install type
+
 
 txt_norm "Choose your install type:"
 SL1
