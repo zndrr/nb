@@ -742,11 +742,12 @@ if [[ $INSTALL = new ]]; then
   
        #=# PLACEHOLDER REMINDER
        # Place options, including use certbot to properly do this
-    txt_info "Create certs..."
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    txt_info "Create certs..."; CR1; SL2
+    openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
+    -subj "/C=NZ/ST=Denial/L=RiverIn/O=Ejypt/CN=${NB_DNS}" \
     -keyout /etc/ssl/private/netbox.key \
     -out /etc/ssl/certs/netbox.crt
-    txt_ok "... done"
+    txt_ok "... done"; CR1
   
     cp $NBROOT/contrib/nginx.conf /etc/nginx/sites-available/netbox
        #=# PLACEHOLDER REMINDER
