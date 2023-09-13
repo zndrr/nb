@@ -88,5 +88,18 @@
 #   https://www.atatus.com/blog/generating-secure-passwords-for-your-linux-server/
 #   https://unix.stackexchange.com/questions/230673/how-to-generate-a-random-string
 #   https://stackoverflow.com/questions/5155422/regex-for-1-or-2-digits-optional-non-alphanumeric-2-known-alphas
-
+#
+# non-interactive ssl keygen
+#   https://unix.stackexchange.com/questions/104171/create-ssl-certificate-non-interactively
+#
+# pkg manager/os determination
+#   https://stackoverflow.com/questions/19477682/bash-script-determine-vendor-and-install-system-apt-get-yum-etc
+#   https://unix.stackexchange.com/questions/330787/how-can-i-find-information-about-the-package-management-software-in-the-linux-u
+#   https://unix.stackexchange.com/questions/46081/identifying-the-system-package-manager
+#
+# psql non-interactive db creation
+#   https://stackfame.com/creating-user-database-and-adding-access-on-postgresql
+#   https://unix.stackexchange.com/questions/646505/postgres-from-script-shell
+#   https://askubuntu.com/questions/1389013/setting-up-postgresql-db-with-bash-script-using-variables-from-env-file
+#
 #################################################################################################
