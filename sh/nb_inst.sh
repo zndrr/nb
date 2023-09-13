@@ -194,14 +194,14 @@ while true; do
     break
   elif ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
     if [[ $(echo "$NEWVER $MAJOR1" | awk '{print ($1 < $2)}') == 1 ]]; then
-      txt_err "Current selection (${NEWVER}) looks to be at least 1 major release older than (${MAJOR1}) !"
+      txt_err "Selection (${NEWVER}) at least 1 major release older than (${MAJOR1}) in Netbox project!"
       txt_err "Selection too old! Select again ..."
       continue
     elif [[ $(echo "$NEWVER $MINOR2" | awk '{print ($1 < $2)}') == 1 ]]; then
-      txt_warn "Current selection (${NEWVER}) looks to be at least 2 minor releases older than (${MINOR2}) !"
-      txt_warn "Highly recommended to seek a newer release !"
+      txt_warn "Selection (${NEWVER}) at least 2 minor releases older than (${MINOR2}) in Netbox project!"
+      txt_warn "Highly recommended to select a newer release!"
     elif [[ $(echo "$NEWVER $MINOR1" | awk '{print ($1 < $2)}') == 1 ]]; then
-      txt_warn "Current selection (${NEWVER}) looks to be at least 1 minor release older than (${MINOR1}) !"
+      txt_warn "Selected (${NEWVER}) at least 1 minor release older than (${MINOR1}) in Netbox project!"
     SL1
     fi
     txt_info "Checking availability ..."
@@ -707,6 +707,8 @@ if [[ $INSTALL = new ]]; then
   
   cp "${NBROOT}/contrib/gunicorn.py" "${NBROOT}/gunicorn.py"
   cp -v "${NBROOT}/contrib/"*".service" "/etc/systemd/system/"
+
+  txt_info "Starting Netbox processes..."
   systemctl daemon-reload
   systemctl start netbox netbox-rq
   systemctl enable netbox netbox-rq
@@ -751,10 +753,10 @@ if [[ $INSTALL = new ]]; then
        # Make this interactive
 
     txt_info "Adjusting ${WWW} config server name"
-    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox) | $(grep -F "server_name")"
+    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox) | $(grep -F 'server_name')"
       sed -i "s|netbox.example.com|$NB_DNS|g" /etc/nginx/sites-available/netbox
     SL1
-    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox) | $(grep -F "server_name")"
+    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox) | $(grep -F 'server_name')"
   
     rm /etc/nginx/sites-enabled/default
     ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
