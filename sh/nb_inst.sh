@@ -85,12 +85,27 @@ URLC="https://github.com/netbox-community/"
 
 # Packages in various stages.
      #=# PLACEHOLDER REMINDER : Plan on making this interactive.
-PKG_SCRIPT="wget tar nano openssl"
-PKG_GIT="git"
-PKG_PSQL="postgresql"
-PKG_REDIS="redis-server"
-PKG_NETBOX="python3 python3-pip python3-venv python3-dev build-essential libxml2-dev libxslt1-dev libffi-dev libpq-dev libssl-dev zlib1g-dev"
-PKG_WWW="nginx"
+
+if [[ $PMGR = apt ]]; then
+  PKG_SCRIPT="wget tar nano openssl"
+  PKG_GIT="git"
+  PKG_PSQL="postgresql"
+  PKG_REDIS="redis-server"
+  PKG_NETBOX="python3 python3-pip python3-venv python3-dev build-essential libxml2-dev libxslt1-dev libffi-dev libpq-dev libssl-dev zlib1g-dev"
+  PKG_WWW="nginx"
+  PKG_LDAP="libldap2-dev libsasl2-dev libssl-dev"
+elif [[ $PMGR = yum ]]; then
+  PKG_SCRIPT="wget tar nano openssl"
+  PKG_GIT="git"
+  PKG_PSQL="postgresql-server"
+  PKG_REDIS="redis"
+  PKG_NETBOX="gcc libxml2-devel libxslt-devel libffi-devel libpq-devel openssl-devel redhat-rpm-config"
+  PKG_WWW="nginx"
+  PKG_LDAP="openldap-devel python3-devel"
+else
+  txt_err "Exception. Distro not determined !"
+  GAME_OVER
+fi
 
 SL1; CR2
 
