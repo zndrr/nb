@@ -740,12 +740,17 @@ fi
 
 if [[ $INSTALL = new ]]; then
   txt_header "----- NEW : GUNICORN SETUP -----"
+  SL0; CR1
   
-  SL0
   WILL_YOU_CONTINUE
-  
+  SL0; CR1
+
+  txt_info "Copying files to set Netbox as service ..."
   cp "${NBROOT}/contrib/gunicorn.py" "${NBROOT}/gunicorn.py"
   cp -v "${NBROOT}/contrib/"*".service" "/etc/systemd/system/"
+  SL1; CR1
+  txt_ok "... done"
+  SL0; CR2
 
   txt_info "Starting Netbox processes..."
   systemctl daemon-reload
@@ -756,6 +761,7 @@ if [[ $INSTALL = new ]]; then
   # systemctl status netbox.service
   SL2; CR1
   txt_ok "...done."
+  CL1; CR1
   
   txt_header "----- GUNICORN SETUP DONE -----"
   SL2
@@ -772,29 +778,37 @@ if [[ $INSTALL = new ]]; then
   NB_DNS=netbox.local
   WWW=nginx
 
+  txt_info "Installing packages ..."
   $PMGET $PKG_WWW
+  SL0; CR1
+  txt_ok "... done !"
+  SL1; CR1
 
   if [[ "${WWW}" = nginx ]]; then
-    txt_header "+++ STAGEe - SETUP NGINX +++"
+    txt_header "----- SETUP NGINX -----"
     SL0
 
     WILL_YOU_CONTINUE
   
        #=# PLACEHOLDER REMINDER
        # Place options, including use certbot to properly do this
-    txt_info "Create certs..."; CR1; SL2
+    txt_info "Creating certs..."
+    SL2; CR1
+
     openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
     -subj "/C=NZ/ST=Denial/L=RiverIn/O=Ejypt/CN=${NB_DNS}" \
     -keyout /etc/ssl/private/netbox.key \
     -out /etc/ssl/certs/netbox.crt
-    txt_ok "... done"; CR1
+
+    txt_ok "... done"
+    SL1; CR1
   
     cp $NBROOT/contrib/nginx.conf /etc/nginx/sites-available/netbox
   
        #=# PLACEHOLDER REMINDER
        # Make this interactive. Consider defining with others at start and then having a match conditional here.
     txt_info "Adjusting ${WWW} config server name"
-    SL0
+    SL0: CR1
 
     txt_info "Before:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
@@ -802,6 +816,8 @@ if [[ $INSTALL = new ]]; then
     SL1
     txt_info "After:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
+    SL0; CR1
+    txt_ok "... done"
     SL1; CR2
 
     txt_info "Cleaning up..."
@@ -813,7 +829,7 @@ if [[ $INSTALL = new ]]; then
     systemctl restart nginx
   
   fi
-  txt_header "+++ STAGEe DONE +++"
+  txt_header "----- NGINX SETUP DONE -----"
   SL2
 fi
 
@@ -827,23 +843,25 @@ fi
 
 
 txt_header "----- RUNNING SCRIPT AND STARTING NETBOX -----"
+SL1; CR1
      #=# PLACEHOLDER REMINDER
      # This applies to new/git installs also. Consider conolidating code.
 txt_info "Running the Netbox upgrade script..."
-
-     #=# PLACEHOLDER REMINDER
-     # Adjust git for git-upgrade vs git-new install
+     #=# PLACEHOLDER REMINDER : add git types to ifs
 if ! [[ $INSTALL = new ]] || [[ $INSTALL = git_new ]]; then
   txt_warn "Likely no going back after this !"
+  SL0; CR1
   WILL_YOU_CONTINUE
-  SL1
+  SL1; CR2
 fi
 
 bash "${NBROOT}/upgrade.sh" | tee "upgrade_$(date +%y-%m-%d_%H-%M).log"
-txt_ok "Netbox upgrade.sh has been run"
+SL1; CR1
+txt_ok "... done"
+SL1; CR2
 
 txt_info "Starting Netbox processes ..."
-SL1
+SL0; CR1
      #=# PLACEHOLDER REMINDER
      # Make this a better choice.
 WILL_YOU_CONTINUE
