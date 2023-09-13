@@ -64,7 +64,7 @@ NBSCRIPTS=$NBROOT/netbox/scripts/
 
 # Local Netbox functions
 nbv() { source $NBROOT/venv/bin/activate; }
-nbmg() { nbv; python3 $NBROOT/netbox/manage.py $1; }
+nbmg() { nbv; python3 $NBROOT/netbox/manage.py "$1"; }
 nbs() { nbv; python3 $NBROOT/netbox/manage.py nbshell; }
 
 
@@ -178,7 +178,7 @@ SL2
 while true; do
   COUNT=0
   CR1
-  read -p "Please enter desired Netbox release (eg 3.6.0) and press Enter: " NEWVER
+  read -p "Please enter desired Netbox release (eg 3.6.0) and press Enter: " -r NEWVER
   URLD="https://github.com/netbox-community/netbox/archive/v${NEWVER}.tar.gz"
   if ! [[ $NEWVER =~ $REGEXVER ]]; then
     if [[ "${COUNT}" -gt 2 ]]; then
@@ -245,7 +245,7 @@ if ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
   txt_err "Manual intervention required ..."
   echo
   txt_info "Path here :"
-  ls -lah "${ROOT}" | egrep *.tar.gz
+  ls -lah "${ROOT}" | grep -E *.tar.gz
   echo
   GAME_OVER
 else
@@ -417,7 +417,7 @@ if [[ $INSTALL = upgrade ]]; then
     ls -ld "${NBROOT}" | grep netbox
     while true; do
       COUNT=0
-      read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " OLDVER
+      read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " -r OLDVER
       if ! [[ $OLDVER =~ $REGEXVER ]]; then
         if [[ "${COUNT}" -gt 2 ]]; then
           txt_err "... Three incorrect attempts made.${CLR}"
@@ -752,10 +752,10 @@ if [[ $INSTALL = new ]]; then
        # Make this interactive
 
     txt_info "Adjusting ${WWW} config server name"
-    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | $(grep -F server_name)"
+    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
       sed -i "s|netbox.example.com|$NB_DNS|g" /etc/nginx/sites-available/netbox
     SL1
-    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | $(grep -F server_name)"
+    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
   
     rm /etc/nginx/sites-enabled/default
     ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
