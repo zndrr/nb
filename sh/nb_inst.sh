@@ -515,7 +515,7 @@ if [[ $INSTALL = new ]]; then
   txt_info "Netbox Secret Password"
   echo "$SC_PASS" | tee .SC_PASS
   txt_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
-  txt_ok "Password files .DB_PASS and .SC_PASS are available here :"
+  txt_ok "Password files '.DB_PASS' and '.SC_PASS' in (${pwd}) :"
   txt_nindent "$(pwd)"
   CR2; SL2
   
@@ -713,7 +713,7 @@ if [[ $INSTALL = new ]]; then
   SL2
        #=# PLACEHOLDER REMINDER
        # Add service start validation. Perhaps make a counter loop.
-  systemctl status netbox.service
+  # systemctl status netbox.service
 
   txt_header "+++ STAGEd DONE +++"
   SL2
