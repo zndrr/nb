@@ -1,4 +1,6 @@
-#!/usr/bin/echo "Not for execution. Only used for sourcing !"
+#!/bin/bash
+
+printf '/n%b' "!! env file, execution not supported"; exit 1
 
 BIG_NAME_IS_BIG() {
   cat <<"EOF"
