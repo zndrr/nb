@@ -439,7 +439,7 @@ if [[ $INSTALL = upgrade ]]; then
   #https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
   #if awk "BEGIN {exit !($NEWVER >= $OLDVER)}"; then
   #if [[ awk "BEGIN {exit !($NEWVER >= $OLDVER)}" == 1 ]]; then
-  if [[ $(echo "${NEWVER} ${OLDVER}" | awk '{print ($1 >= $2)}') == 0 ]]; then
+  if [[ $(echo "${NEWVER} ${OLDVER}" | awk '{print ($1 >= $2)}') == 1 ]]; then
     txt_err "Current 'v${OLDVER}' same or newer than installing 'v${NEWVER}' !"
     GAME_OVER
   fi
@@ -686,11 +686,11 @@ if [[ $INSTALL = new ]]; then
        #=# PLACEHOLDER REMINDER
        # Evaluate this not being missed on a 3.4+ to 3.6 upgrade.
        # Will need to pull it out of the if conditional.
-  if [[ $(echo "${NEWVER} 3.6.0" | awk '{print ($1 >= $2)}') == 0 ]]; then
+  if [[ $(echo "${NEWVER} '3.6.0'" | awk '{print ($1 >= $2)}') == 1 ]]; then
     txt_info "Selection (${NEWVER}) or newer than 3.6.0 requires Dulwich for Git data source function."
     txt_info "Adding dulwich to local_requirements.txt"
     echo 'dulwich' >> "${NBROOT}/local_requirements.txt"
-    text_ok "... done"
+    txt_ok "... done"
   fi
     
   txt_info "Adding Housekeeping to cron tasks"
