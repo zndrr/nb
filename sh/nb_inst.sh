@@ -503,7 +503,6 @@ if [[ $INSTALL = new ]]; then
   DB_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
   SC_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
   
-  
        #=# PLACEHOLDER REMINDER : Check for password file before regen."
   txt_info "Displaying password ..."
   CR1; SL1
@@ -515,8 +514,7 @@ if [[ $INSTALL = new ]]; then
   txt_info "Netbox Secret Password"
   echo "$SC_PASS" | tee .SC_PASS
   txt_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
-  txt_ok "Password files '.DB_PASS' and '.SC_PASS' in (${pwd}) :"
-  txt_nindent "$(pwd)"
+  txt_ok "Password files '.DB_PASS' and '.SC_PASS' in ('$(pwd)')"
   CR2; SL2
   
        #=# PLACEHOLDER REMINDER
@@ -754,10 +752,10 @@ if [[ $INSTALL = new ]]; then
        # Make this interactive
 
     txt_info "Adjusting ${WWW} config server name"
-    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox) | $(grep -F 'server_name')"
+    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | $(grep -F server_name)"
       sed -i "s|netbox.example.com|$NB_DNS|g" /etc/nginx/sites-available/netbox
     SL1
-    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox) | $(grep -F 'server_name')"
+    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | $(grep -F server_name)"
   
     rm /etc/nginx/sites-enabled/default
     ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
