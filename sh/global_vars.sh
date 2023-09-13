@@ -38,8 +38,8 @@ txt_nindent() { local msg="$1"; printf '%b\n' "  ${msg}"; }
 
 txt_info() { local msg="$1"; printf '%b\n' "${CYAN}${msg}${CLR}"; }
 txt_ok() { local msg="$1"; printf '%b\n' "${GREEN} ✓ ${msg}${CLR}"; }
-txt_warn() { local msg="$1"; printf '\n%b\n' "${YELB} ! ${msg}${CLR}"; }
-txt_err() { local msg="$1"; printf '\n%b\n' "${REDB} ✗ ${msg}${CLR}"; }
+txt_warn() { local msg="$1"; printf '%b\n' "${YELB} ! ${msg}${CLR}"; }
+txt_err() { local msg="$1"; printf '%b\n' "${REDB} ✗ ${msg}${CLR}"; }
 
 txt_header() { local msg="$1"; printf '\n%b\n' "${CYANB}${msg}${CLR}"; SL1; }
 txt_url() { local msg="$1"; printf '%b\n' "${BLUU}${msg}${CLR}"; }
@@ -123,6 +123,11 @@ if [[ $(which apt) ]]; then
 elif [[ $(which yum) ]]; then
   PMGR="yum"
   DSTRO="CentOS"
+        #=# PLACEHOLDER REMINDER
+        # Test with CentOS release to validate.
+  txt_warn "Script hasn't been tested against CentOS !"
+  txt_warn "Run at your own peril !"
+  WILL_YOU_CONTINUE
 else
   txt_err "Package manager not APT(Debian/Ubuntu) or YUM(RHEL/CentOS)"
   txt_err "Script doesn't support other types ..."
