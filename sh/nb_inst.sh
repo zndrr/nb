@@ -394,11 +394,8 @@ SL2
 
 
 #################################################################################################
-txt_header "+++ STAGE5 - STOP NETBOX PROCESSES AND SYMLINK NEW +++"
 
-txt_warn "Caution: This will make Netbox unavailable!"
 
-WILL_YOU_CONTINUE
 
      #=# PLACEHOLDER REMINDER
 # look to change to a while loop
@@ -406,7 +403,10 @@ WILL_YOU_CONTINUE
 
 
 if [[ $INSTALL = upgrade ]]; then
+  txt_header "+++ STAGE5 - STOP NETBOX PROCESSES AND SYMLINK NEW +++"
+  txt_warn "Caution: This will make Netbox unavailable!"
 
+  WILL_YOU_CONTINUE
 
   OLDVER=$(ls -ld ${NBROOT} | awk -F"${NBROOT}-" '{print $2}' | cut -d / -f 1)
   if ! [[ $OLDVER =~ $REGEXVER ]]; then
@@ -784,28 +784,31 @@ fi
 
 #################################################################################################
 
-     ## PLACEHOLDER REMINDER : Perform this process.
-# txt_header "+++ STAGEf - SETUP CERTIFICATES +++"
+## PLACEHOLDER REMINDER : Perform this process.
+# txt_header "----- SETUP SSL CERTIFICATES -----"
 
 
 #################################################################################################
 
-txt_header "+++ RUN INSTALL SCRIPT AND STARTING NETBOX +++"
+
+txt_header "----- RUNNING SCRIPT AND STARTING NETBOX -----"
      #=# PLACEHOLDER REMINDER
      # This applies to new/git installs also. Consider conolidating code.
 txt_info "Running the Netbox upgrade script..."
 
      #=# PLACEHOLDER REMINDER
      # Adjust git for git-upgrade vs git-new install
-if [[ $INSTALL = upgrade ]] || [[ $INSTALL = git ]]; then
+if ! [[ $INSTALL = new ]] || [[ $INSTALL = git_new ]]; then
   txt_warn "Likely no going back after this !"
   WILL_YOU_CONTINUE
+  SL1
 fi
 
 bash "${NBROOT}/upgrade.sh" | tee "upgrade_$(date +%y-%m-%d_%H-%M).log"
 txt_ok "Netbox upgrade.sh has been run"
 
 txt_info "Starting Netbox processes ..."
+SL1
      #=# PLACEHOLDER REMINDER
      # Make this a better choice.
 WILL_YOU_CONTINUE
@@ -815,9 +818,8 @@ WILL_YOU_CONTINUE
 systemctl start netbox netbox-rq
 txt_ok "Processes started"
 SL2
-systemctl status netbox netbox-rq
+# systemctl status netbox netbox-rq
 
-txt_header "+++ STAGEx COMPLETE +++"
+txt_header "----- NETBOX RUNNING -----"
 SL2
-
 # FINISHED !!
