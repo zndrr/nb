@@ -92,7 +92,7 @@ PKG_REDIS="redis-server"
 PKG_NETBOX="python3 python3-pip python3-venv python3-dev build-essential libxml2-dev libxslt1-dev libffi-dev libpq-dev libssl-dev zlib1g-dev"
 PKG_WWW="nginx"
 
-CR2; SL1
+SL1; CR2
 
 
 
@@ -102,7 +102,7 @@ CR2; SL1
 # Check critical packages installed. Exit if not.
 txt_info "Running a package update..."
 $PMUPD
-CR2; SL1
+SL1; CR2
 
 txt_info "Checking packages required for script ..."
 
@@ -121,7 +121,7 @@ if [[ $PKGMISSING -gt 0 ]]; then
 fi
 
 txt_ok "Packages okay. Continuing ..."
-CR2; SL1
+SL1; CR2
 
 
 
@@ -254,12 +254,12 @@ fi
 
 CR2
 txt_header "+++ STAGE1 COMPLETE +++"
-CR2; SL2
+SL2; CR2
 
 
 #################################################################################################
 txt_header "+++ STAGE2 : CHECK EXISTING NETBOX INSTALL +++"
-CR2; SL1
+SL1; CR2
 
 WILL_YOU_CONTINUE
 
@@ -326,7 +326,7 @@ fi
 
 CR2
 txt_header "+++ STAGE2 COMPLETE +++"
-CR2; SL2
+SL2; CR2
 
 #################################################################################################
 
@@ -515,7 +515,7 @@ if [[ $INSTALL = new ]]; then
   echo "$SC_PASS" | tee .SC_PASS
   txt_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
   txt_ok "Password files '.DB_PASS' and '.SC_PASS' in '$(pwd)' dir"
-  CR2; SL2
+  SL2; CR2
   
        #=# PLACEHOLDER REMINDER
        # Validate database creation before trying again.
@@ -560,7 +560,7 @@ fi
 
 
 if [[ $INSTALL = new ]]; then
-  txt_header "+++ STAGEb - SETUP REDIS +++"
+  txt_header "----- NEW : SETUP REDIS -----"
   
   WILL_YOU_CONTINUE
   
@@ -578,7 +578,7 @@ if [[ $INSTALL = new ]]; then
   
   SL2
   
-  txt_header "+++ STAGEb DONE +++"
+  txt_header "----- REDIS SETUP DONE -----"
   SL2
 fi
 
@@ -620,28 +620,28 @@ if [[ $INSTALL = new ]]; then
     sed -i "s|ALLOWED_HOSTS = \[\]|ALLOWED_HOSTS = \['*'\]|g" configuration.py
   txt_info "After : ALLOWED_HOSTS"
   printf '%b\n' "$(cat configuration.py | grep -F "ALLOWED_HOSTS = [" | grep -v Example)"
-  CR2; SL1
+  SL1; CR2
 
   txt_info "Before : Netbox Database User"
   printf '%b\n' "$(cat configuration.py | grep -F "'USER': '")"
     sed -i "s|'USER': '',|'USER': '$DB_USER',|g" configuration.py
   txt_info "After : Netbox Database User"
   printf '%b\n' "$(cat configuration.py | grep -F "'USER': '")"
-  CR2; SL1
+  SL1; CR2
 
   txt_info "Before : Password for User"
   printf '%b\n' "$(cat configuration.py | grep -F "'PASSWORD': '" | grep -F "PostgreSQL")"
     sed -i "s|'PASSWORD': '',           # PostgreSQL password|'PASSWORD': '$DB_PASS',           # PostgreSQL password|g" configuration.py
   txt_info "After : Password for User"
   printf '%b\n' "$(cat configuration.py | grep -F "'PASSWORD': '" | grep -F "PostgreSQL")"
-  CR2; SL1
+  SL1; CR2
 
   txt_info "Before : Secret Pass for Netbox"
   printf '%b\n' "$(cat configuration.py | grep -F "SECRET_KEY = '")"
     sed -i "s|SECRET_KEY = ''|SECRET_KEY = '$SC_PASS'|g" configuration.py
   txt_info "After : Secret Pass for Netbox"
   printf '%b\n' "$(cat configuration.py | grep -F "SECRET_KEY = '")"
-  CR2; SL1
+  SL1; CR2
   
   
   # Hint: Square brackets '[]' need escaping '\[\]'. Possibly others.
@@ -671,22 +671,22 @@ if [[ $INSTALL = new ]]; then
   # Redundant since we do our own
   # txt_info "Generate a secret key"
   # python3 ../generate_secret_key.py | tee .NB_PASS
-  # CR2; SL1
+  # SL1; CR2
   
        #=# PLACEHOLDER REMINDER : Code duplicity with upgrade section above. Consolidate...
   txt_info "Run Netbox upgrade script ..."
-  CR2; SL2
+  SL2; CR2
   bash "${NBROOT}/upgrade.sh"
-  CR2; SL2
+  SL2; CR2
   
   txt_info "Create Superuser"
   nbmg createsuperuser
-  CR2; SL1
+  SL1; CR2
   
        #=# PLACEHOLDER REMINDER
        # Evaluate this not being missed on a 3.4+ to 3.6 upgrade.
        # Will need to pull it out of the if conditional.
-  if [[ $(echo "${NEWVER} '3.6.0'" | awk '{print ($1 >= $2)}') == 1 ]]; then
+  if [[ $(echo "${NEWVER} 3.6.0" | awk '{print ($1 >= $2)}') == 1 ]]; then
     txt_info "Selection (${NEWVER}) or newer than 3.6.0 requires Dulwich for Git data source function."
     txt_info "Adding dulwich to local_requirements.txt"
     echo 'dulwich' >> "${NBROOT}/local_requirements.txt"
@@ -759,7 +759,7 @@ if [[ $INSTALL = new ]]; then
        #=# PLACEHOLDER REMINDER
        # Make this interactive. Consider defining with others at start and then having a match conditional here.
     txt_info "Adjusting ${WWW} config server name"
-    CR0
+    SL0
 
     txt_info "Before:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
@@ -767,7 +767,7 @@ if [[ $INSTALL = new ]]; then
     SL1
     txt_info "After:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
-    CR2; SL1
+    SL1; CR2
 
     txt_info "Cleaning up..."
     rm /etc/nginx/sites-enabled/default
