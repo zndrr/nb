@@ -669,10 +669,11 @@ if [[ $INSTALL = new ]]; then
   
   #txt_warn "Clearing DB_PASS variable. Temporarily stored as file .DB_PASS in $(pwd)"
   #unset DB_PASS
-  
-  txt_info "Generate a secret key"
-  python3 ../generate_secret_key.py | tee .NB_PASS
-  CR2; SL1
+
+  # Redundant since we do our own
+  # txt_info "Generate a secret key"
+  # python3 ../generate_secret_key.py | tee .NB_PASS
+  # CR2; SL1
   
        #=# PLACEHOLDER REMINDER : Code duplicity with upgrade section above. Consolidate...
   txt_info "Run Netbox upgrade script ..."
@@ -705,7 +706,7 @@ if [[ $INSTALL = new ]]; then
   WILL_YOU_CONTINUE
   
   cp "${NBROOT}/contrib/gunicorn.py" "${NBROOT}/gunicorn.py"
-  cp -v "${NBROOT}/contrib/*.service" "/etc/systemd/system/"
+  cp -v "${NBROOT}/contrib/"*".service" "/etc/systemd/system/"
   systemctl daemon-reload
   systemctl start netbox netbox-rq
   systemctl enable netbox netbox-rq
