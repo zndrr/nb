@@ -351,7 +351,8 @@ SL2; CR2
 #if [[ $INSTALL = upgrade ]] || [[ $INSTALL = git ]]; then
 if [[ $INSTALL = upgrade ]]; then
   txt_header "----- BACKUP FILES AND DATABASE -----"
-
+  SL1; CR2
+  
   WILL_YOU_CONTINUE
 
   TIME=$(date +%y-%m-%d_%H-%M)
@@ -383,8 +384,9 @@ fi
 
 
 if [[ $INSTALL = upgrade ]]; then
-  txt_header "+++ UPGRADE COPY : FILES TO NEW NETBOX DIR +++"
-
+  txt_header "----- UPGRADE COPY : FILES TO NEW NETBOX DIR -----"
+  SL1; CR1
+  
   WILL_YOU_CONTINUE
   #
        #=# PLACEHOLDER REMINDER
@@ -417,9 +419,10 @@ SL2
 
 
 if [[ $INSTALL = upgrade ]]; then
-  txt_header "+++ STAGE5 - STOP NETBOX PROCESSES AND SYMLINK NEW +++"
+  txt_header "----- UPGRADE : STOP NETBOX PROCESSES AND SYMLINK -----"
   txt_warn "Caution: This will make Netbox unavailable!"
-
+  SL1; CR1
+  
   WILL_YOU_CONTINUE
 
   OLDVER=$(ls -ld ${NBROOT} | awk -F"${NBROOT}-" '{print $2}' | cut -d / -f 1)
@@ -634,7 +637,7 @@ if [[ $INSTALL = new ]]; then
     chown --recursive netbox $NBMEDIA
     chown --recursive netbox $NBREPORTS
     chown --recursive netbox $NBSCRIPTS
-  elif [[ $PMGR = apt ]]; then
+  elif [[ $PMGR = yum ]]; then
     groupadd --system netbox
     adduser --system -g netbox netbox
     chown --recursive netbox /opt/netbox/netbox/media/
@@ -858,14 +861,14 @@ fi
 
 
 txt_header "----- RUNNING SCRIPT AND STARTING NETBOX -----"
-SL1; CR1
+SL1; CR2
      #=# PLACEHOLDER REMINDER
      # This applies to new/git installs also. Consider conolidating code.
 txt_info "Running the Netbox upgrade script..."
      #=# PLACEHOLDER REMINDER : add git types to ifs
 if ! [[ $INSTALL = new ]] || [[ $INSTALL = git_new ]]; then
   txt_warn "Likely no going back after this !"
-  SL0; CR1
+  SL0; CR2
   WILL_YOU_CONTINUE
   SL1; CR2
 fi
@@ -880,10 +883,11 @@ SL0; CR1
      #=# PLACEHOLDER REMINDER
      # Make this a better choice.
 WILL_YOU_CONTINUE
-
+SL1; CR1
      #=# PLACEHOLDER REMINDER
      # Add process start validation.
 systemctl start netbox netbox-rq
+SL0; CR1
 txt_ok "Processes started"
 SL2
 # systemctl status netbox netbox-rq
