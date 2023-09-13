@@ -112,3 +112,22 @@ else
   txt_ok "Root privileges confirmed. Continuing ..."
 fi
 }
+
+PKG_MGR_CHECK() {
+local DSTRO=0
+txt_info "Checking package manager..."
+SL2
+if [[ $(which apt) ]]; then
+  PM="apt"
+  DSTRO="Debian/Ubuntu"
+elif [[ $(which yum) ]]; then
+  PM="yum"
+  DSTRO="CentOS"
+else
+  txt_err "Package manager not APT(Debian/Ubuntu) or YUM(RHEL/CentOS)"
+  txt_err "Script doesn't support other types ..."
+  GAME_OVER
+fi
+txt_ok "Package manager identified as ${PM} (${DSTRO})"
+SL0
+}
