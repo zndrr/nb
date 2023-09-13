@@ -277,7 +277,7 @@ if ! [ -d $NBROOT ]; then
     txt_ok "Missing directory expected of New install"
   elif [[ $INSTALL = upgrade ]]; then
     SL1
-    txt_err "Unexpected outcome. Did you mean to select New install ..."
+    txt_err "Unexpected outcome. Did you mean to select New install ... Restarting..."
     GAME_OVER
   fi
 elif [ -d $NBROOT ]; then
@@ -420,7 +420,7 @@ if [[ $INSTALL = upgrade ]]; then
       read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " -r OLDVER
       if ! [[ $OLDVER =~ $REGEXVER ]]; then
         if [[ "${COUNT}" -gt 2 ]]; then
-          txt_err "... Three incorrect attempts made.${CLR}"
+          txt_err "... Three incorrect attempts made."
           GAME_OVER
         fi
         txt_warn "Selection '${OLDVER}' format STILL not valid (eg 3.6.0). Try again ..."
@@ -434,13 +434,13 @@ if [[ $INSTALL = upgrade ]]; then
     done
   fi
   CR1; SL1
-  txt_info "Comparing current (${OLDVER}) to installing (${NEWVER})"
+  txt_info "Comparing current (${OLDVER}) to selection (${NEWVER})"
        #=# PLACEHOLDER REMINDER : Figure out this syntax. Needs more observation.
   #https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
   #if awk "BEGIN {exit !($NEWVER >= $OLDVER)}"; then
   #if [[ awk "BEGIN {exit !($NEWVER >= $OLDVER)}" == 1 ]]; then
   if [[ $(echo "${NEWVER} ${OLDVER}" | awk '{print ($1 >= $2)}') == 0 ]]; then
-    txt_err "Current version (${OLDVER}) same or newer than installing version (${NEWVER}) !"
+    txt_err "Current 'v${OLDVER}' same or newer than installing 'v${NEWVER}' !"
     GAME_OVER
   fi
 fi
@@ -490,8 +490,8 @@ if [[ $INSTALL = new ]]; then
   echo
   SL1
   # These options are here, but highly recommended to stick with the static vars.
-  #read -p "Enter owner database name (suggested: 'netbox'): " DB_USER
-  #read -p "Enter database name (suggested: 'netbox'): " DB_NAME
+  #read -p "Enter owner database name (suggested: 'netbox'): " -r DB_USER
+  #read -p "Enter database name (suggested: 'netbox'): " -r DB_NAME
        #=# PLACEHOLDER REMINDER : Will make this a choice later.
   DB_USER=netbox
   DB_NAME=netbox
@@ -503,7 +503,7 @@ if [[ $INSTALL = new ]]; then
   DB_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
   SC_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
   
-       #=# PLACEHOLDER REMINDER : Check for password file before regen."
+       #=# PLACEHOLDER REMINDER : Check for password file before autogeneration."
   txt_info "Displaying password ..."
   CR1; SL1
   txt_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
@@ -514,7 +514,7 @@ if [[ $INSTALL = new ]]; then
   txt_info "Netbox Secret Password"
   echo "$SC_PASS" | tee .SC_PASS
   txt_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
-  txt_ok "Password files '.DB_PASS' and '.SC_PASS' in ('$(pwd)')"
+  txt_ok "Password files '.DB_PASS' and '.SC_PASS' in '$(pwd)' dir"
   CR2; SL2
   
        #=# PLACEHOLDER REMINDER
@@ -587,7 +587,7 @@ fi
 
 
 if [[ $INSTALL = new ]]; then
-  txt_header "+++ STAGEc - SETUP NETBOX +++"
+  txt_header "----- NEW : NETBOX SETUP -----"
   
   SL0
   WILL_YOU_CONTINUE
@@ -615,31 +615,31 @@ if [[ $INSTALL = new ]]; then
   txt_info "Updating configuration.py ..."
   CR1; SL1
   
-  txt_info "Before: ALLOWED_HOSTS"
+  txt_info "Before : ALLOWED_HOSTS"
   printf '%b\n' "$(cat configuration.py | grep -F "ALLOWED_HOSTS = [" | grep -v Example)"
     sed -i "s|ALLOWED_HOSTS = \[\]|ALLOWED_HOSTS = \['*'\]|g" configuration.py
-  txt_info "After: ALLOWED_HOSTS"
+  txt_info "After : ALLOWED_HOSTS"
   printf '%b\n' "$(cat configuration.py | grep -F "ALLOWED_HOSTS = [" | grep -v Example)"
   CR2; SL1
 
-  txt_info "Before: Netbox Database User"
+  txt_info "Before : Netbox Database User"
   printf '%b\n' "$(cat configuration.py | grep -F "'USER': '")"
     sed -i "s|'USER': '',|'USER': '$DB_USER',|g" configuration.py
-  txt_info "After: Netbox Database User"
+  txt_info "After : Netbox Database User"
   printf '%b\n' "$(cat configuration.py | grep -F "'USER': '")"
   CR2; SL1
 
-  txt_info "Before: Password for User"
+  txt_info "Before : Password for User"
   printf '%b\n' "$(cat configuration.py | grep -F "'PASSWORD': '" | grep -F "PostgreSQL")"
     sed -i "s|'PASSWORD': '',           # PostgreSQL password|'PASSWORD': '$DB_PASS',           # PostgreSQL password|g" configuration.py
-  txt_info "After: Password for User"
+  txt_info "After : Password for User"
   printf '%b\n' "$(cat configuration.py | grep -F "'PASSWORD': '" | grep -F "PostgreSQL")"
   CR2; SL1
 
-  txt_info "Before: Secret Pass for Netbox"
+  txt_info "Before : Secret Pass for Netbox"
   printf '%b\n' "$(cat configuration.py | grep -F "SECRET_KEY = '")"
     sed -i "s|SECRET_KEY = ''|SECRET_KEY = '$SC_PASS'|g" configuration.py
-  txt_info "After: Secret Pass for Netbox"
+  txt_info "After : Secret Pass for Netbox"
   printf '%b\n' "$(cat configuration.py | grep -F "SECRET_KEY = '")"
   CR2; SL1
   
@@ -675,22 +675,28 @@ if [[ $INSTALL = new ]]; then
   
        #=# PLACEHOLDER REMINDER : Code duplicity with upgrade section above. Consolidate...
   txt_info "Run Netbox upgrade script ..."
+  CR2; SL2
   bash "${NBROOT}/upgrade.sh"
   CR2; SL2
   
   txt_info "Create Superuser"
   nbmg createsuperuser
-
-  SL1
-  txt_info "Adding dulwich to local_requirements.txt for Git source capability"
-       #=# PLACEHOLDER REMINDER
-       # Change this to version conditional - only needed for git on v3.6.0+
-  echo 'dulwich' >> "${NBROOT}/local_requirements.txt"
+  CR2; SL1
   
+       #=# PLACEHOLDER REMINDER
+       # Evaluate this not being missed on a 3.4+ to 3.6 upgrade.
+       # Will need to pull it out of the if conditional.
+  if [[ $(echo "${NEWVER} 3.6.0" | awk '{print ($1 >= $2)}') == 0 ]]; then
+    txt_info "Selection (${NEWVER}) or newer than 3.6.0 requires Dulwich for Git data source function."
+    txt_info "Adding dulwich to local_requirements.txt"
+    echo 'dulwich' >> "${NBROOT}/local_requirements.txt"
+    text_ok "... done"
+  fi
+    
   txt_info "Adding Housekeeping to cron tasks"
   ln -s "${NBROOT}/contrib/netbox-housekeeping.sh" /etc/cron.daily/netbox-housekeeping
   
-  txt_header "+++ STAGEc DONE +++"
+  txt_header "----- NETBOX SETUP DONE -----"
   SL2
 fi
 
@@ -698,7 +704,7 @@ fi
 #################################################################################################
 
 if [[ $INSTALL = new ]]; then
-  txt_header "+++ STAGEd - SETUP GUNICORN +++"
+  txt_header "----- NEW : GUNICORN SETUP -----"
   
   SL0
   WILL_YOU_CONTINUE
@@ -710,12 +716,13 @@ if [[ $INSTALL = new ]]; then
   systemctl daemon-reload
   systemctl start netbox netbox-rq
   systemctl enable netbox netbox-rq
-  SL2
        #=# PLACEHOLDER REMINDER
        # Add service start validation. Perhaps make a counter loop.
   # systemctl status netbox.service
-
-  txt_header "+++ STAGEd DONE +++"
+  SL2; CR1
+  txt_ok "...done."
+  
+  txt_header "----- GUNICORN SETUP DONE -----"
   SL2
 fi
 
@@ -748,15 +755,21 @@ if [[ $INSTALL = new ]]; then
     txt_ok "... done"; CR1
   
     cp $NBROOT/contrib/nginx.conf /etc/nginx/sites-available/netbox
+  
        #=# PLACEHOLDER REMINDER
-       # Make this interactive
-
+       # Make this interactive. Consider defining with others at start and then having a match conditional here.
     txt_info "Adjusting ${WWW} config server name"
+    CR0
+
+    txt_info "Before:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
       sed -i "s|netbox.example.com|$NB_DNS|g" /etc/nginx/sites-available/netbox
     SL1
+    txt_info "After:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
-  
+    CR2; SL1
+
+    txt_info "Cleaning up..."
     rm /etc/nginx/sites-enabled/default
     ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
 
