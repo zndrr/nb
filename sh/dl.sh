@@ -6,20 +6,29 @@
 # License : MIT
 # Created : 2023-09-14
 
+startTime=$(date +%s)
+
 # This is a lazy script to re-download file in to right directory every rollback.
 # Uh ... on second thought, it grew a fair bit ...
+# Made on Ubuntu in bash (obviously)
 
 say() { local msg="$1"; printf '%b\n' "${msg}"; }
 lB() { printf '\n'; }
 
+#################################################
+
 gAuthor="zndrr"
 gRepo="nb"
+
 gBranch="Upload-v1"
 #gBranch="master"
+
 gPath="${gRepo}-${gBranch}"
 fExt=".zip"
 
 gSubPath="sh"
+
+#################################################
 
 fName="${gBranch}${fExt}"
 URLD="https://github.com/${gAuthor}/${gRepo}/archive/refs/heads/${fName}"
@@ -27,22 +36,22 @@ URLD="https://github.com/${gAuthor}/${gRepo}/archive/refs/heads/${fName}"
 rDir="/root"
 archPath="${rDir}/${gPath}/${gSubPath}"
 
+# This is to remove patterns in the testing script file (eg programmed delays or interactives)
 testScript="nb_inst.sh"
 delPattern="WILL_YOU_CONTINUE"
 
-#####
+#################################################
 
 clear
 
-lB
+lB; say "Some details below derived from defined variables:"; lB
 say "Repo and Branch : ${gPath}"
 say "Branth Fullpath : ${gSubPath}"
 say "Root dir : ${rDir}"
 say "Download URL : ${URLD}"
 say "Archive path : ${archPath}/${fName}"
 
-lB; lB
-sleep 1
+sleep 1; lB; lB
 
 mkdir -p "${rDir}"
 
@@ -66,23 +75,31 @@ else
 fi
 
 say "Installing unzip ..."
+  apt update
   apt install -y unzip
   sleep 1
 
-say "Extracting zip ..."
-  unzip ${fName}
-  find ${archPath} -name "*.*" -exec mv '{}' ${rDir} \;
+say "Extracting archive file to specified path ..."
+  unzip "${fName}"
+  find "${archPath}" -name "*.*" -exec mv '{}' ${rDir} \;
   rm -r ${gPath}
+  rm "${fName}"
 say "... Extracted!"
 
 ## This allows you to execute the script from this one. Timesaver!"
 if [ -e "${testScript}" ]; then
   say "Removing '${delPattern}' from '${testScript}"
     sed -i "s|'${delPattern}'||g" ${testScript}
-  say "Warning, remember not to overwrite your main script with the testing version!"
+  say "Warning, remember not to overwrite your main script with this testing version!"
     sleep 1
   say "Executing script ..."
     sleep 2
     bash ${testScript}
   say "... done!"
 fi
+lB; lB
+
+endTime=$(date +%s)
+say "Script completed in $(( endTime - startTime )) seconds!"
+sleep 3
+lB; lB
