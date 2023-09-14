@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Source definitions
-if ! [ -e "env_global.sh" ]; then echo "env .sh Dependency missing! Exiting..." sleep 2; exit; fi
+if ! [ -e "env_global.sh" ]; then printf '%b\n' "env .sh Dependency missing! Exiting..." sleep 2; exit; fi
 source env_global.sh
 
 GREETINGS_TRAVELLER() {
@@ -39,7 +39,7 @@ SPEW_INTRO() {
 EOF
 }
 
-# LET'S GO!
+# LET'S GO! PS. printf rules, echo can suck it
 clear
 
 # Checks you are root or sudo and pkg manager, quits if no sudo and/or no apt/yum.
@@ -51,15 +51,20 @@ PKG_MGR_CHECK
 #################################################################################################
 
 # Local path variables
-     #=# PLACEHOLDER REMINDER : Change these to choices, with defaults.
+      #=# PLACEHOLDER REMINDER : Change these to choices, with defaults.
 ROOT=/opt
 NBROOT=$ROOT/netbox
 BKROOT=$ROOT/nb-backup
 
+      #=# PLACEHOLDER REMINDER : Revisit
+      # These I want to suggest. Backups and external files would be best living outside Netbox path.
+#NBMEDIA=$ROOT/nb/media/
+#NBREPORTS=$ROOT/nb/reports/
+#NBSCRIPTS=$ROOT/nb/scripts/
+
 NBMEDIA=$NBROOT/netbox/media/
 NBREPORTS=$NBROOT/netbox/reports/
 NBSCRIPTS=$NBROOT/netbox/scripts/
-
 
 # Local Netbox functions
 nbv() { source $NBROOT/venv/bin/activate; }
@@ -189,6 +194,9 @@ cd "${ROOT}"
 
 SL2
 
+      #=# PLACEHOLDER REMINDER
+      # Optimise this loop. Bit of redundancy in checks.
+
 COUNT=0
 while true; do
   CR1
@@ -227,6 +235,20 @@ while true; do
       wget -q --show-progress "${URLD}" -P "${ROOT}/" --no-check-certificate
       SL1
       txt_ok "... Download complete!"
+      # Double-checking tarball exists
+      txt_info "Confirming file present after download ..."
+      SL0; CR1
+      if ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
+        txt_err "File v${NEWVER}.tar.gz still doesn't look to exist ..."
+        txt_err "Manual intervention required ..."
+        CR1
+        txt_info "Path here :"
+        ls -lah "${ROOT}" | grep -E *.tar.gz
+        CR1
+        GAME_OVER
+      else
+        txt_ok "File v${NEWVER}.tar.gz is available in $(pwd)"
+      fi
     else
       SL1
       txt_err "Netbox v${NEWVER} either doesn't exist or URL is unavailable ..."
@@ -250,21 +272,6 @@ while true; do
 done
 SL1
 
-     #=# PLACEHOLDER REMINDER
-     # Bake in to while loop above. Inefficient code.
-
-# Double-checking tarball exists
-if ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
-  txt_err "File v${NEWVER}.tar.gz still doesn't look to exist ..."
-  txt_err "Manual intervention required ..."
-  echo
-  txt_info "Path here :"
-  ls -lah "${ROOT}" | grep -E *.tar.gz
-  echo
-  GAME_OVER
-else
-  txt_ok "File v${NEWVER}.tar.gz is available in $(pwd)"
-fi
 
 CR2
 txt_header "----- DOWNLOAD COMPLETE -----"
@@ -331,7 +338,7 @@ if ! [ -d "${NBPATH}" ]; then
   txt_err "Manual intervention required ..."
   txt_norm "Path here :"
   ls -lah "${ROOT}" | grep netbox
-  echo
+  CR1
   GAME_OVER
 fi
 CR1
@@ -427,8 +434,7 @@ if [[ $INSTALL = upgrade ]]; then
   OLDVER=$(ls -ld ${NBROOT} | awk -F"${NBROOT}-" '{print $2}' | cut -d / -f 1)
   if ! [[ $OLDVER =~ $REGEXVER ]]; then
     txt_warn "Discovered '${OLDVER}' doesn't look to be valid (eg 3.6.0) ..."
-    SL1
-    echo
+    SL1; CR1
     txt_info "Directory list here:"
     ls -ld "${NBROOT}" | grep netbox
     while true; do
