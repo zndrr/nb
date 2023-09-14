@@ -4,7 +4,6 @@
 if ! [ -e "env_global.sh" ]; then echo "env .sh Dependency missing! Exiting..." sleep 2; exit; fi
 source env_global.sh
 
-
 GREETINGS_TRAVELLER() {
   cat <<"EOF"
 # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -15,7 +14,7 @@ GREETINGS_TRAVELLER() {
 #  License : MIT
 #
 #  Created: 2023-07-09
-#  Updated: 2023-07-12
+#  Updated: 2023-07-14
 #
 #   Script created in Bash 5.1.16(1) on Ubuntu.
 #   Tested against Netbox v3.5.9 and v3.6.2
@@ -86,22 +85,22 @@ URLC="https://github.com/netbox-community/"
 # Packages in various stages.
      #=# PLACEHOLDER REMINDER : Plan on making this interactive.
 
-if [[ $PMGR = apt ]]; then
-  PKG_SCRIPT="wget tar nano openssl"
+PKG_SCRIPT="wget tar nano openssl"
+
+if [[ $PMGR = apt ]] || [[ $PMGR = yum]]; then
   PKG_GIT="git"
-  PKG_PSQL="postgresql"
-  PKG_REDIS="redis-server"
-  PKG_NETBOX="python3 python3-pip python3-venv python3-dev build-essential libxml2-dev libxslt1-dev libffi-dev libpq-dev libssl-dev zlib1g-dev"
   PKG_WWW="nginx"
-  PKG_LDAP="libldap2-dev libsasl2-dev libssl-dev"
-elif [[ $PMGR = yum ]]; then
-  PKG_SCRIPT="wget tar nano openssl"
-  PKG_GIT="git"
-  PKG_PSQL="postgresql-server"
-  PKG_REDIS="redis"
-  PKG_NETBOX="gcc libxml2-devel libxslt-devel libffi-devel libpq-devel openssl-devel redhat-rpm-config"
-  PKG_WWW="nginx"
-  PKG_LDAP="openldap-devel python3-devel"
+  if [[ $PMGR = apt ]]; then
+    PKG_PSQL="postgresql"
+    PKG_REDIS="redis-server"
+    PKG_NETBOX="python3 python3-pip python3-venv python3-dev build-essential libxml2-dev libxslt1-dev libffi-dev libpq-dev libssl-dev zlib1g-dev"
+    PKG_LDAP="libldap2-dev libsasl2-dev libssl-dev"
+  elif [[ $PMGR = yum ]]; then
+    PKG_PSQL="postgresql-server"
+    PKG_REDIS="redis"
+    PKG_NETBOX="gcc libxml2-devel libxslt-devel libffi-devel libpq-devel openssl-devel redhat-rpm-config"
+    PKG_LDAP="openldap-devel python3-devel"
+  fi
 else
   txt_err "Exception. Distro not determined !"
   GAME_OVER
@@ -779,7 +778,7 @@ if [[ $INSTALL = new ]]; then
   # systemctl status netbox.service
   SL2; CR1
   txt_ok "...done."
-  CL1; CR1
+  SL1; CR1
   
   txt_header "----- GUNICORN SETUP DONE -----"
   SL2
