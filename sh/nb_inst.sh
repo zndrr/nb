@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Source definitions
-if ! [ -e "global_vars.sh" ]; then echo ".sh Dependency missing! Exiting..." sleep 2; exit; fi
-source global_vars.sh
+if ! [ -e "env_global.sh" ]; then echo "env .sh Dependency missing! Exiting..." sleep 2; exit; fi
+source env_global.sh
 
 
 GREETINGS_TRAVELLER() {
