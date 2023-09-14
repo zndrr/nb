@@ -79,6 +79,7 @@ say "... Extracted!"
 if [ -e "${testScript}" ]; then
   say "Removing '${delPattern}' from '${testScript}"
     sed -i "s|'${delPattern}'||g" ${testScript}
+  say "Warning, remember not to overwrite your main script with the testing version!"
     sleep 1
   say "Executing script ..."
     sleep 2
