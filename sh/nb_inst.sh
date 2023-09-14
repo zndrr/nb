@@ -905,5 +905,5 @@ SL2
 
 # FINISHED !!
 endTime=$(date +%s)
-say "Script completed in $(( endTime - startTime )) seconds!"
+txt_ok "Script completed in $(( endTime - startTime )) seconds!"
 SL2; CR2
