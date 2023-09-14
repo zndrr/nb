@@ -7,7 +7,7 @@
 # Created : 2023-09-14
 
 # This is a lazy script to re-download file in to right directory every rollback.
-# Uh ... on second though, it grew a fair bit ...
+# Uh ... on second thought, it grew a fair bit ...
 
 say() { local msg="$1"; printf '%b\n' "${msg}"; }
 lB() { printf '\n'; }
@@ -26,6 +26,9 @@ URLD="https://github.com/${gAuthor}/${gRepo}/archive/refs/heads/${fName}"
 
 rDir="/root"
 archPath="${rDir}/${gPath}/${gSubPath}"
+
+testScript="nb_inst.sh"
+delPattern="WILL_YOU_CONTINUE"
 
 #####
 
@@ -63,10 +66,22 @@ else
 fi
 
 say "Installing unzip ..."
-apt install -y unzip
+  apt install -y unzip
+  sleep 1
 
 say "Extracting zip ..."
-unzip ${fName}
-find ${archPath} -name "*.*" -exec mv '{}' ${rDir} \;
-rm -r ${gPath}
+  unzip ${fName}
+  find ${archPath} -name "*.*" -exec mv '{}' ${rDir} \;
+  rm -r ${gPath}
 say "... Extracted!"
+
+## This allows you to execute the script from this one. Timesaver!"
+if [ -e "${testScript}" ]; then
+  say "Removing '${delPattern}' from '${testScript}"
+    sed -i "s|'${delPattern}'||g" ${testScript}
+    sleep 1
+  say "Executing script ..."
+    sleep 2
+    bash ${testScript}
+  say "... done!"
+fi
