@@ -834,7 +834,7 @@ if [[ $INSTALL = new ]]; then
        #=# PLACEHOLDER REMINDER
        # Make this interactive. Consider defining with others at start and then having a match conditional here.
     txt_info "Adjusting ${WWW} config server name"
-    SL0: CR1
+    SL0; CR1
 
     txt_info "Before:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
