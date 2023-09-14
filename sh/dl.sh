@@ -74,10 +74,10 @@ else
   exit 1
 fi
 
-say "Installing unzip ..."
-  apt update
-  apt install -y unzip
-  sleep 1
+#say "Installing unzip ..."
+#  apt update
+#  apt install -y unzip
+#  sleep 1
 
 say "Extracting archive file to specified path ..."
   unzip "${fName}"
@@ -89,7 +89,7 @@ say "... Extracted!"
 ## This allows you to execute the script from this one. Timesaver!"
 if [ -e "${testScript}" ]; then
   say "Removing '${delPattern}' from '${testScript}"
-    sed -i "s|'${delPattern}'||g" ${testScript}
+    sed -i "s|'$delPattern'||g" ${testScript}
   say "Warning, remember not to overwrite your main script with this testing version!"
     sleep 1
   say "Executing script ..."
