@@ -95,7 +95,7 @@ URLC="https://github.com/netbox-community/"
 
 PKG_SCRIPT="wget tar nano openssl"
 
-if [[ $PMGR = apt ]] || [[ $PMGR = yum]]; then
+if [[ $PMGR = apt ]] || [[ $PMGR = yum ]]; then
   PKG_GIT="git"
   PKG_WWW="nginx"
   if [[ $PMGR = apt ]]; then
