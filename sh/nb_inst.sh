@@ -4,6 +4,9 @@
 if ! [ -e "env_global.sh" ]; then printf '%b\n' "env .sh Dependency missing! Exiting..." sleep 2; exit; fi
 source env_global.sh
 
+# Setting a script timer.
+startTime=$(date +%s)
+
 GREETINGS_TRAVELLER() {
   cat <<"EOF"
 # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -899,4 +902,8 @@ SL2
 
 txt_header "----- NETBOX RUNNING -----"
 SL2
+
 # FINISHED !!
+endTime=$(date +%s)
+say "Script completed in $(( endTime - startTime )) seconds!"
+SL2; CR2
