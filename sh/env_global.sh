@@ -32,7 +32,7 @@ CYANB=$(tput bold setaf 6)
 CLR=$(tput sgr0)
 
 
-## Terminal text colouration for readability
+## OLD : TO GO ONCE DEPENDENCIES DEAD : Terminal text colouration for readability
 txt_norm() { local msg="$1"; printf '%b\n' "${msg}"; }
 txt_nindent() { local msg="$1"; printf '%b\n' "  ${msg}"; }
 
@@ -43,6 +43,20 @@ txt_err() { local msg="$1"; printf '%b\n' "${REDB} ✗ ${msg}${CLR}"; }
 
 txt_header() { local msg="$1"; printf '\n%b\n' "${CYANB}${msg}${CLR}"; SL1; }
 txt_url() { local msg="$1"; printf '%b\n' "${BLUU}${msg}${CLR}"; }
+#-------
+
+## NEW : Terminal text colouration for readability
+t_norm() { local msg="$1"; printf '%b\n' "${msg}"; }
+t_nind() { local msg="$1"; printf '%b\n' "  ${msg}"; }
+
+t_info() { local msg="$1"; printf '%b\n' "${CYAN}${msg}${CLR}"; }
+t_ok() { local msg="$1"; printf '%b\n' "${GREEN} ✓ ${msg}${CLR}"; }
+t_warn() { local msg="$1"; printf '%b\n' "${YELB} ! ${msg}${CLR}"; }
+t_err() { local msg="$1"; printf '%b\n' "${REDB} ✗ ${msg}${CLR}"; }
+
+t_head() { local msg="$1"; printf '\n%b\n' "${CYANB}${msg}${CLR}"; SL1; }
+t_url() { local msg="$1"; printf '%b\n' "${BLUU}${msg}${CLR}"; }
+
 
 
 ## Delay, carriage returns, spacing
@@ -58,7 +72,7 @@ SP2() { printf "  ";}
 trap STAGE_LEFT SIGINT
 STAGE_LEFT() {
   CR1
-  txt_warn "Ctrl+C or Interrupt detected ... ending script."
+  t_warn "Ctrl+C or Interrupt detected ... ending script."
   exit
 }
 
@@ -78,7 +92,7 @@ GAME_OVER() {
 
 WILL_YOU_CONTINUE() {
 while true; do
-  txt_norm "Do you want to continue?"
+  t_norm "Do you want to continue?"
   SL0
   read -p "(c)ontinue | (r)estart | (q)uit : " -r -n 1 CHOICE
   if [[ $CHOICE =~ ^[Cc]$ ]]; then
@@ -94,28 +108,28 @@ while true; do
   else
     SL0
   fi
-  txt_warn "Not a valid choice. Please select again ..."
+  t_warn "Not a valid choice. Please select again ..."
   SL1
   continue
 done
 CR1
-txt_ok "Continuing ..."
+t_ok "Continuing ..."
 }
 
 ROOT_CHECK() {
-txt_info "Checking root privileges ..."
+t_info "Checking root privileges ..."
 SL2
 if ! [ "$(whoami)" = root ]; then
-  txt_err "Please run this script as root or using sudo ..."
+  t_err "Please run this script as root or using sudo ..."
   GAME_OVER
 else
-  txt_ok "Root privileges confirmed. Continuing ..."
+  t_ok "Root privileges confirmed. Continuing ..."
 fi
 }
 
 PKG_MGR_CHECK() {
 local DSTRO=0
-txt_info "Checking package manager..."
+t_info "Checking package manager..."
 SL2
 if [[ $(which apt) ]]; then
   PMGR="apt"
@@ -125,16 +139,21 @@ elif [[ $(which yum) ]]; then
   DSTRO="CentOS"
         #=# PLACEHOLDER REMINDER
         # Test with CentOS release to validate.
-  txt_warn "Script hasn't been tested against CentOS !"
-  txt_warn "Run at your own peril !"
+  t_warn "Script hasn't been tested against CentOS !"
+  t_warn "Run at your own peril !"
   WILL_YOU_CONTINUE
 else
-  txt_err "Package manager not APT(Debian/Ubuntu) or YUM(RHEL/CentOS)"
-  txt_err "Script doesn't support other types ..."
+  t_err "Package manager not APT(Debian/Ubuntu) or YUM(RHEL/CentOS)"
+  t_err "Script doesn't support other types ..."
   GAME_OVER
 fi
-txt_ok "Package manager identified as ${PMGR} (${DSTRO})"
+t_ok "Package manager identified as ${PMGR} (${DSTRO})"
 PMUPD="${PMGR} update"
 PMGET="${PMGR} install -y"
 SL0
+}
+
+# Compare release versions (ref xxvix).
+NB_VER() {
+  printf '%b\n' "$1" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3,$4); }'
 }
