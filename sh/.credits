@@ -3,103 +3,160 @@
 # Resources
 #------------------------------------------------------------------------------------------------
 #
+# These are the various resources I scanned while bruteforcing my way through
+#  usable code. Credit where credit is due!
+#
+#--- i
 # sh checker -- thanks to colleague Blair for showing this
 #   https://www.shellcheck.net/
 #   ! Note: online checker doesn't work well with source import from another script
 #   ! Need to concatenate the two or install locally
 #
+#--- ii
 # banner gen:
 #   https://manytools.org/hacker-tools/ascii-banner/
 #
+#--- iii
 # wget:
 #   https://unix.stackexchange.com/questions/474805/verify-if-a-url-exists
 #
+#--- iv
 # bash exit codes:
 #   https://www.cyberciti.biz/faq/linux-bash-exit-status-set-exit-statusin-bash/
 #
+#--- v
 # Bash inputs:
 #   https://ryanstutorials.net/bash-scripting-tutorial/bash-input.php
 #
+#--- vi
 # tput colours:
 #   https://linuxcommand.org/lc3_adv_tput.php
 #   https://unix.stackexchange.com/questions/269077/tput-setaf-color-table-how-to-determine-color-codes
 #   https://stackoverflow.com/questions/54838578/color-codes-for-tput-setf
 #
+#--- vii
 # interrupts (traps):
 #   https://www.putorius.net/using-trap-to-exit-bash-scripts-cleanly.html
 #
+#--- viii
 # for loop count:
 #   https://stackoverflow.com/questions/10515964/counter-increment-in-bash-loop-not-working
 #   https://linuxize.com/post/bash-increment-decrement-variable/
 #
+#--- ix
 # check for files and symlinks etc
 #   https://stackoverflow.com/questions/5767062/how-to-check-if-a-symlink-exists
 #   https://devconnected.com/how-to-check-if-file-or-directory-exists-in-bash/
 #
+#--- x
 # check for sudo/root
 #   https://electrictoolbox.com/check-user-root-sudo-before-running/
 #
+#--- xi
 # break out of bash if condition (inconclusive)
 #   https://stackoverflow.com/questions/21011010/how-to-break-out-of-an-if-loop-in-bash
 #
+#--- xii
 # prompts
 #   https://stackoverflow.com/questions/1885525/how-do-i-prompt-a-user-for-confirmation-in-bash-script
 #
+#--- xiii (xxvix better for semantic (eg 1.1.10.1 vs 1.2)
 # awk decimal compare
 #   https://stackoverflow.com/questions/11237794/how-to-compare-two-decimal-numbers-in-bash-awk
 #
+#--- xiv
 # awk filename sort
 #   https://stackoverflow.com/questions/13078490/extracting-version-number-from-a-filename
 #
+#--- xv
 # while loops
 #   https://stackoverflow.com/questions/24896455/goto-beginning-of-if-statement
 #   https://stackoverflow.com/questions/7955984/bash-if-return-code-1-re-run-script-start-at-the-beginning
 #
+#--- xvi
 # printf
 #   https://stackoverflow.com/questions/27464569/bash-result-of-multiple-echo-commands-with-a-delay-on-one-line
 #
+#--- xvii
 # printf colours
 #   https://stackoverflow.com/questions/5412761/using-colors-with-printf
 #
+#--- xviii
 # functions" eg FUNCTION() { stuff; some_more_stuff; }
 #   https://phoenixnap.com/kb/bash-function
 #   https://linuxize.com/post/bash-functions/
 #   https://phoenixnap.com/kb/bash-function
 #   https://www.baeldung.com/linux/bash-pass-function-arg
 #
+#--- xix
 # alpha characters in conditionals
 #   https://unix.stackexchange.com/questions/416108/how-to-check-if-string-contain-alphabetic-characters-or-alphabetic-characters-an
 #
+#--- xx
 # regex:
 #   https://stackoverflow.com/questions/18709962/regex-matching-in-a-bash-if-statement
 #   https://www.baeldung.com/linux/regex-inside-if-clause
 #
+#--- xxi
 # unset var
 #   https://www.cyberciti.biz/faq/linux-osx-bsd-unix-bash-undefine-environment-variable/
 #
+#--- xxii
 # postgres bash
 #   https://stackfame.com/creating-user-database-and-adding-access-on-postgresql
 #
+#--- xxiii
 # Python venv in Shell
 #   https://stackoverflow.com/questions/13122137/how-to-source-virtualenv-activate-in-a-bash-script
 #
+#--- xxiv
 # Password gen
 #   https://unix.stackexchange.com/questions/230673/how-to-generate-a-random-string
 #   https://www.atatus.com/blog/generating-secure-passwords-for-your-linux-server/
 #   https://unix.stackexchange.com/questions/230673/how-to-generate-a-random-string
 #   https://stackoverflow.com/questions/5155422/regex-for-1-or-2-digits-optional-non-alphanumeric-2-known-alphas
 #
+#--- xxv
 # non-interactive ssl keygen
 #   https://unix.stackexchange.com/questions/104171/create-ssl-certificate-non-interactively
 #
+#--- xxvi
 # pkg manager/os determination
 #   https://stackoverflow.com/questions/19477682/bash-script-determine-vendor-and-install-system-apt-get-yum-etc
 #   https://unix.stackexchange.com/questions/330787/how-can-i-find-information-about-the-package-management-software-in-the-linux-u
 #   https://unix.stackexchange.com/questions/46081/identifying-the-system-package-manager
 #
+#--- xxvii
 # psql non-interactive db creation
 #   https://stackfame.com/creating-user-database-and-adding-access-on-postgresql
 #   https://unix.stackexchange.com/questions/646505/postgres-from-script-shell
 #   https://askubuntu.com/questions/1389013/setting-up-postgresql-db-with-bash-script-using-variables-from-env-file
+#
+#--- xxviii
+# comparing semantic version numbering
+#   https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
+#   https://apple.stackexchange.com/questions/83939/compare-multi-digit-version-numbers-in-bash/123408#123408
+#    https://stackoverflow.com/questions/23718936/explanation-for-sprintf03d-7-functionality
+# 
+# 
+#--- xxvix
+# comparing semantic version numbering
+#   https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
+#   https://apple.stackexchange.com/questions/83939/compare-multi-digit-version-numbers-in-bash/123408#123408
+#    https://stackoverflow.com/questions/23718936/explanation-for-sprintf03d-7-functionality
+# 
+# % This is for accurately comparing semantic numbers like versionsing.
+# !
+# ! NB_VER() { echo "$1" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3,$4); }'}
+# ! 
+# ! eg  new=3.4.10.1  old=3.5
+# ! 
+# ! echo ${new} | awk -F. '{printf("%d%03d%03d\n", $1,$2,$3,$4); }'
+# !  > 3004010
+# ! echo ${old} | awk -F. '{printf("%d%03d%03d\n", $1,$2,$3,$4); }'
+# !  > 3005000
+# ! 
+# ! if [ $(NB_VER ${new}) -ge $(NB_VER ${old}) ]; then echo "${new} newer than ${old}!"; else echo ${new} older than ${old}; fi
+# ! !! 3.4.10.1 older than 3.5.0
 #
 #################################################################################################
