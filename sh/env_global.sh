@@ -108,7 +108,11 @@ else
 fi
 }
 
-## Process run-check functions. Might not work on CentOS, but don't know yet.
+
+      #=# PLACEHOLDER REMINDER
+      # change some or all to while loops with local var counters
+
+## Check functions. Some might not work on CentOS, but don't know yet.
 CHECK_START() {
 if [ ! $(systemctl is-active "$1" ) > /dev/null ]; then
   t_err "Process '$1' doesn't appear to have started!"
@@ -121,6 +125,11 @@ if [ $(systemctl is-active "$1" ) > /dev/null ]; then
 fi
 }
 
+CHECK_URL() {
+if curl -sSfkL -m 3 "$1" -o /dev/null; then 
+  t_ok "Web Server ' $1 ' is reachable."
+fi
+}
 
 PKG_MGR_CHECK() {
 local DSTRO=0
@@ -152,3 +161,5 @@ SL0
 SW_VER() {
   printf '%b\n' "$1" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3,$4); }'
 }
+
+
