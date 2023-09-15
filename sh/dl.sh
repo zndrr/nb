@@ -1,8 +1,3 @@
-
-
-
-
-
 #!/bin/bash
 
 # Author : zndrr
@@ -95,7 +90,7 @@ say "Extracting archive file to specified path ..."
   rm "${fName}"
 say "... Extracted!"; sleep 0.5
 
-## This allows you to execute the script from this one. Timesaver!"
+## This allows you to execute the testing script from this one. Timesaver!"
 ## Works by copying the file and modifying that, then deleting after.
 if [ -e "${testScript}" ]; then
   say "Removing pattern '${delPattern}' from '${testScript}"
