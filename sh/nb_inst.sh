@@ -203,35 +203,35 @@ SL2
 COUNT=0
 while true; do
   CR1
-  read -p "Please enter desired Netbox release (eg 3.6.0) and press Enter: " -r NEWVER
-  URLD="https://github.com/netbox-community/netbox/archive/v${NEWVER}.tar.gz"
-  if ! [[ $NEWVER =~ $regexVer ]]; then
+  read -p "Please enter desired Netbox release (eg 3.6.0) and press Enter: " -r newVer
+  URLD="https://github.com/netbox-community/netbox/archive/v${newVer}.tar.gz"
+  if ! [[ $newVer =~ $regexVer ]]; then
     if [[ "${COUNT}" -gt 2 ]]; then
       t_err "... Too many incorrect attempts made."
       GAME_OVER
     fi
-    t_warn "Selection '${NEWVER}' not valid (eg 3.6.0). Try again ..."
+    t_warn "Selection '${newVer}' not valid (eg 3.6.0). Try again ..."
     ((COUNT++))
     SL1
     continue
-  elif [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
+  elif [ -e "${ROOT}/v${newVer}.tar.gz" ]; then
     t_ok "File looks to exist already. Download not required ..."
     break
-  elif ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
-    if [[ $(echo "$NEWVER $major1" | awk '{print ($1 < $2)}') == 1 ]]; then
-      t_err "Selection (${NEWVER}) at least 1 MAJOR release behind project (${major1}) !"
+  elif ! [ -e "${ROOT}/v${newVer}.tar.gz" ]; then
+    if [[ $(echo "$newVer $major1" | awk '{print ($1 < $2)}') == 1 ]]; then
+      t_err "Selection (${newVer}) at least 1 MAJOR release behind project (${major1}) !"
       t_err "Selection too old! Select again ..."
       continue
-    elif [[ $(echo "$NEWVER $minor2" | awk '{print ($1 < $2)}') == 1 ]]; then
-      t_warn "Selection (${NEWVER}) at least 2 minor releases behind project (${minor1}) !"
+    elif [[ $(echo "$newVer $minor2" | awk '{print ($1 < $2)}') == 1 ]]; then
+      t_warn "Selection (${newVer}) at least 2 minor releases behind project (${minor1}) !"
       t_warn "Highly recommended to select a newer release!"
-    elif [[ $(echo "$NEWVER $minor1" | awk '{print ($1 < $2)}') == 1 ]]; then
-      t_warn "Selection '${NEWVER}' at least 1 minor release behind project '${minor1}' !"
+    elif [[ $(echo "$newVer $minor1" | awk '{print ($1 < $2)}') == 1 ]]; then
+      t_warn "Selection '${newVer}' at least 1 minor release behind project '${minor1}' !"
     SL1
     fi
     t_info "Checking availability ..."
     if wget --spider "${URLD}" 2>/dev/null; then
-      t_ok "Release v${NEWVER} found."
+      t_ok "Release v${newVer} found."
       SL1; CR1
       t_info "Downloading ..."
       SL1
@@ -241,8 +241,8 @@ while true; do
       # Double-checking tarball exists
       t_info "Confirming file present after download ..."
       SL0; CR1
-      if ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
-        t_err "File v${NEWVER}.tar.gz still doesn't look to exist ..."
+      if ! [ -e "${ROOT}/v${newVer}.tar.gz" ]; then
+        t_err "File v${newVer}.tar.gz still doesn't look to exist ..."
         t_err "Manual intervention required ..."
         CR1
         t_info "Path here :"
@@ -250,11 +250,11 @@ while true; do
         CR1
         GAME_OVER
       else
-        t_ok "File v${NEWVER}.tar.gz is available in $(pwd)"
+        t_ok "File v${newVer}.tar.gz is available in $(pwd)"
       fi
     else
       SL1
-      t_err "Netbox v${NEWVER} either doesn't exist or URL is unavailable ..."
+      t_err "Netbox v${newVer} either doesn't exist or URL is unavailable ..."
       SL1; CR1
       t_info "Refer to website for Releases:"
       t_url "${urlR}"
@@ -321,23 +321,23 @@ fi
 SL2
 
 # Will extract tar file as long as destination doesn't exist.
-NBPATH=$nbRoot-$NEWVER
+nbPath=$nbRoot-$newVer
 
      #=# PLACEHOLDER REMINDER
      # Look to change this to a while loop
-if [ -d "${NBPATH}" ]; then
-  t_info "Path ${NBPATH} looks to exist already ..."
+if [ -d "${nbPath}" ]; then
+  t_info "Path ${nbPath} looks to exist already ..."
 else
-  t_info "Extracting tar file to ${NBPATH} ..."
-  tar -xzf "v${NEWVER}.tar.gz"
+  t_info "Extracting tar file to ${nbPath} ..."
+  tar -xzf "v${newVer}.tar.gz"
   SL1
   t_ok "... Extracted"
 fi
 SL1; CR1
 
       #=# PLACEHOLDER REMINDER : As above.
-if ! [ -d "${NBPATH}" ]; then
-  t_err "Path ${NBPATH} still doesn't look to exist ..."
+if ! [ -d "${nbPath}" ]; then
+  t_err "Path ${nbPath} still doesn't look to exist ..."
   t_err "Manual intervention required ..."
   t_norm "Path here :"
   ls -lah "${ROOT}" | grep netbox
@@ -365,19 +365,19 @@ if [[ $INSTALL = upgrade ]]; then
   WILL_YOU_CONTINUE
 
   TIME=$(date +%y-%m-%d_%H-%M)
-  BKPATH="${bkRoot}/${TIME}"
-  mkdir -p "${BKPATH}"
+  bkPath="${bkRoot}/${TIME}"
+  mkdir -p "${bkPath}"
        #=# PLACEHOLDER REMINDER
        # File validations before copy, eg ldap
   t_info "Copying files to backup dir ..."
-  cp $nbRoot/local_requirements.txt "${BKPATH}/"
-  cp $nbRoot/gunicorn.py "${BKPATH}/"
-  cp $nbRoot/netbox/netbox/configuration.py "${BKPATH}/"
-  cp $nbRoot/netbox/netbox/ldap_config.py "${BKPATH}/"
+  cp $nbRoot/local_requirements.txt "${bkPath}/"
+  cp $nbRoot/gunicorn.py "${bkPath}/"
+  cp $nbRoot/netbox/netbox/configuration.py "${bkPath}/"
+  cp $nbRoot/netbox/netbox/ldap_config.py "${bkPath}/"
   t_ok "Complete !"
   SL0; CR1
   t_info "Backed up files here: "
-  ls -lah "${BKPATH}"/
+  ls -lah "${bkPath}"/
   SL2; CR2
        #=# PLACEHOLDER REMINDER
        # Come back to this for database backup etc
@@ -401,16 +401,16 @@ if [[ $INSTALL = upgrade ]]; then
        #=# PLACEHOLDER REMINDER
        # Check files exist before copying
        # eg ldap and gunicorn might not
-  cp $nbRoot/local_requirements.txt "${nbRoot}-${NEWVER}/"
-  cp $nbRoot/gunicorn.py "${nbRoot}-${NEWVER}/"
-  cp $nbRoot/netbox/netbox/configuration.py "${nbRoot}-${NEWVER}/netbox/netbox/"
-  cp $nbRoot/netbox/netbox/ldap_config.py "${nbRoot}-${NEWVER}/netbox/netbox/"
+  cp $nbRoot/local_requirements.txt "${nbRoot}-${newVer}/"
+  cp $nbRoot/gunicorn.py "${nbRoot}-${newVer}/"
+  cp $nbRoot/netbox/netbox/configuration.py "${nbRoot}-${newVer}/netbox/netbox/"
+  cp $nbRoot/netbox/netbox/ldap_config.py "${nbRoot}-${newVer}/netbox/netbox/"
        #=# PLACEHOLDER REMINDER
        # Add below in to presence validation and backup if so.
        # Consider adding filesize validation too.
-  # cp -pr $nbRoot-$OLDVER/netbox/media/ $nbRoot/netbox/
-  # cp -r $nbRoot-$OLDVER/netbox/scripts $nbRoot/netbox/
-  # cp -r $nbRoot-$OLDVER/netbox/reports $nbRoot/netbox/
+  # cp -pr $nbRoot-$oldVer/netbox/media/ $nbRoot/netbox/
+  # cp -r $nbRoot-$oldVer/netbox/scripts $nbRoot/netbox/
+  # cp -r $nbRoot-$oldVer/netbox/reports $nbRoot/netbox/
 
   t_head "+++ UPGRADE COPY : COMPLETE +++"
 fi
@@ -434,38 +434,38 @@ if [[ $INSTALL = upgrade ]]; then
   
   WILL_YOU_CONTINUE
 
-  OLDVER=$(ls -ld ${nbRoot} | awk -F"${nbRoot}-" '{print $2}' | cut -d / -f 1)
-  if ! [[ $OLDVER =~ $regexVer ]]; then
-    t_warn "Discovered '${OLDVER}' doesn't look to be valid (eg 3.6.0) ..."
+  oldVer=$(ls -ld ${nbRoot} | awk -F"${nbRoot}-" '{print $2}' | cut -d / -f 1)
+  if ! [[ $oldVer =~ $regexVer ]]; then
+    t_warn "Discovered '${oldVer}' doesn't look to be valid (eg 3.6.0) ..."
     SL1; CR1
     t_info "Directory list here:"
     ls -ld "${nbRoot}" | grep netbox
     while true; do
       COUNT=0
-      read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " -r OLDVER
-      if ! [[ $OLDVER =~ $regexVer ]]; then
+      read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " -r oldVer
+      if ! [[ $oldVer =~ $regexVer ]]; then
         if [[ "${COUNT}" -gt 2 ]]; then
           t_err "... Three incorrect attempts made."
           GAME_OVER
         fi
-        t_warn "Selection '${OLDVER}' format STILL not valid (eg 3.6.0). Try again ..."
+        t_warn "Selection '${oldVer}' format STILL not valid (eg 3.6.0). Try again ..."
         ((COUNT++))
         SL1
         continue
-      elif [[ $OLDVER =~ $regexVer ]]; then
-        t_ok "Selection '${OLDVER}' looks to be valid ..."
+      elif [[ $oldVer =~ $regexVer ]]; then
+        t_ok "Selection '${oldVer}' looks to be valid ..."
         break
       fi
     done
   fi
   CR1; SL1
-  t_info "Comparing current (${OLDVER}) to selection (${NEWVER})"
+  t_info "Comparing current (${oldVer}) to selection (${newVer})"
        #=# PLACEHOLDER REMINDER : Figure out this syntax. Needs more observation.
   #https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
-  #if awk "BEGIN {exit !($NEWVER >= $OLDVER)}"; then
-  #if [[ awk "BEGIN {exit !($NEWVER >= $OLDVER)}" == 1 ]]; then
-  if [[ $(echo "${NEWVER} ${OLDVER}" | awk '{print ($1 >= $2)}') == 1 ]]; then
-    t_err "Current 'v${OLDVER}' same or newer than installing 'v${NEWVER}' !"
+  #if awk "BEGIN {exit !($newVer >= $oldVer)}"; then
+  #if [[ awk "BEGIN {exit !($newVer >= $oldVer)}" == 1 ]]; then
+  if [[ $(echo "${newVer} ${oldVer}" | awk '{print ($1 >= $2)}') == 1 ]]; then
+    t_err "Current 'v${oldVer}' same or newer than installing 'v${newVer}' !"
     GAME_OVER
   fi
 fi
@@ -481,15 +481,15 @@ elif [[ $INSTALL = upgrade ]]; then
        # Validate processes have actually stopped
   t_ok "Processes netbox and netbox-rq stopped ..."
   SL1
-  ln -sfn "${nbRoot}-${NEWVER}"/ "${nbRoot}"
+  ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
   t_info "Backed up files here: "
        #=# PLACEHOLDER REMINDER
        # Finish this off
 fi
 
 if [[ $INSTALL = upgrade ]]; then
-  t_info "Symlinking New ${NEWVER} to ${nbRoot}"
-  ln -sfn "${nbRoot}-${NEWVER}"/ "${nbRoot}"
+  t_info "Symlinking New ${newVer} to ${nbRoot}"
+  ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
 fi
 
 
@@ -635,7 +635,7 @@ if [[ $INSTALL = new ]]; then
   SL0; CR1
   t_ok "... done !"
   
-  ln -sfn "${nbRoot}-${NEWVER}"/ "${nbRoot}"
+  ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
 
   t_info "Setting permissions on dirs ..."
        #=# PLACEHOLDER REMINDER
@@ -744,8 +744,8 @@ if [[ $INSTALL = new ]]; then
        #=# PLACEHOLDER REMINDER
        # Evaluate this not being missed on a 3.4+ to 3.6 upgrade.
        # Will need to pull it out of the if conditional.
-  if [[ $(echo "${NEWVER} 3.6.0" | awk '{print ($1 >= $2)}') == 1 ]]; then
-    t_info "Selection (${NEWVER}) or newer than 3.6.0 requires Dulwich for Git data source function."
+  if [[ $(echo "${newVer} 3.6.0" | awk '{print ($1 >= $2)}') == 1 ]]; then
+    t_info "Selection (${newVer}) or newer than 3.6.0 requires Dulwich for Git data source function."
     t_info "Adding dulwich to local_requirements.txt"
     echo 'dulwich' >> "${nbRoot}/local_requirements.txt"
     SL1; CR1
@@ -801,8 +801,8 @@ fi
      # https://docs.netbox.dev/en/stable/installation/5-http-server/
 
 if [[ $INSTALL = new ]]; then
-  NB_DNS=netbox.local
-  WWW=nginx
+  nbHost=netbox.local
+  webSrv=nginx
 
   t_info "Installing packages ..."
   $PMGET $pkgWww
@@ -810,7 +810,7 @@ if [[ $INSTALL = new ]]; then
   t_ok "... done !"
   SL1; CR1
 
-  if [[ "${WWW}" = nginx ]]; then
+  if [[ "${webSrv}" = nginx ]]; then
     t_head "----- SETUP NGINX -----"
     SL0
 
@@ -822,7 +822,7 @@ if [[ $INSTALL = new ]]; then
     SL2; CR1
 
     openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
-    -subj "/C=NZ/ST=Denial/L=RiverIn/O=Ejypt/CN=${NB_DNS}" \
+    -subj "/C=NZ/ST=Denial/L=RiverIn/O=Ejypt/CN=${nbHost}" \
     -keyout /etc/ssl/private/netbox.key \
     -out /etc/ssl/certs/netbox.crt
 
@@ -833,12 +833,12 @@ if [[ $INSTALL = new ]]; then
   
        #=# PLACEHOLDER REMINDER
        # Make this interactive. Consider defining with others at start and then having a match conditional here.
-    t_info "Adjusting ${WWW} config server name"
+    t_info "Adjusting ${webSrv} config server name"
     SL0; CR1
 
     t_info "Before:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
-      sed -i "s|netbox.example.com|$NB_DNS|g" /etc/nginx/sites-available/netbox
+      sed -i "s|netbox.example.com|$nbHost|g" /etc/nginx/sites-available/netbox
     SL1
     t_info "After:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
