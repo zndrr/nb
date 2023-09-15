@@ -218,14 +218,14 @@ while true; do
     t_ok "File looks to exist already. Download not required ..."
     break
   elif [ ! -e "${ROOT}/v${newVer}.tar.gz" ]; then
-    if [ $(NB_VER ${newVer}) -lt $(NB_VER ${major1}) ]; then
+    if [ $(SW_VER ${newVer}) -lt $(SW_VER ${major1}) ]; then
       t_err "Selection (${newVer}) at least 1 MAJOR release behind project (${major1}) !"
       t_err "Selection too old! Select again ..."
       continue
-    elif [ $(NB_VER ${newVer}) -lt $(NB_VER ${minor2}) ]; then
+    elif [ $(SW_VER ${newVer}) -lt $(SW_VER ${minor2}) ]; then
       t_warn "Selection (${newVer}) at least 2 minor releases behind project (${minor1}) !"
       t_warn "Highly recommended to select a newer release!"
-    elif [ $(NB_VER ${newVer}) -lt $(NB_VER ${minor1}) ]; then
+    elif [ $(SW_VER ${newVer}) -lt $(SW_VER ${minor1}) ]; then
       t_warn "Selection '${newVer}' at least 1 minor release behind project '${minor1}' !"
     SL1
     fi
@@ -475,7 +475,7 @@ if [[ $INSTALL = upgrade ]]; then
        #https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
        #if awk "BEGIN {exit !($newVer >= $oldVer)}"; then
        #if [[ awk "BEGIN {exit !($newVer >= $oldVer)}" == 1 ]]; then
-  if [ $(NB_VER ${oldVer}) -ge $(NB_VER ${newVer}) ]; then
+  if [ $(SW_VER ${oldVer}) -ge $(SW_VER ${newVer}) ]; then
     t_err "Current 'v${oldVer}' same or newer than installing 'v${newVer}' !"
     GAME_OVER
   fi
