@@ -384,7 +384,7 @@ if [[ $INSTALL = upgrade ]]; then
   if [ -f "${nbLdap}" ]; then cp "${nbLdap}" "${bkPath}/"; fi
   t_ok "Complete !"
   SL0; CR1
-  t_info "Backed up files here: "; SL0
+  t_info "Backed up files in '${bkPath}': "; SL0
   ls -lah "${bkPath}"/
   SL2; CR2
        #=# PLACEHOLDER REMINDER
