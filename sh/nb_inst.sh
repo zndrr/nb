@@ -357,6 +357,12 @@ SL2; CR2
 #elif [[ $INSTALL = git ]]; then
 #  t_err "Git installs not yet supported. Script cannot continue ..."
 #  GAME_OVER
+
+nbConfPy=$nbRoot/netbox/netbox/configuration.py
+nbGuni=$nbRoot/gunicorn.py
+nbLReq=$nbRoot/local_requirements.txt
+nbLdap=$nbRoot/netbox/netbox/ldap_config.py
+
 #if [[ $INSTALL = upgrade ]] || [[ $INSTALL = git ]]; then
 if [[ $INSTALL = upgrade ]]; then
   t_head "----- BACKUP FILES AND DATABASE -----"
@@ -367,16 +373,18 @@ if [[ $INSTALL = upgrade ]]; then
   TIME=$(date +%y-%m-%d_%H-%M)
   bkPath="${bkRoot}/${TIME}"
   mkdir -p "${bkPath}"
-       #=# PLACEHOLDER REMINDER
-       # File validations before copy, eg ldap
   t_info "Copying files to backup dir ..."
-  cp $nbRoot/local_requirements.txt "${bkPath}/"
-  cp $nbRoot/gunicorn.py "${bkPath}/"
-  cp $nbRoot/netbox/netbox/configuration.py "${bkPath}/"
-  cp $nbRoot/netbox/netbox/ldap_config.py "${bkPath}/"
+  if [-f "${nbConfPy}" ]; then
+    cp "${nbConfPy}" "${bkPath}/"
+  else
+    t_warn "Important file 'configuration.py' not found !"
+  fi
+  if [ -f "${nbLReq}" ]; then cp "${nbLReq}" "${bkPath}/"; fi
+  if [ -f "${nbGuni}" ]; then cp "${nbGuni}" "${bkPath}/"; fi
+  if [ -f "${nbLdap}" ]; then cp "${nbLdap}" "${bkPath}/"; fi
   t_ok "Complete !"
   SL0; CR1
-  t_info "Backed up files here: "
+  t_info "Backed up files here: "; SL0
   ls -lah "${bkPath}"/
   SL2; CR2
        #=# PLACEHOLDER REMINDER
@@ -397,21 +405,28 @@ if [[ $INSTALL = upgrade ]]; then
   SL1; CR1
   
   WILL_YOU_CONTINUE
-  #
-       #=# PLACEHOLDER REMINDER
-       # Check files exist before copying
-       # eg ldap and gunicorn might not
-  cp $nbRoot/local_requirements.txt "${nbRoot}-${newVer}/"
-  cp $nbRoot/gunicorn.py "${nbRoot}-${newVer}/"
-  cp $nbRoot/netbox/netbox/configuration.py "${nbRoot}-${newVer}/netbox/netbox/"
-  cp $nbRoot/netbox/netbox/ldap_config.py "${nbRoot}-${newVer}/netbox/netbox/"
-       #=# PLACEHOLDER REMINDER
-       # Add below in to presence validation and backup if so.
-       # Consider adding filesize validation too.
-  # cp -pr $nbRoot-$oldVer/netbox/media/ $nbRoot/netbox/
-  # cp -r $nbRoot-$oldVer/netbox/scripts $nbRoot/netbox/
-  # cp -r $nbRoot-$oldVer/netbox/reports $nbRoot/netbox/
-
+  
+  t_info "Copying configuration files to new install ..."
+  if [ -f "${nbConfPy}" ]; then
+    cp "${nbConfPy}" "${nbRoot}-${newVer}/netbox/netbox/"
+  else
+    t_err "Important file 'configuration.py' not found !"
+    t_warn "Manual intervention likely required. Chance of failure!"
+    t_warn "Use the time at prompt to search ..."; SL0
+    WILL_YOU_CONTINUE
+  fi
+  if [ -f "${nbLReq}" ]; then cp "${nbLReq}" "${nbRoot}-${newVer}/"; fi
+  if [ -f "${nbGuni}" ]; then cp "${nbGuni}" "${nbRoot}-${newVer}/"; fi
+  if [ -f "${nbLdap}" ]; then cp "${nbLdap}" "${nbRoot}-${newVer}/netbox/netbox/"; fi
+        #=# PLACEHOLDER REMINDER
+        # Look to make this conditional on user folder choice.
+        # If outside Netbox Root, then no need to move around.
+  if [ -d "${nbRoot}-${oldVer}/netbox/scripts/" ]; then cp -r "${nbRoot}-${oldVer}/netbox/scripts/" "${nbRoot}/netbox/"; fi
+  if [ -d "${nbRoot}-${oldVer}/netbox/reports/" ]; then cp -r "${nbRoot}-${oldVer}/netbox/reports/" "${nbRoot}/netbox/"; fi  
+  if [ -d "${nbRoot}-${oldVer}/netbox/media/" ]; then cp -pr "${nbRoot}-${oldVer}/netbox/media/" "${nbRoot}/netbox/"; fi
+  SL1; CR1
+  t_ok "... done! Files copied."
+  SL1; CR1
   t_head "+++ UPGRADE COPY : COMPLETE +++"
 fi
 
@@ -461,9 +476,9 @@ if [[ $INSTALL = upgrade ]]; then
   CR1; SL1
   t_info "Comparing current (${oldVer}) to selection (${newVer})"
        #=# PLACEHOLDER REMINDER : Figure out this syntax. Needs more observation.
-  #https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
-  #if awk "BEGIN {exit !($newVer >= $oldVer)}"; then
-  #if [[ awk "BEGIN {exit !($newVer >= $oldVer)}" == 1 ]]; then
+       #https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
+       #if awk "BEGIN {exit !($newVer >= $oldVer)}"; then
+       #if [[ awk "BEGIN {exit !($newVer >= $oldVer)}" == 1 ]]; then
   if [[ $(echo "${newVer} ${oldVer}" | awk '{print ($1 >= $2)}') == 1 ]]; then
     t_err "Current 'v${oldVer}' same or newer than installing 'v${newVer}' !"
     GAME_OVER
