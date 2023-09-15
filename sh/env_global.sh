@@ -108,6 +108,20 @@ else
 fi
 }
 
+## Process run-check functions. Might not work on CentOS, but don't know yet.
+CHECK_START() {
+if [ ! $(systemctl is-active "$1" ) > /dev/null ]; then
+  t_err "Process '$1' doesn't appear to have started!"
+fi
+}
+
+CHECK_STOP() {
+if [ $(systemctl is-active "$1" ) > /dev/null ]; then
+  t_err "Process '$1' doesn't appear to have stopped!"
+fi
+}
+
+
 PKG_MGR_CHECK() {
 local DSTRO=0
 t_info "Checking package manager..."
