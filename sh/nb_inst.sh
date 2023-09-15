@@ -284,7 +284,7 @@ SL2; CR2
 #################################################################################################
 
 
-t_head "----- CHECK EXISTING NETBOX INSTALL -----"
+t_head "----- CHECK FOR EXISTING NETBOX INSTALL -----"
 SL1; CR2
 
 WILL_YOU_CONTINUE
@@ -294,22 +294,18 @@ SL1; CR1
 
 t_info "Checking directories ..."
 
-if ! [ -d $nbRoot ]; then
-  if [[ $INSTALL = new ]]; then
-    SL1
-  elif [[ $INSTALL = upgrade ]]; then
-    SL1
-    t_err "Unexpected outcome. Did you mean to select New install ..."
-    GAME_OVER
-  fi
-elif [ -d $nbRoot ]; then
-  if [ -e $nbRoot/.git ]; then
+if [[ ! -d $nbRoot ]] && [[ $INSTALL = upgrade ]]; then
+  SL1
+  t_err "Unexpected outcome. Did you mean to select New install ..."
+  GAME_OVER
+elif [[ -d $nbRoot ]]; then
+  if [[ -e $nbRoot/.git ]]; then
          #=# PLACEHOLDER REMINDER
          # ADD GIT COMMANDS IN HERE
     t_warn "Netbox directory exists but appears to be a Git install ..."
     t_err "Git installs not yet supported. Script cannot continue ..."
     GAME_OVER
-  elif [ -L $nbRoot ]; then
+  elif [[ -L $nbRoot ]]; then
     t_ok "Netbox dir is symbolically linked."
   else
     t_err "Exception : Netbox dir exists but undetermined install type ..."
