@@ -446,7 +446,7 @@ if [[ $INSTALL = upgrade ]]; then
   WILL_YOU_CONTINUE
 
   oldVer=$(ls -ld ${nbRoot} | awk -F"${nbRoot}-" '{print $2}' | cut -d / -f 1)
-  if ! [[ $oldVer =~ $regexVer ]]; then
+  if [[ ! $oldVer =~ $regexVer ]]; then
     t_warn "Discovered '${oldVer}' doesn't look to be valid (eg 3.6.0) ..."
     SL1; CR1
     t_info "Directory list here:"
@@ -454,7 +454,7 @@ if [[ $INSTALL = upgrade ]]; then
     while true; do
       COUNT=0
       read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " -r oldVer
-      if ! [[ $oldVer =~ $regexVer ]]; then
+      if [[ ! $oldVer =~ $regexVer ]]; then
         if [[ "${COUNT}" -gt 2 ]]; then
           t_err "... Three incorrect attempts made."
           GAME_OVER
@@ -890,7 +890,7 @@ SL1; CR2
      # This applies to new/git installs also. Consider conolidating code.
 t_info "Running the Netbox upgrade script..."
      #=# PLACEHOLDER REMINDER : add git types to ifs
-if ! [[ $INSTALL = new ]] || [[ $INSTALL = git_new ]]; then
+if [[ ! $INSTALL = new ]] || [[ ! $INSTALL = git_new ]]; then
   t_warn "Likely no going back after this !"
   SL0; CR2
   WILL_YOU_CONTINUE
