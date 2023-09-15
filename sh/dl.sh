@@ -1,3 +1,8 @@
+
+
+
+
+
 #!/bin/bash
 
 # Author : zndrr
@@ -31,7 +36,7 @@ gSubPath="sh"
 #################################################
 
 fName="${gBranch}${fExt}"
-URLD="https://github.com/${gAuthor}/${gRepo}/archive/refs/heads/${fName}"
+urlD="https://github.com/${gAuthor}/${gRepo}/archive/refs/heads/${fName}"
 
 rDir="/root"
 archPath="${rDir}/${gPath}/${gSubPath}"
@@ -48,32 +53,36 @@ lB; say "Some details below derived from defined variables:"; lB
 say "Repo and Branch : ${gPath}"
 say "Branth Fullpath : ${gSubPath}"
 say "Root dir : ${rDir}"
-say "Download URL : ${URLD}"
+say "Download URL : ${urlD}"
 say "Archive path : ${archPath}/${fName}"
 
 sleep 1; lB; lB
 
 mkdir -p "${rDir}"
 
-if ! [ $(pwd) = $rDir ]; then
+if [ ! $(pwd) = "${rDir}" ]; then
   say "Moving in to ${rDir}"
   cd $rDir
 fi
 
-if [ -e "${fName}" ]; then
-  say "File looks to exist already. Download not required ..."
-elif wget --spider "${URLD}" 2>/dev/null; then
+if wget --spider "${urlD}" 2>/dev/null; then
   say "File found ..."
   sleep 1; lB
+  if [ -e "${fName}" ]; then
+    say "File looks to exist already. Deleting existing ..."
+    rm "${fName}"
+  fi
   say "Downloading ..."
   sleep 1; lB
-  wget -q --show-progress "${URLD}" -P "${rDir}/" --no-check-certificate
+  wget -q --show-progress "${urlD}" -P "${rDir}/" --no-check-certificate
   say "File is available in $(pwd)"
 else
   say "File not found ..."
   exit 1
 fi
 
+
+## Uncomment this to install dependency
 #say "Installing unzip ..."
 #  apt update
 #  apt install -y unzip
