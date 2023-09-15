@@ -56,58 +56,58 @@ PKG_MGR_CHECK
 # Local path variables
       #=# PLACEHOLDER REMINDER : Change these to choices, with defaults.
 ROOT=/opt
-NBROOT=$ROOT/netbox
-BKROOT=$ROOT/nb-backup
+nbRoot=$ROOT/netbox
+bkRoot=$ROOT/nb/backup
 
       #=# PLACEHOLDER REMINDER : Revisit
       # These I want to suggest. Backups and external files would be best living outside Netbox path.
-#NBMEDIA=$ROOT/nb/media/
-#NBREPORTS=$ROOT/nb/reports/
-#NBSCRIPTS=$ROOT/nb/scripts/
+#nbMedia=$ROOT/nb/media/
+#nbReports=$ROOT/nb/reports/
+#nbScripts=$ROOT/nb/scripts/
 
-NBMEDIA=$NBROOT/netbox/media/
-NBREPORTS=$NBROOT/netbox/reports/
-NBSCRIPTS=$NBROOT/netbox/scripts/
+nbMedia=$nbRoot/netbox/media/
+nbReports=$nbRoot/netbox/reports/
+nbScripts=$nbRoot/netbox/scripts/
 
 # Local Netbox functions
-nbv() { source $NBROOT/venv/bin/activate; }
-nbmg() { nbv; python3 $NBROOT/netbox/manage.py "$1"; }
-nbs() { nbv; python3 $NBROOT/netbox/manage.py nbshell; }
+nbv() { source $nbRoot/venv/bin/activate; }
+nbmgr() { nbv; python3 $nbRoot/netbox/manage.py "$1"; }
+nbs() { nbv; python3 $nbRoot/netbox/manage.py nbshell; }
 
 
 # Variables to validate Netbox release version inputs etc.
 # Check and update periodically as newer releases roll around.
-REGEXVER="^[0-9].[0-9].[0-9]{1,2}$"
-MINOR1=3.6.0
-MINOR2=3.5.0
-MAJOR1=3.0.0
+regexVer="^[0-9].[0-9].[0-9]{1,2}$"
+minor1=3.6.0
+minor2=3.5.0
+major1=3.0.0
 
 
 # URL variables for text output. Update if they change.
-URLU="https://docs.netbox.dev/en/stable/installation/upgrading/"
-URLN="https://docs.netbox.dev/en/stable/installation/"
-URLR="https://github.com/netbox-community/netbox/releases/"
-URLC="https://github.com/netbox-community/"
+urlU="https://docs.netbox.dev/en/stable/installation/upgrading/"
+urlN="https://docs.netbox.dev/en/stable/installation/"
+urlR="https://github.com/netbox-community/netbox/releases/"
+urlC="https://github.com/netbox-community/"
 
 
 # Packages in various stages.
      #=# PLACEHOLDER REMINDER : Plan on making this interactive.
 
-PKG_SCRIPT="wget tar nano openssl"
+pkgScript="wget tar nano openssl"
 
 if [[ $PMGR = apt ]] || [[ $PMGR = yum ]]; then
-  PKG_GIT="git"
-  PKG_WWW="nginx"
+  pkgGit="git"
+  pkgWww="nginx"
   if [[ $PMGR = apt ]]; then
-    PKG_PSQL="postgresql"
-    PKG_REDIS="redis-server"
-    PKG_NETBOX="python3 python3-pip python3-venv python3-dev build-essential libxml2-dev libxslt1-dev libffi-dev libpq-dev libssl-dev zlib1g-dev"
-    PKG_LDAP="libldap2-dev libsasl2-dev libssl-dev"
+    pkgPsql="postgresql"
+    pkgRedis="redis-server"
+    pkgNetbox="python3 python3-pip python3-venv python3-dev build-essential libxml2-dev libxslt1-dev libffi-dev libpq-dev libssl-dev zlib1g-dev"
+    pkgLdap="libldap2-dev libsasl2-dev libssl-dev"
   elif [[ $PMGR = yum ]]; then
-    PKG_PSQL="postgresql-server"
-    PKG_REDIS="redis"
-    PKG_NETBOX="gcc libxml2-devel libxslt-devel libffi-devel libpq-devel openssl-devel redhat-rpm-config"
-    PKG_LDAP="openldap-devel python3-devel"
+    pkgPsql="postgresql-server"
+    pkgRedis="redis"
+    pkgNetbox="gcc libxml2-devel libxslt-devel libffi-devel libpq-devel openssl-devel redhat-rpm-config"
+    pkgLdap="openldap-devel python3-devel"
   fi
 else
   t_err "Exception. Distro not determined !"
@@ -128,16 +128,16 @@ SL1; CR2
 
 t_info "Checking packages required for script ..."
 
-for pkg in $PKG_SCRIPT; do
+for pkg in $pkgScript; do
   command -v "${pkg}" &>/dev/null
   if [[ $pkg = 0 ]]; then
     t_warn "Package '${pkg}' is not installed!"
-    PKGMISSING=$(( PKGMISSING + 1 ))
+    pkgMissing=$(( pkgMissing + 1 ))
     SL0
   fi
 done
 
-if [[ $PKGMISSING -gt 0 ]]; then
+if [[ $pkgMissing -gt 0 ]]; then
   t_err "... Script cannot run without these packages."
   GAME_OVER
 fi
@@ -205,7 +205,7 @@ while true; do
   CR1
   read -p "Please enter desired Netbox release (eg 3.6.0) and press Enter: " -r NEWVER
   URLD="https://github.com/netbox-community/netbox/archive/v${NEWVER}.tar.gz"
-  if ! [[ $NEWVER =~ $REGEXVER ]]; then
+  if ! [[ $NEWVER =~ $regexVer ]]; then
     if [[ "${COUNT}" -gt 2 ]]; then
       t_err "... Too many incorrect attempts made."
       GAME_OVER
@@ -218,15 +218,15 @@ while true; do
     t_ok "File looks to exist already. Download not required ..."
     break
   elif ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
-    if [[ $(echo "$NEWVER $MAJOR1" | awk '{print ($1 < $2)}') == 1 ]]; then
-      t_err "Selection (${NEWVER}) at least 1 MAJOR release behind project (${MAJOR1}) !"
+    if [[ $(echo "$NEWVER $major1" | awk '{print ($1 < $2)}') == 1 ]]; then
+      t_err "Selection (${NEWVER}) at least 1 MAJOR release behind project (${major1}) !"
       t_err "Selection too old! Select again ..."
       continue
-    elif [[ $(echo "$NEWVER $MINOR2" | awk '{print ($1 < $2)}') == 1 ]]; then
-      t_warn "Selection (${NEWVER}) at least 2 minor releases behind project (${MINOR1}) !"
+    elif [[ $(echo "$NEWVER $minor2" | awk '{print ($1 < $2)}') == 1 ]]; then
+      t_warn "Selection (${NEWVER}) at least 2 minor releases behind project (${minor1}) !"
       t_warn "Highly recommended to select a newer release!"
-    elif [[ $(echo "$NEWVER $MINOR1" | awk '{print ($1 < $2)}') == 1 ]]; then
-      t_warn "Selection '${NEWVER}' at least 1 minor release behind project '${MINOR1}' !"
+    elif [[ $(echo "$NEWVER $minor1" | awk '{print ($1 < $2)}') == 1 ]]; then
+      t_warn "Selection '${NEWVER}' at least 1 minor release behind project '${minor1}' !"
     SL1
     fi
     t_info "Checking availability ..."
@@ -257,16 +257,16 @@ while true; do
       t_err "Netbox v${NEWVER} either doesn't exist or URL is unavailable ..."
       SL1; CR1
       t_info "Refer to website for Releases:"
-      t_url "${URLR}"
+      t_url "${urlR}"
       if [[ $INSTALL = new ]]; then
         t_info "Also refer to the below for new install process ..."
-        t_url "${URLN}"
+        t_url "${urlN}"
       elif [[ $INSTALL = upgrade ]]; then
         t_info "Also refer to the below for upgrade process ..."
-        t_url "${URLU}"
+        t_url "${urlU}"
       fi
       t_info "Or visit Netbox Community here ..."
-      t_url "${URLC}"
+      t_url "${urlC}"
       GAME_OVER
     fi
     unset COUNT
@@ -294,7 +294,7 @@ SL1; CR1
 
 t_info "Checking directories ..."
 
-if ! [ -d $NBROOT ]; then
+if ! [ -d $nbRoot ]; then
   if [[ $INSTALL = new ]]; then
     SL1
   elif [[ $INSTALL = upgrade ]]; then
@@ -302,14 +302,14 @@ if ! [ -d $NBROOT ]; then
     t_err "Unexpected outcome. Did you mean to select New install ..."
     GAME_OVER
   fi
-elif [ -d $NBROOT ]; then
-  if [ -e $NBROOT/.git ]; then
+elif [ -d $nbRoot ]; then
+  if [ -e $nbRoot/.git ]; then
          #=# PLACEHOLDER REMINDER
          # ADD GIT COMMANDS IN HERE
     t_warn "Netbox directory exists but appears to be a Git install ..."
     t_err "Git installs not yet supported. Script cannot continue ..."
     GAME_OVER
-  elif [ -L $NBROOT ]; then
+  elif [ -L $nbRoot ]; then
     t_ok "Netbox dir is symbolically linked."
   else
     t_err "Exception : Netbox dir exists but undetermined install type ..."
@@ -321,7 +321,7 @@ fi
 SL2
 
 # Will extract tar file as long as destination doesn't exist.
-NBPATH=$NBROOT-$NEWVER
+NBPATH=$nbRoot-$NEWVER
 
      #=# PLACEHOLDER REMINDER
      # Look to change this to a while loop
@@ -365,15 +365,15 @@ if [[ $INSTALL = upgrade ]]; then
   WILL_YOU_CONTINUE
 
   TIME=$(date +%y-%m-%d_%H-%M)
-  BKPATH="${BKROOT}/${TIME}"
+  BKPATH="${bkRoot}/${TIME}"
   mkdir -p "${BKPATH}"
        #=# PLACEHOLDER REMINDER
        # File validations before copy, eg ldap
   t_info "Copying files to backup dir ..."
-  cp $NBROOT/local_requirements.txt "${BKPATH}/"
-  cp $NBROOT/gunicorn.py "${BKPATH}/"
-  cp $NBROOT/netbox/netbox/configuration.py "${BKPATH}/"
-  cp $NBROOT/netbox/netbox/ldap_config.py "${BKPATH}/"
+  cp $nbRoot/local_requirements.txt "${BKPATH}/"
+  cp $nbRoot/gunicorn.py "${BKPATH}/"
+  cp $nbRoot/netbox/netbox/configuration.py "${BKPATH}/"
+  cp $nbRoot/netbox/netbox/ldap_config.py "${BKPATH}/"
   t_ok "Complete !"
   SL0; CR1
   t_info "Backed up files here: "
@@ -401,16 +401,16 @@ if [[ $INSTALL = upgrade ]]; then
        #=# PLACEHOLDER REMINDER
        # Check files exist before copying
        # eg ldap and gunicorn might not
-  cp $NBROOT/local_requirements.txt "${NBROOT}-${NEWVER}/"
-  cp $NBROOT/gunicorn.py "${NBROOT}-${NEWVER}/"
-  cp $NBROOT/netbox/netbox/configuration.py "${NBROOT}-${NEWVER}/netbox/netbox/"
-  cp $NBROOT/netbox/netbox/ldap_config.py "${NBROOT}-${NEWVER}/netbox/netbox/"
+  cp $nbRoot/local_requirements.txt "${nbRoot}-${NEWVER}/"
+  cp $nbRoot/gunicorn.py "${nbRoot}-${NEWVER}/"
+  cp $nbRoot/netbox/netbox/configuration.py "${nbRoot}-${NEWVER}/netbox/netbox/"
+  cp $nbRoot/netbox/netbox/ldap_config.py "${nbRoot}-${NEWVER}/netbox/netbox/"
        #=# PLACEHOLDER REMINDER
        # Add below in to presence validation and backup if so.
        # Consider adding filesize validation too.
-  # cp -pr $NBROOT-$OLDVER/netbox/media/ $NBROOT/netbox/
-  # cp -r $NBROOT-$OLDVER/netbox/scripts $NBROOT/netbox/
-  # cp -r $NBROOT-$OLDVER/netbox/reports $NBROOT/netbox/
+  # cp -pr $nbRoot-$OLDVER/netbox/media/ $nbRoot/netbox/
+  # cp -r $nbRoot-$OLDVER/netbox/scripts $nbRoot/netbox/
+  # cp -r $nbRoot-$OLDVER/netbox/reports $nbRoot/netbox/
 
   t_head "+++ UPGRADE COPY : COMPLETE +++"
 fi
@@ -434,16 +434,16 @@ if [[ $INSTALL = upgrade ]]; then
   
   WILL_YOU_CONTINUE
 
-  OLDVER=$(ls -ld ${NBROOT} | awk -F"${NBROOT}-" '{print $2}' | cut -d / -f 1)
-  if ! [[ $OLDVER =~ $REGEXVER ]]; then
+  OLDVER=$(ls -ld ${nbRoot} | awk -F"${nbRoot}-" '{print $2}' | cut -d / -f 1)
+  if ! [[ $OLDVER =~ $regexVer ]]; then
     t_warn "Discovered '${OLDVER}' doesn't look to be valid (eg 3.6.0) ..."
     SL1; CR1
     t_info "Directory list here:"
-    ls -ld "${NBROOT}" | grep netbox
+    ls -ld "${nbRoot}" | grep netbox
     while true; do
       COUNT=0
       read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " -r OLDVER
-      if ! [[ $OLDVER =~ $REGEXVER ]]; then
+      if ! [[ $OLDVER =~ $regexVer ]]; then
         if [[ "${COUNT}" -gt 2 ]]; then
           t_err "... Three incorrect attempts made."
           GAME_OVER
@@ -452,7 +452,7 @@ if [[ $INSTALL = upgrade ]]; then
         ((COUNT++))
         SL1
         continue
-      elif [[ $OLDVER =~ $REGEXVER ]]; then
+      elif [[ $OLDVER =~ $regexVer ]]; then
         t_ok "Selection '${OLDVER}' looks to be valid ..."
         break
       fi
@@ -481,15 +481,15 @@ elif [[ $INSTALL = upgrade ]]; then
        # Validate processes have actually stopped
   t_ok "Processes netbox and netbox-rq stopped ..."
   SL1
-  ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
+  ln -sfn "${nbRoot}-${NEWVER}"/ "${nbRoot}"
   t_info "Backed up files here: "
        #=# PLACEHOLDER REMINDER
        # Finish this off
 fi
 
 if [[ $INSTALL = upgrade ]]; then
-  t_info "Symlinking New ${NEWVER} to ${NBROOT}"
-  ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
+  t_info "Symlinking New ${NEWVER} to ${nbRoot}"
+  ln -sfn "${nbRoot}-${NEWVER}"/ "${nbRoot}"
 fi
 
 
@@ -511,8 +511,8 @@ if [[ $INSTALL = new ]]; then
   
   WILL_YOU_CONTINUE
 
-  t_info "Installing packages '${PKG_PSQL}' ..."
-  $PMGET $PKG_PSQL
+  t_info "Installing packages '${pkgPsql}' ..."
+  $PMGET $pkgPsql
   t_ok "... done !"
   SL0; CR2
   
@@ -599,7 +599,7 @@ if [[ $INSTALL = new ]]; then
   
   t_info "Installing packages for Redis ..."
   CR1
-  $PMGET $PKG_REDIS
+  $PMGET $pkgRedis
   SL0; CR1
   
   t_ok "... done !"
@@ -631,20 +631,20 @@ if [[ $INSTALL = new ]]; then
   SL0; CR2
   
   t_info "Installing packages ..."
-  $PMGET $PKG_NETBOX
+  $PMGET $pkgNetbox
   SL0; CR1
   t_ok "... done !"
   
-  ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
+  ln -sfn "${nbRoot}-${NEWVER}"/ "${nbRoot}"
 
   t_info "Setting permissions on dirs ..."
        #=# PLACEHOLDER REMINDER
        # Make more robust I guess
   if [[ $PMGR = apt ]]; then
     adduser --system --group netbox
-    chown --recursive netbox $NBMEDIA
-    chown --recursive netbox $NBREPORTS
-    chown --recursive netbox $NBSCRIPTS
+    chown --recursive netbox $nbMedia
+    chown --recursive netbox $nbReports
+    chown --recursive netbox $nbScripts
   elif [[ $PMGR = yum ]]; then
     groupadd --system netbox
     adduser --system -g netbox netbox
@@ -659,7 +659,7 @@ if [[ $INSTALL = new ]]; then
   t_ok "... done !"
 
   
-  cd "${NBROOT}/netbox/netbox/"
+  cd "${nbRoot}/netbox/netbox/"
   cp configuration_example.py configuration.py
   
        #=# PLACEHOLDER REMINDER :
@@ -709,15 +709,15 @@ if [[ $INSTALL = new ]]; then
   ## OPTIONAL : This will change the media, reports and scripts paths. Here for reference. Might make it a choice later.
   
   #printf '%b\n' "$(cat configuration.py | grep -F "MEDIA_ROOT")"
-    #sed -i "s|# MEDIA_ROOT = '/opt/netbox/netbox/media'|MEDIA_ROOT = '$NBMEDIA'|g" configuration.py
+    #sed -i "s|# MEDIA_ROOT = '/opt/netbox/netbox/media'|MEDIA_ROOT = '$nbMedia'|g" configuration.py
   #printf '%b\n' "$(cat configuration.py | grep -F "MEDIA_ROOT")"
   #
   #printf '%b\n' "$(cat configuration.py | grep -F "REPORTS_ROOT")"
-    #sed -i "s|# REPORTS_ROOT = '/opt/netbox/netbox/reports'|REPORTS_ROOT = '$NBREPORTS'|g" configuration.py
+    #sed -i "s|# REPORTS_ROOT = '/opt/netbox/netbox/reports'|REPORTS_ROOT = '$nbReports'|g" configuration.py
   #printf '%b\n' "$(cat configuration.py | grep -F "REPORTS_ROOT")"
   #
   #printf '%b\n' "$(cat configuration.py | grep -F "SCRIPTS_ROOT")"
-    #sed -i "s|# SCRIPTS_ROOT = '/opt/netbox/netbox/scripts'|SCRIPTS_ROOT = '$NBSCRIPTS'|g" configuration.py
+    #sed -i "s|# SCRIPTS_ROOT = '/opt/netbox/netbox/scripts'|SCRIPTS_ROOT = '$nbScripts'|g" configuration.py
   #printf '%b\n' "$(cat configuration.py | grep -F "SCRIPTS_ROOT")"
   
   #t_warn "Clearing DB_PASS variable. Temporarily stored as file .DB_PASS in $(pwd)"
@@ -732,13 +732,13 @@ if [[ $INSTALL = new ]]; then
        # Code duplicity with upgrade section above. Look to consolidate
   t_info "Run Netbox upgrade script ..."
   SL2; CR2
-  bash "${NBROOT}/upgrade.sh"
+  bash "${nbRoot}/upgrade.sh"
   SL2; CR2
   t_ok "... done"
   SL0; CR1
   
   t_info "Create Superuser"
-  nbmg createsuperuser
+  nbmgr createsuperuser
   SL1; CR1
   t_ok "... done"
        #=# PLACEHOLDER REMINDER
@@ -747,13 +747,13 @@ if [[ $INSTALL = new ]]; then
   if [[ $(echo "${NEWVER} 3.6.0" | awk '{print ($1 >= $2)}') == 1 ]]; then
     t_info "Selection (${NEWVER}) or newer than 3.6.0 requires Dulwich for Git data source function."
     t_info "Adding dulwich to local_requirements.txt"
-    echo 'dulwich' >> "${NBROOT}/local_requirements.txt"
+    echo 'dulwich' >> "${nbRoot}/local_requirements.txt"
     SL1; CR1
     t_ok "... done"
   fi
     
   t_info "Adding Housekeeping to cron tasks"
-  ln -s "${NBROOT}/contrib/netbox-housekeeping.sh" /etc/cron.daily/netbox-housekeeping
+  ln -s "${nbRoot}/contrib/netbox-housekeeping.sh" /etc/cron.daily/netbox-housekeeping
   SL0
   t_ok "... done"
   
@@ -772,8 +772,8 @@ if [[ $INSTALL = new ]]; then
   SL0; CR1
 
   t_info "Copying files to set Netbox as service ..."
-  cp "${NBROOT}/contrib/gunicorn.py" "${NBROOT}/gunicorn.py"
-  cp -v "${NBROOT}/contrib/"*".service" "/etc/systemd/system/"
+  cp "${nbRoot}/contrib/gunicorn.py" "${nbRoot}/gunicorn.py"
+  cp -v "${nbRoot}/contrib/"*".service" "/etc/systemd/system/"
   SL1; CR1
   t_ok "... done"
   SL0; CR2
@@ -805,7 +805,7 @@ if [[ $INSTALL = new ]]; then
   WWW=nginx
 
   t_info "Installing packages ..."
-  $PMGET $PKG_WWW
+  $PMGET $pkgWww
   SL0; CR1
   t_ok "... done !"
   SL1; CR1
@@ -829,7 +829,7 @@ if [[ $INSTALL = new ]]; then
     t_ok "... done"
     SL1; CR1
   
-    cp $NBROOT/contrib/nginx.conf /etc/nginx/sites-available/netbox
+    cp $nbRoot/contrib/nginx.conf /etc/nginx/sites-available/netbox
   
        #=# PLACEHOLDER REMINDER
        # Make this interactive. Consider defining with others at start and then having a match conditional here.
@@ -881,7 +881,7 @@ if ! [[ $INSTALL = new ]] || [[ $INSTALL = git_new ]]; then
   SL1; CR2
 fi
 
-bash "${NBROOT}/upgrade.sh" | tee "upgrade_$(date +%y-%m-%d_%H-%M).log"
+bash "${nbRoot}/upgrade.sh" | tee "upgrade_$(date +%y-%m-%d_%H-%M).log"
 SL1; CR1
 t_ok "... done"
 SL1; CR2
