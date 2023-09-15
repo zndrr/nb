@@ -93,18 +93,21 @@ say "Extracting archive file to specified path ..."
   find "${archPath}" -name "*.*" -exec mv '{}' ${rDir} \;
   rm -r ${gPath}
   rm "${fName}"
-say "... Extracted!"
+say "... Extracted!"; sleep 0.5
 
 ## This allows you to execute the script from this one. Timesaver!"
+## Works by copying the file and modifying that, then deleting after.
 if [ -e "${testScript}" ]; then
-  say "Removing '${delPattern}' from '${testScript}"
-    sed -i "s|$delPattern||g" ${testScript}
-  say "Warning, remember not to overwrite your main script with this testing version!"
-    sleep 1
+  say "Removing pattern '${delPattern}' from '${testScript}"
+  say "Cloning script to perform action. Original will be preserved."
+    cp ${testScipt} "mod.${testScript}"; sleep 0.5
+    sed -i "s|$delPattern||g" "mod.${testScript}"; sleep 0.5
   say "Executing script ..."
     sleep 2
     bash ${testScript}
-  say "... done!"
+  say "... done!"; sleep 1
+  say "Cleaning up modified script."
+  rm "mod.${testScript}"
 fi
 lB; lB
 
