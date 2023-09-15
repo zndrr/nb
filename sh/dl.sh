@@ -100,14 +100,14 @@ say "... Extracted!"; sleep 0.5
 if [ -e "${testScript}" ]; then
   say "Removing pattern '${delPattern}' from '${testScript}"
   say "Cloning script to perform action. Original will be preserved."
-    cp ${testScipt} "mod.${testScript}"; sleep 0.5
-    sed -i "s|$delPattern||g" "mod.${testScript}"; sleep 0.5
+    cp ${testScript} "temp.${testScript}"; sleep 0.5
+    sed -i "s|$delPattern||g" "temp.${testScript}"; sleep 0.5
   say "Executing script ..."
     sleep 2
-    bash ${testScript}
+    bash "temp.${testScript}"
   say "... done!"; sleep 1
   say "Cleaning up modified script."
-  rm "mod.${testScript}"
+  rm "temp.${testScript}"
 fi
 lB; lB
 
