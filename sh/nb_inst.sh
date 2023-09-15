@@ -374,7 +374,7 @@ if [[ $INSTALL = upgrade ]]; then
   bkPath="${bkRoot}/${TIME}"
   mkdir -p "${bkPath}"
   t_info "Copying files to backup dir ..."
-  if [-f "${nbConfPy}" ]; then
+  if [ -f "${nbConfPy}" ]; then
     cp "${nbConfPy}" "${bkPath}/"
   else
     t_warn "Important file 'configuration.py' not found !"
