@@ -489,11 +489,9 @@ elif [[ $INSTALL = git ]]; then
 elif [[ $INSTALL = upgrade ]]; then
   systemctl stop netbox netbox-rq
   SL1
-  if [[ ! $(systemctl is-active netbox) > /dev/null ]] && [[ ! $(systemctl is-active netbox-rq) > /dev/null ]]; then
-    t_ok "Processes netbox and netbox-rq stopped ..."
-  else
-    t_err "Processes netbox and netbox-rq don't appear to have stopped !"
-  fi
+  CHECK_STOP netbox
+  CHECK_STOP netbox-rq
+  
   SL1
   ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
   t_info "Backed up files here: "
@@ -798,11 +796,8 @@ if [[ $INSTALL = new ]]; then
   systemctl enable netbox netbox-rq
   # systemctl status netbox.service
   SL1; CR1
-  if [[ ! $(systemctl is-active netbox) > /dev/null ]]; then
-    t_err "Process 'netbox' doesn't appear to have started!"
-  elif [[ ! $(systemctl is-active netbox-rq) > /dev/null ]]; then
-    t_err "Process 'netbox-rq' doesn't appear to have started!"
-  fi
+  CHECK_START netbox
+  CHECK_START netbox-rq
   
   SL2; CR1
   t_ok "...done."
@@ -873,9 +868,8 @@ if [[ $INSTALL = new ]]; then
     # Add start validation
     systemctl restart nginx
     SL1; CR1
-    if [[ ! $(systemctl is-active nginx) > /dev/null ]]; then
-      t_err "Process 'nginx' doesn't appear to have started!"
-    fi
+    
+    CHECK_START nginx
   
   t_head "----- NGINX SETUP DONE -----"
   SL2
@@ -918,6 +912,8 @@ SL1; CR1
      # Add process start validation.
 systemctl start netbox netbox-rq
 SL0; CR1
+CHECK_START netbox
+CHECK_START netbox-rq
 t_ok "Processes started"
 SL2
 # systemctl status netbox netbox-rq
