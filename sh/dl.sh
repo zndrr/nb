@@ -89,7 +89,7 @@ fi
 #  sleep 1
 
 say "Extracting archive file to specified path ..."
-  unzip "${fName}"
+  unzip -o "${fName}"
   find "${archPath}" -name "*.*" -exec mv '{}' ${rDir} \;
   rm -r ${gPath}
   rm "${fName}"
