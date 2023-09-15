@@ -135,6 +135,6 @@ SL0
 }
 
 # Compare release versions (ref xxvix).
-NB_VER() {
+SW_VER() {
   printf '%b\n' "$1" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3,$4); }'
 }
