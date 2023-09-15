@@ -488,9 +488,12 @@ elif [[ $INSTALL = git ]]; then
   GAME_OVER
 elif [[ $INSTALL = upgrade ]]; then
   systemctl stop netbox netbox-rq
-       #=# PLACEHOLDER REMINDER
-       # Validate processes have actually stopped
-  t_ok "Processes netbox and netbox-rq stopped ..."
+  SL1
+  if [[ ! $(systemctl is-active netbox) > /dev/null ]] && [[ ! $(systemctl is-active netbox-rq) > /dev/null ]]; then
+    t_ok "Processes netbox and netbox-rq stopped ..."
+  else
+    t_err "Processes netbox and netbox-rq don't appear to have stopped !"
+  fi
   SL1
   ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
   t_info "Backed up files here: "
@@ -793,9 +796,14 @@ if [[ $INSTALL = new ]]; then
   systemctl daemon-reload
   systemctl start netbox netbox-rq
   systemctl enable netbox netbox-rq
-       #=# PLACEHOLDER REMINDER
-       # Add service start validation. Perhaps make a counter loop.
   # systemctl status netbox.service
+  SL1; CR1
+  if [[ ! $(systemctl is-active netbox) > /dev/null ]]; then
+    t_err "Process 'netbox' doesn't appear to have started!"
+  elif [[ ! $(systemctl is-active netbox-rq) > /dev/null ]]; then
+    t_err "Process 'netbox-rq' doesn't appear to have started!"
+  fi
+  
   SL2; CR1
   t_ok "...done."
   SL1; CR1
@@ -864,8 +872,11 @@ if [[ $INSTALL = new ]]; then
     #=# PLACEHOLDER REMINDER
     # Add start validation
     systemctl restart nginx
+    SL1; CR1
+    if [[ ! $(systemctl is-active nginx) > /dev/null ]]; then
+      t_err "Process 'nginx' doesn't appear to have started!"
+    fi
   
-  fi
   t_head "----- NGINX SETUP DONE -----"
   SL2
 fi
