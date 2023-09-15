@@ -110,7 +110,7 @@ if [[ $PMGR = apt ]] || [[ $PMGR = yum ]]; then
     PKG_LDAP="openldap-devel python3-devel"
   fi
 else
-  txt_err "Exception. Distro not determined !"
+  t_err "Exception. Distro not determined !"
   GAME_OVER
 fi
 
@@ -122,27 +122,27 @@ SL1; CR2
 
 
 # Check critical packages installed. Exit if not.
-txt_info "Running a package update..."
+t_info "Running a package update..."
 $PMUPD
 SL1; CR2
 
-txt_info "Checking packages required for script ..."
+t_info "Checking packages required for script ..."
 
 for pkg in $PKG_SCRIPT; do
   command -v "${pkg}" &>/dev/null
   if [[ $pkg = 0 ]]; then
-    txt_warn "Package '${pkg}' is not installed!"
+    t_warn "Package '${pkg}' is not installed!"
     PKGMISSING=$(( PKGMISSING + 1 ))
     SL0
   fi
 done
 
 if [[ $PKGMISSING -gt 0 ]]; then
-  txt_err "... Script cannot run without these packages."
+  t_err "... Script cannot run without these packages."
   GAME_OVER
 fi
 
-txt_ok "Packages okay. Continuing ..."
+t_ok "Packages okay. Continuing ..."
 SL1; CR2
 
 
@@ -151,7 +151,7 @@ SL1; CR2
 # Make deterministic choice of install type
 
 
-txt_norm "Choose your install type:"
+t_norm "Choose your install type:"
 SL1
 PS3="(1) Upgrade, (2) New, (3) Git, (4) Quit: "
 
@@ -166,14 +166,14 @@ do
             break;;
         Git)
             INSTALL=git
-            txt_err "Git install not supported yet. Try again..."
+            t_err "Git install not supported yet. Try again..."
             CR2
             SL1
             ;;
         Quit)
             GAME_OVER;;
         *)
-            txt_warn "Invalid option '${REPLY}'. Try again..."
+            t_warn "Invalid option '${REPLY}'. Try again..."
             CR2
             SL1
             ;;
@@ -181,7 +181,7 @@ do
 done
 CR1; SL1
 
-txt_info "Will proceed with ${INSTALL} install ..."
+t_info "Will proceed with ${INSTALL} install ..."
 
 SL1
 
@@ -189,9 +189,9 @@ SL1
 #################################################################################################
 # Start script here
 
-txt_header "----- DOWNLOADING NETBOX RELEASE -----"
+t_head "----- DOWNLOADING NETBOX RELEASE -----"
 
-txt_info "Moving in to ${ROOT} directory ..."
+t_info "Moving in to ${ROOT} directory ..."
 mkdir -p "${ROOT}"
 cd "${ROOT}"
 
@@ -207,66 +207,66 @@ while true; do
   URLD="https://github.com/netbox-community/netbox/archive/v${NEWVER}.tar.gz"
   if ! [[ $NEWVER =~ $REGEXVER ]]; then
     if [[ "${COUNT}" -gt 2 ]]; then
-      txt_err "... Too many incorrect attempts made."
+      t_err "... Too many incorrect attempts made."
       GAME_OVER
     fi
-    txt_warn "Selection '${NEWVER}' not valid (eg 3.6.0). Try again ..."
+    t_warn "Selection '${NEWVER}' not valid (eg 3.6.0). Try again ..."
     ((COUNT++))
     SL1
     continue
   elif [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
-    txt_ok "File looks to exist already. Download not required ..."
+    t_ok "File looks to exist already. Download not required ..."
     break
   elif ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
     if [[ $(echo "$NEWVER $MAJOR1" | awk '{print ($1 < $2)}') == 1 ]]; then
-      txt_err "Selection (${NEWVER}) at least 1 MAJOR release behind project (${MAJOR1}) !"
-      txt_err "Selection too old! Select again ..."
+      t_err "Selection (${NEWVER}) at least 1 MAJOR release behind project (${MAJOR1}) !"
+      t_err "Selection too old! Select again ..."
       continue
     elif [[ $(echo "$NEWVER $MINOR2" | awk '{print ($1 < $2)}') == 1 ]]; then
-      txt_warn "Selection (${NEWVER}) at least 2 minor releases behind project (${MINOR1}) !"
-      txt_warn "Highly recommended to select a newer release!"
+      t_warn "Selection (${NEWVER}) at least 2 minor releases behind project (${MINOR1}) !"
+      t_warn "Highly recommended to select a newer release!"
     elif [[ $(echo "$NEWVER $MINOR1" | awk '{print ($1 < $2)}') == 1 ]]; then
-      txt_warn "Selection '${NEWVER}' at least 1 minor release behind project '${MINOR1}' !"
+      t_warn "Selection '${NEWVER}' at least 1 minor release behind project '${MINOR1}' !"
     SL1
     fi
-    txt_info "Checking availability ..."
+    t_info "Checking availability ..."
     if wget --spider "${URLD}" 2>/dev/null; then
-      txt_ok "Release v${NEWVER} found."
+      t_ok "Release v${NEWVER} found."
       SL1; CR1
-      txt_info "Downloading ..."
+      t_info "Downloading ..."
       SL1
       wget -q --show-progress "${URLD}" -P "${ROOT}/" --no-check-certificate
       SL1
-      txt_ok "... Download complete!"
+      t_ok "... Download complete!"
       # Double-checking tarball exists
-      txt_info "Confirming file present after download ..."
+      t_info "Confirming file present after download ..."
       SL0; CR1
       if ! [ -e "${ROOT}/v${NEWVER}.tar.gz" ]; then
-        txt_err "File v${NEWVER}.tar.gz still doesn't look to exist ..."
-        txt_err "Manual intervention required ..."
+        t_err "File v${NEWVER}.tar.gz still doesn't look to exist ..."
+        t_err "Manual intervention required ..."
         CR1
-        txt_info "Path here :"
+        t_info "Path here :"
         ls -lah "${ROOT}" | grep -E *.tar.gz
         CR1
         GAME_OVER
       else
-        txt_ok "File v${NEWVER}.tar.gz is available in $(pwd)"
+        t_ok "File v${NEWVER}.tar.gz is available in $(pwd)"
       fi
     else
       SL1
-      txt_err "Netbox v${NEWVER} either doesn't exist or URL is unavailable ..."
+      t_err "Netbox v${NEWVER} either doesn't exist or URL is unavailable ..."
       SL1; CR1
-      txt_info "Refer to website for Releases:"
-      txt_url "${URLR}"
+      t_info "Refer to website for Releases:"
+      t_url "${URLR}"
       if [[ $INSTALL = new ]]; then
-        txt_info "Also refer to the below for new install process ..."
-        txt_url "${URLN}"
+        t_info "Also refer to the below for new install process ..."
+        t_url "${URLN}"
       elif [[ $INSTALL = upgrade ]]; then
-        txt_info "Also refer to the below for upgrade process ..."
-        txt_url "${URLU}"
+        t_info "Also refer to the below for upgrade process ..."
+        t_url "${URLU}"
       fi
-      txt_info "Or visit Netbox Community here ..."
-      txt_url "${URLC}"
+      t_info "Or visit Netbox Community here ..."
+      t_url "${URLC}"
       GAME_OVER
     fi
     unset COUNT
@@ -277,43 +277,43 @@ SL1
 
 
 CR2
-txt_header "----- DOWNLOAD COMPLETE -----"
+t_head "----- DOWNLOAD COMPLETE -----"
 SL2; CR2
 
 
 #################################################################################################
 
 
-txt_header "----- CHECK EXISTING NETBOX INSTALL -----"
+t_head "----- CHECK EXISTING NETBOX INSTALL -----"
 SL1; CR2
 
 WILL_YOU_CONTINUE
 
-txt_warn "Script only supports symlink installs at this stage."
+t_warn "Script only supports symlink installs at this stage."
 SL1; CR1
 
-txt_info "Checking directories ..."
+t_info "Checking directories ..."
 
 if ! [ -d $NBROOT ]; then
   if [[ $INSTALL = new ]]; then
     SL1
   elif [[ $INSTALL = upgrade ]]; then
     SL1
-    txt_err "Unexpected outcome. Did you mean to select New install ..."
+    t_err "Unexpected outcome. Did you mean to select New install ..."
     GAME_OVER
   fi
 elif [ -d $NBROOT ]; then
   if [ -e $NBROOT/.git ]; then
          #=# PLACEHOLDER REMINDER
          # ADD GIT COMMANDS IN HERE
-    txt_warn "Netbox directory exists but appears to be a Git install ..."
-    txt_err "Git installs not yet supported. Script cannot continue ..."
+    t_warn "Netbox directory exists but appears to be a Git install ..."
+    t_err "Git installs not yet supported. Script cannot continue ..."
     GAME_OVER
   elif [ -L $NBROOT ]; then
-    txt_ok "Netbox dir is symbolically linked."
+    t_ok "Netbox dir is symbolically linked."
   else
-    txt_err "Exception : Netbox dir exists but undetermined install type ..."
-    txt_err "Script cannot continue ..."
+    t_err "Exception : Netbox dir exists but undetermined install type ..."
+    t_err "Script cannot continue ..."
     GAME_OVER
   fi
 fi
@@ -326,27 +326,27 @@ NBPATH=$NBROOT-$NEWVER
      #=# PLACEHOLDER REMINDER
      # Look to change this to a while loop
 if [ -d "${NBPATH}" ]; then
-  txt_info "Path ${NBPATH} looks to exist already ..."
+  t_info "Path ${NBPATH} looks to exist already ..."
 else
-  txt_info "Extracting tar file to ${NBPATH} ..."
+  t_info "Extracting tar file to ${NBPATH} ..."
   tar -xzf "v${NEWVER}.tar.gz"
   SL1
-  txt_ok "... Extracted"
+  t_ok "... Extracted"
 fi
 SL1; CR1
 
       #=# PLACEHOLDER REMINDER : As above.
 if ! [ -d "${NBPATH}" ]; then
-  txt_err "Path ${NBPATH} still doesn't look to exist ..."
-  txt_err "Manual intervention required ..."
-  txt_norm "Path here :"
+  t_err "Path ${NBPATH} still doesn't look to exist ..."
+  t_err "Manual intervention required ..."
+  t_norm "Path here :"
   ls -lah "${ROOT}" | grep netbox
   CR1
   GAME_OVER
 fi
 CR1
 
-txt_header "----- NETBOX INSTALL CHECK COMPLETE -----"
+t_head "----- NETBOX INSTALL CHECK COMPLETE -----"
 SL2; CR2
 
 
@@ -355,11 +355,11 @@ SL2; CR2
 
      #=# PLACEHOLDER REMINDER : Revise code. Some redundant, at least at this stage.
 #elif [[ $INSTALL = git ]]; then
-#  txt_err "Git installs not yet supported. Script cannot continue ..."
+#  t_err "Git installs not yet supported. Script cannot continue ..."
 #  GAME_OVER
 #if [[ $INSTALL = upgrade ]] || [[ $INSTALL = git ]]; then
 if [[ $INSTALL = upgrade ]]; then
-  txt_header "----- BACKUP FILES AND DATABASE -----"
+  t_head "----- BACKUP FILES AND DATABASE -----"
   SL1; CR2
   
   WILL_YOU_CONTINUE
@@ -369,22 +369,22 @@ if [[ $INSTALL = upgrade ]]; then
   mkdir -p "${BKPATH}"
        #=# PLACEHOLDER REMINDER
        # File validations before copy, eg ldap
-  txt_info "Copying files to backup dir ..."
+  t_info "Copying files to backup dir ..."
   cp $NBROOT/local_requirements.txt "${BKPATH}/"
   cp $NBROOT/gunicorn.py "${BKPATH}/"
   cp $NBROOT/netbox/netbox/configuration.py "${BKPATH}/"
   cp $NBROOT/netbox/netbox/ldap_config.py "${BKPATH}/"
-  txt_ok "Complete !"
+  t_ok "Complete !"
   SL0; CR1
-  txt_info "Backed up files here: "
+  t_info "Backed up files here: "
   ls -lah "${BKPATH}"/
   SL2; CR2
        #=# PLACEHOLDER REMINDER
        # Come back to this for database backup etc
-  #txt_warn "TODO: DATABASE BACKUP STUFF HERE"
-  #txt_warn "TODO: TAR FILES HERE"
-  #txt_warn "TODO: DELETE SOURCE FILES ONCE TAR'd"
-  txt_header "----- BACKUP COMPLETE -----"
+  #t_warn "TODO: DATABASE BACKUP STUFF HERE"
+  #t_warn "TODO: TAR FILES HERE"
+  #t_warn "TODO: DELETE SOURCE FILES ONCE TAR'd"
+  t_head "----- BACKUP COMPLETE -----"
   unset TIME
 fi
 
@@ -393,7 +393,7 @@ fi
 
 
 if [[ $INSTALL = upgrade ]]; then
-  txt_header "----- UPGRADE COPY : FILES TO NEW NETBOX DIR -----"
+  t_head "----- UPGRADE COPY : FILES TO NEW NETBOX DIR -----"
   SL1; CR1
   
   WILL_YOU_CONTINUE
@@ -412,7 +412,7 @@ if [[ $INSTALL = upgrade ]]; then
   # cp -r $NBROOT-$OLDVER/netbox/scripts $NBROOT/netbox/
   # cp -r $NBROOT-$OLDVER/netbox/reports $NBROOT/netbox/
 
-  txt_header "+++ UPGRADE COPY : COMPLETE +++"
+  t_head "+++ UPGRADE COPY : COMPLETE +++"
 fi
 
 SL2
@@ -428,73 +428,73 @@ SL2
 
 
 if [[ $INSTALL = upgrade ]]; then
-  txt_header "----- UPGRADE : STOP NETBOX PROCESSES AND SYMLINK -----"
-  txt_warn "Caution: This will make Netbox unavailable!"
+  t_head "----- UPGRADE : STOP NETBOX PROCESSES AND SYMLINK -----"
+  t_warn "Caution: This will make Netbox unavailable!"
   SL1; CR1
   
   WILL_YOU_CONTINUE
 
   OLDVER=$(ls -ld ${NBROOT} | awk -F"${NBROOT}-" '{print $2}' | cut -d / -f 1)
   if ! [[ $OLDVER =~ $REGEXVER ]]; then
-    txt_warn "Discovered '${OLDVER}' doesn't look to be valid (eg 3.6.0) ..."
+    t_warn "Discovered '${OLDVER}' doesn't look to be valid (eg 3.6.0) ..."
     SL1; CR1
-    txt_info "Directory list here:"
+    t_info "Directory list here:"
     ls -ld "${NBROOT}" | grep netbox
     while true; do
       COUNT=0
       read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " -r OLDVER
       if ! [[ $OLDVER =~ $REGEXVER ]]; then
         if [[ "${COUNT}" -gt 2 ]]; then
-          txt_err "... Three incorrect attempts made."
+          t_err "... Three incorrect attempts made."
           GAME_OVER
         fi
-        txt_warn "Selection '${OLDVER}' format STILL not valid (eg 3.6.0). Try again ..."
+        t_warn "Selection '${OLDVER}' format STILL not valid (eg 3.6.0). Try again ..."
         ((COUNT++))
         SL1
         continue
       elif [[ $OLDVER =~ $REGEXVER ]]; then
-        txt_ok "Selection '${OLDVER}' looks to be valid ..."
+        t_ok "Selection '${OLDVER}' looks to be valid ..."
         break
       fi
     done
   fi
   CR1; SL1
-  txt_info "Comparing current (${OLDVER}) to selection (${NEWVER})"
+  t_info "Comparing current (${OLDVER}) to selection (${NEWVER})"
        #=# PLACEHOLDER REMINDER : Figure out this syntax. Needs more observation.
   #https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
   #if awk "BEGIN {exit !($NEWVER >= $OLDVER)}"; then
   #if [[ awk "BEGIN {exit !($NEWVER >= $OLDVER)}" == 1 ]]; then
   if [[ $(echo "${NEWVER} ${OLDVER}" | awk '{print ($1 >= $2)}') == 1 ]]; then
-    txt_err "Current 'v${OLDVER}' same or newer than installing 'v${NEWVER}' !"
+    t_err "Current 'v${OLDVER}' same or newer than installing 'v${NEWVER}' !"
     GAME_OVER
   fi
 fi
 
 if [[ $INSTALL = new ]]; then
-  txt_warn "New install selected. No processes to stop ..."
+  t_warn "New install selected. No processes to stop ..."
 elif [[ $INSTALL = git ]]; then
-  txt_err "Git installs not yet supported. Script cannot continue ..."
+  t_err "Git installs not yet supported. Script cannot continue ..."
   GAME_OVER
 elif [[ $INSTALL = upgrade ]]; then
   systemctl stop netbox netbox-rq
        #=# PLACEHOLDER REMINDER
        # Validate processes have actually stopped
-  txt_ok "Processes netbox and netbox-rq stopped ..."
+  t_ok "Processes netbox and netbox-rq stopped ..."
   SL1
   ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
-  txt_info "Backed up files here: "
+  t_info "Backed up files here: "
        #=# PLACEHOLDER REMINDER
        # Finish this off
 fi
 
 if [[ $INSTALL = upgrade ]]; then
-  txt_info "Symlinking New ${NEWVER} to ${NBROOT}"
+  t_info "Symlinking New ${NEWVER} to ${NBROOT}"
   ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
 fi
 
 
 SL2
-txt_header "+++ STAGEx COMPLETE +++"
+t_head "+++ STAGEx COMPLETE +++"
 SL2
 
 #################################################################################################
@@ -503,17 +503,17 @@ SL2
 # https://docs.netbox.dev/en/stable/installation/1-postgresql/
 
 if [[ $INSTALL = new ]]; then
-  txt_header "----- NEW : SETUP POSTGRESQL +++"
+  t_head "----- NEW : SETUP POSTGRESQL +++"
   SL2; CR2
   
-  txt_info "Setting up Database ..."
+  t_info "Setting up Database ..."
   SL0
   
   WILL_YOU_CONTINUE
 
-  txt_info "Installing packages '${PKG_PSQL}' ..."
+  t_info "Installing packages '${PKG_PSQL}' ..."
   $PMGET $PKG_PSQL
-  txt_ok "... done !"
+  t_ok "... done !"
   SL0; CR2
   
   set -e
@@ -534,24 +534,24 @@ if [[ $INSTALL = new ]]; then
        #=# PLACEHOLDER REMINDER
        # Check for password file before autogeneration.
        # Should cover interrupted or incomplete installs.
-  txt_info "Displaying password ..."
+  t_info "Displaying password ..."
   SL1; CR1
-  txt_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
+  t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
   SL0; CR1
-  txt_info "Database Password"
+  t_info "Database Password"
   echo "$DB_PASS" | tee .DB_PASS
   
-  txt_info "Netbox Secret Password"
+  t_info "Netbox Secret Password"
   echo "$SC_PASS" | tee .SC_PASS
   SL0; CR1
-  txt_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
+  t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
   SL0; CR1
-  txt_ok "Password files '.DB_PASS' and '.SC_PASS' in '$(pwd)' dir"
+  t_ok "Password files '.DB_PASS' and '.SC_PASS' in '$(pwd)' dir"
   SL2; CR2
   
        #=# PLACEHOLDER REMINDER
        # Validate database creation, just in case another install is made.       
-  txt_info "Modifying database."
+  t_info "Modifying database."
   su postgres <<EOF
 psql -c "CREATE DATABASE $DB_NAME;"
 psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
@@ -582,10 +582,10 @@ EOF
    # SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
    # netbox=> \q
   fi
-  txt_ok "... done !"
+  t_ok "... done !"
   SL1; CR1
 
-  txt_header "----- POSTGRES SETUP COMPLETE -----"
+  t_head "----- POSTGRES SETUP COMPLETE -----"
   SL2
 fi
 
@@ -593,29 +593,29 @@ fi
 
 
 if [[ $INSTALL = new ]]; then
-  txt_header "----- NEW : SETUP REDIS -----"
+  t_head "----- NEW : SETUP REDIS -----"
   
   WILL_YOU_CONTINUE
   
-  txt_info "Installing packages for Redis ..."
+  t_info "Installing packages for Redis ..."
   CR1
   $PMGET $PKG_REDIS
   SL0; CR1
   
-  txt_ok "... done !"
+  t_ok "... done !"
   SL0; CR1
   
-  txt_info "Redis checks..."
+  t_info "Redis checks..."
   SL1; CR1
   
        #=# PLACEHOLDER REMINDER
        # Add auto-validation to capture the PONG to the ping. Consider intervention if not.
   redis-server -v
   redis-cli ping
-  txt_ok "... done"
+  t_ok "... done"
   SL2; CR2
   
-  txt_header "----- REDIS SETUP DONE -----"
+  t_head "----- REDIS SETUP DONE -----"
   SL2; CR2
 fi
 
@@ -624,20 +624,20 @@ fi
 
 
 if [[ $INSTALL = new ]]; then
-  txt_header "----- NEW : NETBOX SETUP -----"
+  t_head "----- NEW : NETBOX SETUP -----"
   SL0; CR1
   
   WILL_YOU_CONTINUE
   SL0; CR2
   
-  txt_info "Installing packages ..."
+  t_info "Installing packages ..."
   $PMGET $PKG_NETBOX
   SL0; CR1
-  txt_ok "... done !"
+  t_ok "... done !"
   
   ln -sfn "${NBROOT}-${NEWVER}"/ "${NBROOT}"
 
-  txt_info "Setting permissions on dirs ..."
+  t_info "Setting permissions on dirs ..."
        #=# PLACEHOLDER REMINDER
        # Make more robust I guess
   if [[ $PMGR = apt ]]; then
@@ -652,11 +652,11 @@ if [[ $INSTALL = new ]]; then
     chown --recursive netbox /opt/netbox/netbox/reports/
     chown --recursive netbox /opt/netbox/netbox/scripts/
   else
-    txt_err "Exception. Distro not determined"
+    t_err "Exception. Distro not determined"
     GAME_OVER
   fi
   SL1; CR1
-  txt_ok "... done !"
+  t_ok "... done !"
 
   
   cd "${NBROOT}/netbox/netbox/"
@@ -667,37 +667,37 @@ if [[ $INSTALL = new ]]; then
        #
        # Also evaluate making this user input choice using the likes of nano.
        
-  txt_info "Updating configuration.py ..."
+  t_info "Updating configuration.py ..."
   SL1; CR1
   
-  txt_info "Before : ALLOWED_HOSTS"
+  t_info "Before : ALLOWED_HOSTS"
   printf '%b\n' "$(cat configuration.py | grep -F "ALLOWED_HOSTS = [" | grep -v Example)"
     sed -i "s|ALLOWED_HOSTS = \[\]|ALLOWED_HOSTS = \['*'\]|g" configuration.py
-  txt_info "After : ALLOWED_HOSTS"
+  t_info "After : ALLOWED_HOSTS"
   printf '%b\n' "$(cat configuration.py | grep -F "ALLOWED_HOSTS = [" | grep -v Example)"
   SL1; CR1
 
-  txt_info "Before : Netbox Database User"
+  t_info "Before : Netbox Database User"
   printf '%b\n' "$(cat configuration.py | grep -F "'USER': '")"
     sed -i "s|'USER': '',|'USER': '$DB_USER',|g" configuration.py
-  txt_info "After : Netbox Database User"
+  t_info "After : Netbox Database User"
   printf '%b\n' "$(cat configuration.py | grep -F "'USER': '")"
   SL1; CR1
 
-  txt_info "Before : Password for User"
+  t_info "Before : Password for User"
   printf '%b\n' "$(cat configuration.py | grep -F "'PASSWORD': '" | grep -F "PostgreSQL")"
     sed -i "s|'PASSWORD': '',           # PostgreSQL password|'PASSWORD': '$DB_PASS',           # PostgreSQL password|g" configuration.py
-  txt_info "After : Password for User"
+  t_info "After : Password for User"
   printf '%b\n' "$(cat configuration.py | grep -F "'PASSWORD': '" | grep -F "PostgreSQL")"
   SL1; CR1
 
-  txt_info "Before : Secret Pass for Netbox"
+  t_info "Before : Secret Pass for Netbox"
   printf '%b\n' "$(cat configuration.py | grep -F "SECRET_KEY = '")"
     sed -i "s|SECRET_KEY = ''|SECRET_KEY = '$SC_PASS'|g" configuration.py
-  txt_info "After : Secret Pass for Netbox"
+  t_info "After : Secret Pass for Netbox"
   printf '%b\n' "$(cat configuration.py | grep -F "SECRET_KEY = '")"
   SL1; CR2
-  txt_ok "... done"
+  t_ok "... done"
   SL0; CR2
   
   # Hint: Square brackets '[]' need escaping '\[\]'. Possibly others.
@@ -720,44 +720,44 @@ if [[ $INSTALL = new ]]; then
     #sed -i "s|# SCRIPTS_ROOT = '/opt/netbox/netbox/scripts'|SCRIPTS_ROOT = '$NBSCRIPTS'|g" configuration.py
   #printf '%b\n' "$(cat configuration.py | grep -F "SCRIPTS_ROOT")"
   
-  #txt_warn "Clearing DB_PASS variable. Temporarily stored as file .DB_PASS in $(pwd)"
+  #t_warn "Clearing DB_PASS variable. Temporarily stored as file .DB_PASS in $(pwd)"
   #unset DB_PASS
 
   # Redundant since we do our own
-  # txt_info "Generate a secret key"
+  # t_info "Generate a secret key"
   # python3 ../generate_secret_key.py | tee .NB_PASS
   # SL1; CR2
   
        #=# PLACEHOLDER REMINDER
        # Code duplicity with upgrade section above. Look to consolidate
-  txt_info "Run Netbox upgrade script ..."
+  t_info "Run Netbox upgrade script ..."
   SL2; CR2
   bash "${NBROOT}/upgrade.sh"
   SL2; CR2
-  txt_ok "... done"
+  t_ok "... done"
   SL0; CR1
   
-  txt_info "Create Superuser"
+  t_info "Create Superuser"
   nbmg createsuperuser
   SL1; CR1
-  txt_ok "... done"
+  t_ok "... done"
        #=# PLACEHOLDER REMINDER
        # Evaluate this not being missed on a 3.4+ to 3.6 upgrade.
        # Will need to pull it out of the if conditional.
   if [[ $(echo "${NEWVER} 3.6.0" | awk '{print ($1 >= $2)}') == 1 ]]; then
-    txt_info "Selection (${NEWVER}) or newer than 3.6.0 requires Dulwich for Git data source function."
-    txt_info "Adding dulwich to local_requirements.txt"
+    t_info "Selection (${NEWVER}) or newer than 3.6.0 requires Dulwich for Git data source function."
+    t_info "Adding dulwich to local_requirements.txt"
     echo 'dulwich' >> "${NBROOT}/local_requirements.txt"
     SL1; CR1
-    txt_ok "... done"
+    t_ok "... done"
   fi
     
-  txt_info "Adding Housekeeping to cron tasks"
+  t_info "Adding Housekeeping to cron tasks"
   ln -s "${NBROOT}/contrib/netbox-housekeeping.sh" /etc/cron.daily/netbox-housekeeping
   SL0
-  txt_ok "... done"
+  t_ok "... done"
   
-  txt_header "----- NETBOX SETUP DONE -----"
+  t_head "----- NETBOX SETUP DONE -----"
   SL2
 fi
 
@@ -765,20 +765,20 @@ fi
 #################################################################################################
 
 if [[ $INSTALL = new ]]; then
-  txt_header "----- NEW : GUNICORN SETUP -----"
+  t_head "----- NEW : GUNICORN SETUP -----"
   SL0; CR1
   
   WILL_YOU_CONTINUE
   SL0; CR1
 
-  txt_info "Copying files to set Netbox as service ..."
+  t_info "Copying files to set Netbox as service ..."
   cp "${NBROOT}/contrib/gunicorn.py" "${NBROOT}/gunicorn.py"
   cp -v "${NBROOT}/contrib/"*".service" "/etc/systemd/system/"
   SL1; CR1
-  txt_ok "... done"
+  t_ok "... done"
   SL0; CR2
 
-  txt_info "Starting Netbox processes..."
+  t_info "Starting Netbox processes..."
   systemctl daemon-reload
   systemctl start netbox netbox-rq
   systemctl enable netbox netbox-rq
@@ -786,10 +786,10 @@ if [[ $INSTALL = new ]]; then
        # Add service start validation. Perhaps make a counter loop.
   # systemctl status netbox.service
   SL2; CR1
-  txt_ok "...done."
+  t_ok "...done."
   SL1; CR1
   
-  txt_header "----- GUNICORN SETUP DONE -----"
+  t_head "----- GUNICORN SETUP DONE -----"
   SL2
 fi
 
@@ -804,21 +804,21 @@ if [[ $INSTALL = new ]]; then
   NB_DNS=netbox.local
   WWW=nginx
 
-  txt_info "Installing packages ..."
+  t_info "Installing packages ..."
   $PMGET $PKG_WWW
   SL0; CR1
-  txt_ok "... done !"
+  t_ok "... done !"
   SL1; CR1
 
   if [[ "${WWW}" = nginx ]]; then
-    txt_header "----- SETUP NGINX -----"
+    t_head "----- SETUP NGINX -----"
     SL0
 
     WILL_YOU_CONTINUE
   
        #=# PLACEHOLDER REMINDER
        # Place options, including use certbot to properly do this
-    txt_info "Creating certs..."
+    t_info "Creating certs..."
     SL2; CR1
 
     openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
@@ -826,27 +826,27 @@ if [[ $INSTALL = new ]]; then
     -keyout /etc/ssl/private/netbox.key \
     -out /etc/ssl/certs/netbox.crt
 
-    txt_ok "... done"
+    t_ok "... done"
     SL1; CR1
   
     cp $NBROOT/contrib/nginx.conf /etc/nginx/sites-available/netbox
   
        #=# PLACEHOLDER REMINDER
        # Make this interactive. Consider defining with others at start and then having a match conditional here.
-    txt_info "Adjusting ${WWW} config server name"
+    t_info "Adjusting ${WWW} config server name"
     SL0; CR1
 
-    txt_info "Before:"
+    t_info "Before:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
       sed -i "s|netbox.example.com|$NB_DNS|g" /etc/nginx/sites-available/netbox
     SL1
-    txt_info "After:"
+    t_info "After:"
     printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
     SL0; CR1
-    txt_ok "... done"
+    t_ok "... done"
     SL1; CR2
 
-    txt_info "Cleaning up..."
+    t_info "Cleaning up..."
     rm /etc/nginx/sites-enabled/default
     ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
 
@@ -855,27 +855,27 @@ if [[ $INSTALL = new ]]; then
     systemctl restart nginx
   
   fi
-  txt_header "----- NGINX SETUP DONE -----"
+  t_head "----- NGINX SETUP DONE -----"
   SL2
 fi
 
 #################################################################################################
 
 ## PLACEHOLDER REMINDER : Perform this process.
-# txt_header "----- SETUP SSL CERTIFICATES -----"
+# t_head "----- SETUP SSL CERTIFICATES -----"
 
 
 #################################################################################################
 
 
-txt_header "----- RUNNING SCRIPT AND STARTING NETBOX -----"
+t_head "----- RUNNING SCRIPT AND STARTING NETBOX -----"
 SL1; CR2
      #=# PLACEHOLDER REMINDER
      # This applies to new/git installs also. Consider conolidating code.
-txt_info "Running the Netbox upgrade script..."
+t_info "Running the Netbox upgrade script..."
      #=# PLACEHOLDER REMINDER : add git types to ifs
 if ! [[ $INSTALL = new ]] || [[ $INSTALL = git_new ]]; then
-  txt_warn "Likely no going back after this !"
+  t_warn "Likely no going back after this !"
   SL0; CR2
   WILL_YOU_CONTINUE
   SL1; CR2
@@ -883,10 +883,10 @@ fi
 
 bash "${NBROOT}/upgrade.sh" | tee "upgrade_$(date +%y-%m-%d_%H-%M).log"
 SL1; CR1
-txt_ok "... done"
+t_ok "... done"
 SL1; CR2
 
-txt_info "Starting Netbox processes ..."
+t_info "Starting Netbox processes ..."
 SL0; CR1
      #=# PLACEHOLDER REMINDER
      # Make this a better choice.
@@ -896,14 +896,14 @@ SL1; CR1
      # Add process start validation.
 systemctl start netbox netbox-rq
 SL0; CR1
-txt_ok "Processes started"
+t_ok "Processes started"
 SL2
 # systemctl status netbox netbox-rq
 
-txt_header "----- NETBOX RUNNING -----"
+t_head "----- NETBOX RUNNING -----"
 SL2
 
 # FINISHED !!
 endTime=$(date +%s)
-txt_ok "Script completed in $(( endTime - startTime )) seconds!"
+t_ok "Script completed in $(( endTime - startTime )) seconds!"
 SL2; CR2
