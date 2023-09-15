@@ -548,19 +548,24 @@ if [[ $INSTALL = new ]]; then
        # Should cover interrupted or incomplete installs.
   t_info "Displaying password ..."
   SL1; CR1
-  t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
-  SL0; CR1
-  t_info "Database Password"
-  echo "$DB_PASS" | tee .DB_PASS
-  
-  t_info "Netbox Secret Password"
-  echo "$SC_PASS" | tee .SC_PASS
-  SL0; CR1
-  t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
-  SL0; CR1
-  t_ok "Password files '.DB_PASS' and '.SC_PASS' in '$(pwd)' dir"
-  SL2; CR2
-  
+  if [[ -e "${bkRoot}/.DB_PASS" ]] || [[ -e "${bkRoot}/.DB_PASS" ]]; then
+    t_err "One or more files already exist !"
+    t_err "Seems a possible failed or interrupted new install ..."
+    WILL_YOU_CONTINUE
+  else
+    mkdir -p "${bkRoot}"
+    t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
+    SL0; CR1
+    t_info "Database Password"
+      t_norm "$DB_PASS" | tee "${bkRoot}/.DB_PASS"
+    t_info "Netbox Secret Password"
+      t_norm "$SC_PASS" | tee "${bkRoot}/.SC_PASS"
+    SL0; CR1
+    t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
+    SL0; CR1
+    t_ok "Password files '.DB_PASS' and '.SC_PASS' in '$(pwd)' dir"
+    SL2; CR2
+  fi
        #=# PLACEHOLDER REMINDER
        # Validate database creation, just in case another install is made.       
   t_info "Modifying database."
