@@ -31,33 +31,14 @@ CYAN=$(tput setaf 6)
 CYANB=$(tput bold setaf 6)
 CLR=$(tput sgr0)
 
-
-## OLD : TO GO ONCE DEPENDENCIES DEAD : Terminal text colouration for readability
-txt_norm() { local msg="$1"; printf '%b\n' "${msg}"; }
-txt_nindent() { local msg="$1"; printf '%b\n' "  ${msg}"; }
-
-txt_info() { local msg="$1"; printf '%b\n' "${CYAN}${msg}${CLR}"; }
-txt_ok() { local msg="$1"; printf '%b\n' "${GREEN} ✓ ${msg}${CLR}"; }
-txt_warn() { local msg="$1"; printf '%b\n' "${YELB} ! ${msg}${CLR}"; }
-txt_err() { local msg="$1"; printf '%b\n' "${REDB} ✗ ${msg}${CLR}"; }
-
-txt_header() { local msg="$1"; printf '\n%b\n' "${CYANB}${msg}${CLR}"; SL1; }
-txt_url() { local msg="$1"; printf '%b\n' "${BLUU}${msg}${CLR}"; }
-#-------
-
 ## NEW : Terminal text colouration for readability
 t_norm() { local msg="$1"; printf '%b\n' "${msg}"; }
-t_nind() { local msg="$1"; printf '%b\n' "  ${msg}"; }
-
 t_info() { local msg="$1"; printf '%b\n' "${CYAN}${msg}${CLR}"; }
 t_ok() { local msg="$1"; printf '%b\n' "${GREEN} ✓ ${msg}${CLR}"; }
 t_warn() { local msg="$1"; printf '%b\n' "${YELB} ! ${msg}${CLR}"; }
 t_err() { local msg="$1"; printf '%b\n' "${REDB} ✗ ${msg}${CLR}"; }
-
 t_head() { local msg="$1"; printf '\n%b\n' "${CYANB}${msg}${CLR}"; SL1; }
 t_url() { local msg="$1"; printf '%b\n' "${BLUU}${msg}${CLR}"; }
-
-
 
 ## Delay, carriage returns, spacing
 SL0() { sleep 0.5; }
