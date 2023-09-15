@@ -563,7 +563,7 @@ if [[ $INSTALL = new ]]; then
     SL0; CR1
     t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
     SL0; CR1
-    t_ok "Password files '.DB_PASS' and '.SC_PASS' in '$(pwd)' dir"
+    t_ok "Password files '.DB_PASS' and '.SC_PASS' in '${bkRoot}' dir"
     SL2; CR2
   fi
        #=# PLACEHOLDER REMINDER
