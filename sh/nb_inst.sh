@@ -17,7 +17,7 @@ GREETINGS_TRAVELLER() {
 #  License : MIT
 #
 #  Created: 2023-07-09
-#  Updated: 2023-07-14
+#  Updated: 2023-07-16
 #
 #   Script created in Bash 5.1.16(1) on Ubuntu.
 #   Tested against Netbox v3.5.9 and v3.6.2
@@ -93,7 +93,7 @@ urlC="https://github.com/netbox-community/"
 # Packages in various stages.
      #=# PLACEHOLDER REMINDER : Plan on making this interactive.
 
-pkgScript="wget tar nano openssl"
+pkgScript="wget tar nano curl"
 
 if [[ $PMGR = apt ]] || [[ $PMGR = yum ]]; then
   pkgGit="git"
@@ -798,6 +798,8 @@ if [[ $INSTALL = new ]]; then
   SL1; CR1
   CHECK_START netbox
   CHECK_START netbox-rq
+  CHECK_URL $(hostname -i)
+
   
   SL2; CR1
   t_ok "...done."
@@ -870,6 +872,7 @@ if [[ $INSTALL = new ]]; then
     SL1; CR1
     
     CHECK_START nginx
+    CHECK_URL $(hostname -i)
   fi
   t_head "----- NGINX SETUP DONE -----"
   SL2
@@ -914,6 +917,7 @@ systemctl start netbox netbox-rq
 SL0; CR1
 CHECK_START netbox
 CHECK_START netbox-rq
+CHECK_URL $(hostname -i)
 t_ok "Processes started"
 SL2
 # systemctl status netbox netbox-rq
