@@ -147,10 +147,14 @@ else
   local found+=($service)
 fi
 done
+if [ ${found} ]; then
 t_ok "The following are installed:"
 t_info "  ${found[@]}"; SL0
-t_warn "The following aren't installed:"
-t_info "  ${missing[@]}"; SL2
+fi
+if [ ${missing} ]; then
+  t_warn "The following aren't installed:"
+  t_info "  ${missing[@]}"; SL2
+fi
 
 t_err "Reminder"
 t_err "Prompt to install goes here !!"
