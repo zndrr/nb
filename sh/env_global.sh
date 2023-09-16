@@ -97,6 +97,18 @@ CR1
 t_ok "Continuing ..."
 }
 
+CHECK_CHECK() {
+t_info "Checking root privileges ..."
+SL2
+if ! [ "$(whoami)" = root ]; then
+  t_err "Please run this script as root or using sudo ..."
+  GAME_OVER
+else
+  t_ok "Root privileges confirmed. Continuing ..."
+fi
+}
+
+      #=# PLACEHOLDER REMINDER : remove this
 ROOT_CHECK() {
 t_info "Checking root privileges ..."
 SL2
@@ -114,7 +126,6 @@ fi
 
 ## Check functions. Some might not work on CentOS, but don't know yet.
 CHECK_PKG_MGR() {
-local DSTRO=0
 t_info "Checking package manager..."
 SL2
 if [[ $(command -v apt) ]]; then
