@@ -143,23 +143,18 @@ local list=($@)
 for service in "${list[@]}"; do
 if [ ! $(command -v $service ) ]; then
   local missing+=($service)
-else
+elif [ $(command -v $service) ]; then
   local found+=($service)
 fi
 done
 if [ ${found} ]; then
 t_ok "The following are installed:"
-t_info "  ${found[@]}"; SL0
+t_norm "  ${found[*]}"; SL0
 fi
 if [ ${missing} ]; then
-  t_warn "The following aren't installed:"
-  t_info "  ${missing[@]}"; SL2
+  t_err "The following aren't installed:"
+  t_norm "  ${missing[*]}"; SL2
 fi
-
-t_err "Reminder"
-t_err "Prompt to install goes here !!"
-t_err "Reminder"
-
 for install in ${missing[@]}; do
   $PMGET $install
 done
