@@ -113,6 +113,55 @@ fi
       # change some or all to while loops with local var counters
 
 ## Check functions. Some might not work on CentOS, but don't know yet.
+CHECK_PKG_MGR() {
+local DSTRO=0
+t_info "Checking package manager..."
+SL2
+if [[ $(command -v apt) ]]; then
+  PMGR="apt"
+  DSTRO="Debian/Ubuntu"
+elif [[ $(command -v yum) ]]; then
+  PMGR="yum"
+  DSTRO="CentOS"
+        #=# PLACEHOLDER REMINDER
+        # Test with CentOS release to validate.
+  t_warn "Script hasn't been tested against CentOS !"
+  t_warn "Run at your own peril !"
+  WILL_YOU_CONTINUE
+else
+  t_err "Package manager not APT(Debian/Ubuntu) or YUM(RHEL/CentOS)"
+  t_err "Script doesn't support other types ..."
+  GAME_OVER
+fi
+t_ok "Package manager identified as ${PMGR} (${DSTRO})"
+PMUPD="${PMGR} update"
+PMGET="${PMGR} install -y"
+SL0
+}
+
+      #=# PLACEHOLDER REMINDER
+      # Incomplete. Needs prompts for install.
+CHECK_PACKAGES() {
+local list=($@)
+for service in "${list[@]}"; do
+if [ ! $(command -v $service ) ]; then
+  local missing+=($service)
+fi
+done
+t_warn "The following aren't installed:"
+t_info "  ${missing[@]}"; SL2
+
+t_err "Reminder
+t_err "Prompt to install goes here !!"
+t_err "Reminder
+
+for install in ${missing[@]}; do
+  $PMGET $install
+done
+}
+
+
+
 CHECK_START() {
 if [ ! $(systemctl is-active "$1" ) > /dev/null ]; then
   t_err "Process '$1' doesn't appear to have started!"
@@ -131,6 +180,9 @@ if curl -sSfkL -m 3 "$1" -o /dev/null; then
 fi
 }
 
+
+
+      #=# PLACEHOLDER : NEEDS DELETION
 PKG_MGR_CHECK() {
 local DSTRO=0
 t_info "Checking package manager..."
@@ -157,7 +209,7 @@ PMGET="${PMGR} install -y"
 SL0
 }
 
-# Compare release versions (ref xxvix).
+# Compare release versions in semantic format (ref xxvix).
 SW_VER() {
   printf '%b\n' "$1" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3,$4); }'
 }
