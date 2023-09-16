@@ -141,7 +141,7 @@ SL0
 
       #=# PLACEHOLDER REMINDER
       # Incomplete. Needs prompts for install.
-CHECK_PACKAGES() {
+CHECK_PKG() {
 local list=($@)
 for service in "${list[@]}"; do
 if [ ! $(command -v $service ) ]; then
