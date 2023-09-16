@@ -99,7 +99,7 @@ say "... Extracted!"; sleep 0.5
 ## Works by copying the file and modifying that, then deleting after.
 if [ -e "${testScript}" ]; then
   #say "Removing pattern '${delPattern}' from '${testScript}"
-  say "Removing pattern '${delPattern2}' from '${testScript2}"
+  say "Removing pattern '${delPattern2}' from '${testScript}"
   say "Cloning script to perform action. Original will be preserved."
     cp ${testScript} "temp.${testScript}"; sleep 0.5
     #sed -i "s|$delPattern||g" "temp.${testScript}"; sleep 0.5
