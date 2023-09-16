@@ -139,7 +139,7 @@
 #    https://stackoverflow.com/questions/23718936/explanation-for-sprintf03d-7-functionality
 # 
 # 
-#--- xxvix
+#--- xxix
 # comparing semantic version numbering
 #   https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 #   https://apple.stackexchange.com/questions/83939/compare-multi-digit-version-numbers-in-bash/123408#123408
@@ -158,5 +158,21 @@
 # ! 
 # ! if [ $(NB_VER ${new}) -ge $(NB_VER ${old}) ]; then echo "${new} newer than ${old}!"; else echo ${new} older than ${old}; fi
 # ! !! 3.4.10.1 older than 3.5.0
+#
+# --- xxx
+# bash arrays
+#   https://linuxhint.com/bash_append_array/
+#   https://stackoverflow.com/questions/9293887/how-to-read-a-space-delimited-string-into-an-array-in-bash
+#   https://linuxhint.com/bash_append_array/
+#   https://transang.me/array-expansion-in-bash/
+#   https://unix.stackexchange.com/questions/349974/how-to-expand-array-content-from-its-name
+# 
+# --- xxxi
+# checking pkg installed part deus
+#   https://askubuntu.com/questions/1103860/script-to-check-if-some-program-is-already-installed
+#     >  dpkg -s <packagename> &> /dev/null
+#   x https://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
+#   x >  dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$"
+#
 #
 #################################################################################################
