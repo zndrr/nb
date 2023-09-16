@@ -131,34 +131,59 @@ else
   GAME_OVER
 fi
 t_ok "Package manager identified as ${PMGR} (${DSTRO})"
-PMUPD="${PMGR} update"
-PMGET="${PMGR} install -y"
 SL0
 }
+
+PMUPD(){ ${PMGR} update; }
+PMGET(){ ${PMGR} install -qq -y $1; }
+PMREM(){ ${PMGR} remove -qq -y $1; }
 
       #=# PLACEHOLDER REMINDER
       # Incomplete. Needs prompts for install.
 CHECK_PKG() {
 local list=($@)
 for service in "${list[@]}"; do
-if [ ! $(command -v $service ) ]; then
-  local missing+=($service)
-elif [ $(command -v $service) ]; then
-  local found+=($service)
-fi
+  dpkg -s $service &> /dev/null
+  if [ $? -ne 0 ]; then
+    local missing+=($service)
+  else
+    local found+=($service)
+  fi
 done
 if [ ${found} ]; then
-t_ok "The following are installed:"
-t_norm "  ${found[*]}"; SL0
+  t_ok "The following are installed:"
+  t_norm "  ${found[*]}"; SL0
 fi
 if [ ${missing} ]; then
   t_err "The following aren't installed:"
-  t_norm "  ${missing[*]}"; SL2
+  t_norm "  ${missing[*]}"; SL0
+  PMGET "${missing[*]}" 
 fi
-for install in ${missing[@]}; do
-  $PMGET $install
-done
 }
+
+#### Auditing replacement
+##!
+##!  CHECK_PKG() {
+##!  local list=($@)
+##!  for service in "${list[@]}"; do
+##!  if [ ! $(command -v $service ) ]; then
+##!    local missing+=($service)
+##!  elif [ $(command -v $service) ]; then
+##!    local found+=($service)
+##!  fi
+##!  done
+##!  if [ ${found} ]; then
+##!  t_ok "The following are installed:"
+##!  t_norm "  ${found[*]}"; SL0
+##!  fi
+##!  if [ ${missing} ]; then
+##!    t_err "The following aren't installed:"
+##!    t_norm "  ${missing[*]}"; SL2
+##!  fi
+##!  for install in ${missing[@]}; do
+##!    $PMGET $install
+##!  done
+##!  }
 
 
       #=# PLACEHOLDER REMINDER
