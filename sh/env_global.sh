@@ -134,9 +134,15 @@ t_ok "Package manager identified as ${PMGR} (${DSTRO})"
 SL0
 }
 
+## Quiet commands, no stout
 PMUPD(){ ${PMGR} update; }
-PMGET(){ ${PMGR} install -qq -y $1; }
-PMREM(){ ${PMGR} remove -qq -y $1; }
+PMGET(){ ${PMGR} install -qq -y $1 &> .nb_apt_install.log; }
+PMREM(){ ${PMGR} remove -qq -y $1 &> .nb_apt_remove.log; }
+
+## These are the normalish output commands
+#! PMUPD(){ ${PMGR} update; }
+#! PMGET(){ ${PMGR} install -qq -y $1; }
+#! PMREM(){ ${PMGR} remove -qq -y $1; }
 
       #=# PLACEHOLDER REMINDER
       # Incomplete. Needs prompts for install.
@@ -161,7 +167,7 @@ if [ ${missing} ]; then
 fi
 }
 
-#### Auditing replacement
+#### Auditing replacement above
 ##!
 ##!  CHECK_PKG() {
 ##!  local list=($@)
