@@ -38,7 +38,12 @@ archPath="${rDir}/${gPath}/${gSubPath}"
 
 # This is to remove patterns in the testing script file (eg programmed delays or interactives)
 testScript="nb_inst.sh"
+
 delPattern="WILL_YOU_CONTINUE"
+swapPattern=""
+
+delPattern2="WILL_YOU_CONTINUE"
+swapPattern2=""
 
 #################################################
 
@@ -93,10 +98,12 @@ say "... Extracted!"; sleep 0.5
 ## This allows you to execute the testing script from this one. Timesaver!"
 ## Works by copying the file and modifying that, then deleting after.
 if [ -e "${testScript}" ]; then
-  say "Removing pattern '${delPattern}' from '${testScript}"
+  #say "Removing pattern '${delPattern}' from '${testScript}"
+  say "Removing pattern '${delPattern2}' from '${testScript2}"
   say "Cloning script to perform action. Original will be preserved."
     cp ${testScript} "temp.${testScript}"; sleep 0.5
-    sed -i "s|$delPattern||g" "temp.${testScript}"; sleep 0.5
+    #sed -i "s|$delPattern||g" "temp.${testScript}"; sleep 0.5
+    sed -i "s|$delPattern2|$swapPattern2|g" "temp.${testScript}"; sleep 0.5
   say "Executing script ..."
     sleep 2
     bash "temp.${testScript}"
