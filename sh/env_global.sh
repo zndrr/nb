@@ -108,22 +108,8 @@ else
 fi
 }
 
-      #=# PLACEHOLDER REMINDER : remove this
-ROOT_CHECK() {
-t_info "Checking root privileges ..."
-SL2
-if ! [ "$(whoami)" = root ]; then
-  t_err "Please run this script as root or using sudo ..."
-  GAME_OVER
-else
-  t_ok "Root privileges confirmed. Continuing ..."
-fi
-}
-
-
       #=# PLACEHOLDER REMINDER
       # change some or all to while loops with local var counters
-
 ## Check functions. Some might not work on CentOS, but don't know yet.
 CHECK_PKG_MGR() {
 t_info "Checking package manager..."
@@ -157,8 +143,11 @@ local list=($@)
 for service in "${list[@]}"; do
 if [ ! $(command -v $service ) ]; then
   local missing+=($service)
-fi
+else
+  local found+=($service)
 done
+t_ok "The following are installed:"
+t_info "  ${found[@]}"; SL0
 t_warn "The following aren't installed:"
 t_info "  ${missing[@]}"; SL2
 
@@ -168,12 +157,12 @@ t_err "Reminder"
 
 for install in ${missing[@]}; do
   $PMGET $install
-  t_warn "Debug CHECK_PKG install"
 done
 }
 
 
-
+      #=# PLACEHOLDER REMINDER
+      # make this more robust like a loop
 CHECK_START() {
 if [ ! $(systemctl is-active "$1" ) > /dev/null ]; then
   t_err "Process '$1' doesn't appear to have started!"
@@ -190,35 +179,6 @@ CHECK_URL() {
 if curl -sSfkL -m 3 "$1" -o /dev/null; then 
   t_ok "Web Server ' $1 ' is reachable."
 fi
-}
-
-
-
-      #=# PLACEHOLDER : NEEDS DELETION
-PKG_MGR_CHECK() {
-local DSTRO=0
-t_info "Checking package manager..."
-SL2
-if [[ $(which apt) ]]; then
-  PMGR="apt"
-  DSTRO="Debian/Ubuntu"
-elif [[ $(which yum) ]]; then
-  PMGR="yum"
-  DSTRO="CentOS"
-        #=# PLACEHOLDER REMINDER
-        # Test with CentOS release to validate.
-  t_warn "Script hasn't been tested against CentOS !"
-  t_warn "Run at your own peril !"
-  WILL_YOU_CONTINUE
-else
-  t_err "Package manager not APT(Debian/Ubuntu) or YUM(RHEL/CentOS)"
-  t_err "Script doesn't support other types ..."
-  GAME_OVER
-fi
-t_ok "Package manager identified as ${PMGR} (${DSTRO})"
-PMUPD="${PMGR} update"
-PMGET="${PMGR} install -y"
-SL0
 }
 
 # Compare release versions in semantic format (ref xxvix).
