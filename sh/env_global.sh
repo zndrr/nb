@@ -145,6 +145,7 @@ if [ ! $(command -v $service ) ]; then
   local missing+=($service)
 else
   local found+=($service)
+fi
 done
 t_ok "The following are installed:"
 t_info "  ${found[@]}"; SL0
