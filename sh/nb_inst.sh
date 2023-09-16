@@ -46,8 +46,13 @@ EOF
 clear
 
 # Checks you are root or sudo and pkg manager, quits if no sudo and/or no apt/yum.
-ROOT_CHECK
-PKG_MGR_CHECK
+CHECK_ROOT
+CHECK_PKG_MGR
+
+      #=# PLACEHOLDER REMINDER
+      # To remove
+#ROOT_CHECK
+#PKG_MGR_CHECK
 
 
 
@@ -126,21 +131,25 @@ t_info "Running a package update..."
 $PMUPD
 SL1; CR2
 
-t_info "Checking packages required for script ..."
+CHECK_PKG $pkgScript
 
-for pkg in $pkgScript; do
-  command -v "${pkg}" &>/dev/null
-  if [[ $pkg = 0 ]]; then
-    t_warn "Package '${pkg}' is not installed!"
-    pkgMissing=$(( pkgMissing + 1 ))
-    SL0
-  fi
-done
 
-if [[ $pkgMissing -gt 0 ]]; then
-  t_err "... Script cannot run without these packages."
-  GAME_OVER
-fi
+      #=# PLACEHOLDER REMINDER
+#t_info "Checking packages required for script ..."
+#
+#for pkg in $pkgScript; do
+#  command -v "${pkg}" &>/dev/null
+#  if [[ $pkg = 0 ]]; then
+#    t_warn "Package '${pkg}' is not installed!"
+#    pkgMissing=$(( pkgMissing + 1 ))
+#    SL0
+#  fi
+#done
+
+#if [[ $pkgMissing -gt 0 ]]; then
+#  t_err "... Script cannot run without these packages."
+#  GAME_OVER
+#fi
 
 t_ok "Packages okay. Continuing ..."
 SL1; CR2
@@ -524,7 +533,9 @@ if [[ $INSTALL = new ]]; then
   WILL_YOU_CONTINUE
 
   t_info "Installing packages '${pkgPsql}' ..."
-  $PMGET $pkgPsql
+  CHECK_PKG $pkgPsql
+        #=# PLACEHOLDER REMINDER
+  #$PMGET $pkgPsql
   t_ok "... done !"
   SL0; CR2
   
@@ -616,7 +627,9 @@ if [[ $INSTALL = new ]]; then
   
   t_info "Installing packages for Redis ..."
   CR1
-  $PMGET $pkgRedis
+  CHECK_PKG $pkgRedis
+        #=# PLACEHOLDER REMINDER
+  #$PMGET $pkgRedis
   SL0; CR1
   
   t_ok "... done !"
@@ -648,7 +661,9 @@ if [[ $INSTALL = new ]]; then
   SL0; CR2
   
   t_info "Installing packages ..."
-  $PMGET $pkgNetbox
+  CHECK_PKG $pkgNetbox
+        #=# PLACEHOLDER REMINDER
+  #$PMGET $pkgNetbox
   SL0; CR1
   t_ok "... done !"
   
@@ -826,7 +841,9 @@ if [[ $INSTALL = new ]]; then
   webSrv=nginx
 
   t_info "Installing packages ..."
-  $PMGET $pkgWww
+  CHECK_PKG $pkgWww
+        #=# PLACEHOLDER REMINDER
+  #$PMGET $pkgWww
   SL0; CR1
   t_ok "... done !"
   SL1; CR1
