@@ -97,7 +97,7 @@ CR1
 t_ok "Continuing ..."
 }
 
-CHECK_CHECK() {
+CHECK_ROOT() {
 t_info "Checking root privileges ..."
 SL2
 if ! [ "$(whoami)" = root ]; then
