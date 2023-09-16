@@ -151,12 +151,13 @@ done
 t_warn "The following aren't installed:"
 t_info "  ${missing[@]}"; SL2
 
-t_err "Reminder
+t_err "Reminder"
 t_err "Prompt to install goes here !!"
-t_err "Reminder
+t_err "Reminder"
 
 for install in ${missing[@]}; do
   $PMGET $install
+  t_warn "Debug CHECK_PKG install"
 done
 }
 
