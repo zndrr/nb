@@ -169,10 +169,11 @@
 # 
 # --- xxxi
 # checking pkg installed part deus
-#   https://askubuntu.com/questions/1103860/script-to-check-if-some-program-is-already-installed
-#     >  dpkg -s <packagename> &> /dev/null
+#   x https://askubuntu.com/questions/1103860/script-to-check-if-some-program-is-already-installed
+#   x  >  dpkg -s <packagename> &> /dev/null ---> not universally accurate
 #   x https://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
-#   x >  dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$"
-#
+#   x  >  dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" ---> not universally accurate
+#   https://askubuntu.com/questions/1103860/script-to-check-if-some-program-is-already-installed
+#    > apt-mark showinstall | grep -e "^$1$" &> /dev/null ---> seems to cover our bases
 #
 #################################################################################################
