@@ -29,7 +29,7 @@ BLUE=$(tput setaf 4)
 BLUU=$(tput smul setaf 4)
 CYAN=$(tput setaf 6)
 CYANB=$(tput bold setaf 6)
-MAGENTABL=$(tput sms0 setaf 125)
+MAGENTABL=$(tput smso setaf 125)
 CLR=$(tput sgr0)
 
 ## NEW : Terminal text colouration for readability
