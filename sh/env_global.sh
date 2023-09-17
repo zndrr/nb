@@ -87,30 +87,23 @@ if [ -e .NB_FAST ] || [ SKIP=yes ]; then
   t_warn "Auto-skipping continue prompt (implied continue) ..."
   SL1; CR1
 else
+  t_norm "Do you want to continue?"
   while true; do
-    t_norm "Do you want to continue?"
-    SL0
     read -p "(c)ontinue | (r)estart | (q)uit : " -r -n 1 CHOICE
-    if [[ $CHOICE =~ ^[Cc]$ ]]; then
-      SL0
-      break
-    elif [[ $CHOICE =~ ^[Rr]$ ]]; then
-      SL0
-      START_OVER
-      exec bash "$0"
-    elif [[ $CHOICE =~ ^[Qq]$ ]]; then
-      SL0
-      GAME_OVER
-    else
-      SL0
-    fi
-    t_warn "Not a valid choice. Please select again ..."
-    SL1
-    continue
+    case $CHOICE in
+      c|C)
+        break;;
+      r|R)
+        START_OVER ;;
+      q|Q)
+        GAME_OVER ;;
+      *)
+        t_warn "Not a valid choice. Please select again ..."; CR1
+    esac
   done
   CR1
   t_ok "Continuing ..."
-fi
+#fi
 }
 
 CHECK_ROOT() {
