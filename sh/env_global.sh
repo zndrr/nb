@@ -172,7 +172,7 @@ if [[ $PMGR = apt ]]; then
     t_err "The following aren't installed:"
     t_norm "  ${missing[*]}";
     # PLACEHOLDER REMINDER give fn prompt, maybe a while loop just in case
-    #PMGET "${missing[*]}"
+    PMGET "${missing[*]}"
   fi
 elif [[ $PMGR = yum ]]; then
   # This is a fallback since apt is not CentOS and so that detection won't likely work.
