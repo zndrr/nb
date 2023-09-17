@@ -74,29 +74,35 @@ GAME_OVER() {
 }
 
 WILL_YOU_CONTINUE() {
-while true; do
-  t_norm "Do you want to continue?"
-  SL0
-  read -p "(c)ontinue | (r)estart | (q)uit : " -r -n 1 CHOICE
-  if [[ $CHOICE =~ ^[Cc]$ ]]; then
+# You can create a file called .NB_FAST in the script root. Good for repeat use.
+if [ -e .NB_FAST ] || [ SKIP=yes ]; then
+  t_warn "Auto-skipping continue prompt (implied continue) ..."
+  SL1; CR1
+else
+  while true; do
+    t_norm "Do you want to continue?"
     SL0
-    break
-  elif [[ $CHOICE =~ ^[Rr]$ ]]; then
-    SL0
-    START_OVER
-    exec bash "$0"
-  elif [[ $CHOICE =~ ^[Qq]$ ]]; then
-    SL0
-    GAME_OVER
-  else
-    SL0
-  fi
-  t_warn "Not a valid choice. Please select again ..."
-  SL1
-  continue
-done
-CR1
-t_ok "Continuing ..."
+    read -p "(c)ontinue | (r)estart | (q)uit : " -r -n 1 CHOICE
+    if [[ $CHOICE =~ ^[Cc]$ ]]; then
+      SL0
+      break
+    elif [[ $CHOICE =~ ^[Rr]$ ]]; then
+      SL0
+      START_OVER
+      exec bash "$0"
+    elif [[ $CHOICE =~ ^[Qq]$ ]]; then
+      SL0
+      GAME_OVER
+    else
+      SL0
+    fi
+    t_warn "Not a valid choice. Please select again ..."
+    SL1
+    continue
+  done
+  CR1
+  t_ok "Continuing ..."
+fi
 }
 
 CHECK_ROOT() {
@@ -191,18 +197,21 @@ fi
       #=# PLACEHOLDER REMINDER
       # make this more robust like a loop
 CHECK_START() {
+SL2
 if [ ! $(systemctl is-active "$1" ) > /dev/null ]; then
   t_err "Process '$1' doesn't appear to have started!"
 fi
 }
 
 CHECK_STOP() {
+SL2
 if [ $(systemctl is-active "$1" ) > /dev/null ]; then
   t_err "Process '$1' doesn't appear to have stopped!"
 fi
 }
 
 CHECK_URL() {
+SL2
 if curl -sSfkL -m 3 "$1" -o /dev/null; then 
   t_ok "Web Server ' $1 ' is reachable."
 fi
