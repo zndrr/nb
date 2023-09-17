@@ -244,16 +244,16 @@ while true; do
       t_err "Netbox v${newVer} either doesn't exist or URL is unavailable ..."
       SL1; CR1
       t_info "Refer to website for Releases:"
-      t_url "${urlR}"
+      t_url "  ${urlR}"
       if [[ $INSTALL = new ]]; then
         t_info "Also refer to the below for new install process ..."
-        t_url "${urlN}"
+        t_url "  ${urlN}"
       elif [[ $INSTALL = upgrade ]]; then
         t_info "Also refer to the below for upgrade process ..."
-        t_url "${urlU}"
+        t_url "  ${urlU}"
       fi
       t_info "Or visit Netbox Community here ..."
-      t_url "${urlC}"
+      t_url "  ${urlC}"
       GAME_OVER
     fi
     unset COUNT
