@@ -1,9 +1,3 @@
-temp
-
-
-
-
-
 #!/bin/bash
 
 # Source definitions
