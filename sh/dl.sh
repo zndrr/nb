@@ -107,7 +107,7 @@ if [ -e "${testScript}" ]; then
   say "Executing script ..."
     sleep 2
     bash "temp.${testScript}"
-  say "... done!"; sleep 1
+  say "... dl.sh script done!"; sleep 1
   say "Cleaning up modified script."
   rm "temp.${testScript}"
 fi
