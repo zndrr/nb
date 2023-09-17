@@ -1,3 +1,9 @@
+temp
+
+
+
+
+
 #!/bin/bash
 
 # Source definitions
@@ -485,7 +491,7 @@ if [[ $INSTALL = upgrade ]]; then
        #if awk "BEGIN {exit !($newVer >= $oldVer)}"; then
        #if [[ awk "BEGIN {exit !($newVer >= $oldVer)}" == 1 ]]; then
   if [ $(SW_VER ${oldVer}) -ge $(SW_VER ${newVer}) ]; then
-    t_err "Current 'v${oldVer}' same or newer than installing 'v${newVer}' !"
+    t_err "Current 'v${oldVer}' same or newer than selected 'v${newVer}' !"
     GAME_OVER
   fi
 fi
@@ -503,7 +509,7 @@ elif [[ $INSTALL = upgrade ]]; then
   
   SL1
   ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
-  t_info "Backed up files here: "
+  t_db "Backed up files here: "
        #=# PLACEHOLDER REMINDER
        # Finish this off
 fi
@@ -511,6 +517,8 @@ fi
 if [[ $INSTALL = upgrade ]]; then
   t_info "Symlinking New ${newVer} to ${nbRoot}"
   ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
+  SL0
+  t_ok "... done."
 fi
 
 
@@ -524,7 +532,7 @@ SL2
 # https://docs.netbox.dev/en/stable/installation/1-postgresql/
 
 if [[ $INSTALL = new ]]; then
-  t_head "----- NEW : SETUP POSTGRESQL +++"
+  t_head "----- NEW : SETUP POSTGRESQL -----"
   SL2; CR2
   
   t_info "Setting up Database ..."
@@ -532,7 +540,7 @@ if [[ $INSTALL = new ]]; then
   
   WILL_YOU_CONTINUE
 
-  t_info "Installing packages '${pkgPsql}' ..."
+  t_info "Checking package dependencies for PostgreSQL ..."
   CHECK_PKG $pkgPsql
         #=# PLACEHOLDER REMINDER
   #$PMGET $pkgPsql
@@ -625,7 +633,7 @@ if [[ $INSTALL = new ]]; then
   
   WILL_YOU_CONTINUE
   
-  t_info "Installing packages for Redis ..."
+  t_info "Checking package dependencies for Redis ..."
   CR1
   CHECK_PKG $pkgRedis
         #=# PLACEHOLDER REMINDER
@@ -660,7 +668,7 @@ if [[ $INSTALL = new ]]; then
   WILL_YOU_CONTINUE
   SL0; CR2
   
-  t_info "Installing packages ..."
+  t_info "Checking package dependencies for Netbox ..."
   CHECK_PKG $pkgNetbox
         #=# PLACEHOLDER REMINDER
   #$PMGET $pkgNetbox
@@ -840,7 +848,7 @@ if [[ $INSTALL = new ]]; then
   nbHost=netbox.local
   webSrv=nginx
 
-  t_info "Installing packages ..."
+  t_info "Checking package dependencies for ${webSrv} ..."
   CHECK_PKG $pkgWww
         #=# PLACEHOLDER REMINDER
   #$PMGET $pkgWww
