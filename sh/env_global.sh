@@ -83,7 +83,7 @@ GAME_OVER() {
 
 WILL_YOU_CONTINUE() {
 # You can create a file called .NB_FAST in the script root. Good for repeat use.
-if [ -e .NB_FAST ] || [ SKIP=yes ]; then
+if [ -e .NB_FAST ] || [[ $SKIP = yes ]]; then
   t_warn "Auto-skipping continue prompt (implied continue) ..."
   SL1; CR1
 else
