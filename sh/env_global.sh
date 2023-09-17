@@ -45,7 +45,7 @@ t_db() { local msg="$1"; printf '%b\n' "${MAGENTABL}DEBUG: ${msg}${CLR}"; }
 ## Delay, carriage returns, spacing
 
 # You can create a file called .NB_FAST in the script root. Good for repeat use.
-if [ -e .NB_FAST ] || [ SKIP=yes ]; then
+if [ -e .NB_FAST ] || [[ $SKIP = yes ]]; then
   SL0() { sleep 0.1; }
   SL1() { sleep 0.2; }
   SL2() { sleep 0.3; }
