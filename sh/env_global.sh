@@ -152,25 +152,37 @@ PMREM(){ ${PMGR} remove -qq -y $1; }
       # Incomplete. Needs prompts for install.
       # apt-specific ; needs a yum fallback
 CHECK_PKG() {
+# NOTE : need to seriously evaluate whether this is worth not just installing packages and relying on the package managers.
 local list=($@)
-for service in ${list[@]}; do
-  if ! apt-mark showinstall | grep -e "^$1$" &> /dev/null; then
-    local missing+=($service)
-  else
-    local found+=($service)
+if [[ $PMGR = apt ]]; then
+  for service in ${list[@]}; do
+    if ! apt-mark showinstall | grep -e "^$1$" &> /dev/null; then
+      local missing+=($service)
+    else
+      local found+=($service)
+    fi
+  done
+  #SL2; CR2
+  #SL2; CR2
+  if [ ${found} ]; then
+      t_ok "The following are installed:"
+      t_norm "  ${found[*]}";
   fi
-done
-#SL2; CR2
-#SL2; CR2
-if [ ${found} ]; then
-    t_ok "The following are installed:"
-    t_norm "  ${found[*]}";
-fi
-if [ ${missing} ]; then
-  t_err "The following aren't installed:"
-  t_norm "  ${missing[*]}";
-  # PLACEHOLDER REMINDER give fn prompt, maybe a while loop just in case
-  #PMGET "${missing[*]}"
+  if [ ${missing} ]; then
+    t_err "The following aren't installed:"
+    t_norm "  ${missing[*]}";
+    # PLACEHOLDER REMINDER give fn prompt, maybe a while loop just in case
+    #PMGET "${missing[*]}"
+  fi
+elif [[ $PMGR = yum ]]; then
+  # This is a fallback since apt is not CentOS and so that detection won't likely work.
+  t_info "Installing required packages ..."
+  PMGET "${list[*]}"
+  SL1
+  t_ok " ... done" 
+else
+  t_err "Not sure how you got this far, but here's an error for your troubles !"
+  GAME_OVER
 fi
 }
 
