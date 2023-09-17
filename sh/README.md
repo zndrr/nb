@@ -1,4 +1,4 @@
-#### Netbox Install Script
+# Netbox Install Script
 
 This set of bash scripts is an ongoing effort to streamline the Netbox install experience. \
 Mostly a labour of love and a great learning experience.
@@ -11,6 +11,11 @@ The script intended to have as little interaction as possible:
 - Install type prompt
 - Continue prompts between sections or at critical junctions
 - Choosing a root user
+
+To run, you can do one of two things:
+- pull the git repo, or-
+- wget the dl.sh (this however removes the continue prompts which expedites the install script).
+
 
 It does automatically choose a DB and Secret pass though. This has security implications of course.
 
