@@ -43,9 +43,17 @@ t_url() { local msg="$1"; printf '%b\n' "${BLUU}${msg}${CLR}"; }
 t_db() { local msg="$1"; printf '%b\n' "${MAGENTABL}DEBUG: ${msg}${CLR}"; }
 
 ## Delay, carriage returns, spacing
-SL0() { sleep 0.5; }
-SL1() { sleep 1; }
-SL2() { sleep 2; }
+
+# You can create a file called .NB_FAST in the script root. Good for repeat use.
+if [ -e .NB_FAST ] || [ SKIP=yes ]; then
+  SL0() { sleep 0.1; }
+  SL1() { sleep 0.2; }
+  SL2() { sleep 0.3; }
+else
+  SL0() { sleep 0.5; }
+  SL1() { sleep 1; }
+  SL2() { sleep 2; }
+fi
 CR1() { printf '\n'; }
 CR2() { printf '\n\n'; }
 SP1() { printf " ";}
