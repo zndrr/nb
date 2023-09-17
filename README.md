@@ -1,25 +1,16 @@
-# nb
-#### Netbox Install Script
+# nb (aka Netbox)
 
-This set of bash scripts is an ongoing effort to streamline the Netbox install experience. \
-Mostly a labour of love and a great learning experience.
+#### Welcome traveller
 
-It is intended to be highly defensive with a lot of detection and failsafes.
-Not perfect of course. Still improving it.
+This repo is a hobby effort to do stuff to make Netbox easier.
+I am lazy, so I contradict myself with effort to be lazy?
 
-The script intended to have as little interaction as possible:
-- Developed in bash on Ubuntu
-- Install type prompt
-- Continue prompts between sections or at critical junctions
-- Choosing a root user
+I am in no way affiliated with the wonderful project maintainers; just a fan of the tool!
 
-It does automatically choose a DB and Secret pass though. This has security implications of course.
+Not much going on yet. Should expand as stuff is added.
 
-I'm sure there is a better way to do a lot of things.
-Truth be told, I have already refactored many times as I have learned better approaches through my journey.
-Never ends.
-
-If you're here and have any suggestions or improvements, I would love to hear from you.
+For now, there is a set of bash scripts to help with Netbox install. Ongoing effort.
 
 
+Enjoy,
 Zndrr
