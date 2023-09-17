@@ -103,7 +103,7 @@ else
   done
   CR1
   t_ok "Continuing ..."
-#fi
+fi
 }
 
 CHECK_ROOT() {
