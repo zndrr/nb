@@ -136,63 +136,43 @@ t_ok "Package manager identified as ${PMGR} (${DSTRO})"
 SL0
 }
 
-## Quiet commands, no stout
+## Quiet commands, no redirection
 PMUPD(){ ${PMGR} update; }
-PMGET(){ ${PMGR} install -qq -y $1 &> .nb_apt_install.log; }
-PMREM(){ ${PMGR} remove -qq -y $1 &> .nb_apt_remove.log; }
+PMGET(){ ${PMGR} install -qq -y $1; }
+PMREM(){ ${PMGR} remove -qq -y $1; }
+#PMREM(){ ${PMGR} purge -qq -y $1; }
 
-## These are the normalish output commands
-#! PMUPD(){ ${PMGR} update; }
-#! PMGET(){ ${PMGR} install -qq -y $1; }
-#! PMREM(){ ${PMGR} remove -qq -y $1; }
+## These are the normalish output commands, redirection
+#! PMUPD(){ ${PMGR} update &> .nb_apt_update.log; }
+#! PMGET(){ ${PMGR} install -y $1 &> .nb_apt_install.log;; }
+#! PMREM(){ ${PMGR} remove -y $1 &> .nb_apt_remove.log; }
+#! #PMREM(){ ${PMGR} purge -y $1 &> .nb_apt_remove.log; } # uncomment to change remove > purge (more comprehensive)
 
       #=# PLACEHOLDER REMINDER
       # Incomplete. Needs prompts for install.
+      # apt-specific ; needs a yum fallback
 CHECK_PKG() {
 local list=($@)
-for service in "${list[@]}"; do
-  dpkg -s $service &> /dev/null
-  if [ $? -ne 0 ]; then
+for service in ${list[@]}; do
+  if ! apt-mark showinstall | grep -e "^$1$" &> /dev/null; then
     local missing+=($service)
   else
     local found+=($service)
   fi
 done
+#SL2; CR2
+#SL2; CR2
 if [ ${found} ]; then
-  t_ok "The following are installed:"
-  t_norm "  ${found[*]}"; SL0
+    t_ok "The following are installed:"
+    t_norm "  ${found[*]}";
 fi
 if [ ${missing} ]; then
   t_err "The following aren't installed:"
-  t_norm "  ${missing[*]}"; SL0
-  PMGET "${missing[*]}" 
+  t_norm "  ${missing[*]}";
+  # PLACEHOLDER REMINDER give fn prompt, maybe a while loop just in case
+  #PMGET "${missing[*]}"
 fi
 }
-
-#### Auditing replacement above
-##!
-##!  CHECK_PKG() {
-##!  local list=($@)
-##!  for service in "${list[@]}"; do
-##!  if [ ! $(command -v $service ) ]; then
-##!    local missing+=($service)
-##!  elif [ $(command -v $service) ]; then
-##!    local found+=($service)
-##!  fi
-##!  done
-##!  if [ ${found} ]; then
-##!  t_ok "The following are installed:"
-##!  t_norm "  ${found[*]}"; SL0
-##!  fi
-##!  if [ ${missing} ]; then
-##!    t_err "The following aren't installed:"
-##!    t_norm "  ${missing[*]}"; SL2
-##!  fi
-##!  for install in ${missing[@]}; do
-##!    $PMGET $install
-##!  done
-##!  }
-
 
       #=# PLACEHOLDER REMINDER
       # make this more robust like a loop
