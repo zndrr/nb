@@ -29,6 +29,7 @@ BLUE=$(tput setaf 4)
 BLUU=$(tput smul setaf 4)
 CYAN=$(tput setaf 6)
 CYANB=$(tput bold setaf 6)
+MAGENTABL=$(tput sms0 setaf 125)
 CLR=$(tput sgr0)
 
 ## NEW : Terminal text colouration for readability
@@ -39,7 +40,7 @@ t_warn() { local msg="$1"; printf '%b\n' "${YELB} ! ${msg}${CLR}"; }
 t_err() { local msg="$1"; printf '%b\n' "${REDB} ✗ ${msg}${CLR}"; }
 t_head() { local msg="$1"; printf '\n%b\n' "${CYANB}${msg}${CLR}"; SL1; }
 t_url() { local msg="$1"; printf '%b\n' "${BLUU}${msg}${CLR}"; }
-t_db() { local msg="$1"; printf '%b\n' "${GREEN}DEBUG: ${msg}${CLR}; }
+t_db() { local msg="$1"; printf '%b\n' "${MAGENTABL}DEBUG: ${msg}${CLR}; }
 
 ## Delay, carriage returns, spacing
 SL0() { sleep 0.5; }
