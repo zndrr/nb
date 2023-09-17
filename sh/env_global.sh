@@ -40,7 +40,7 @@ t_warn() { local msg="$1"; printf '%b\n' "${YELB} ! ${msg}${CLR}"; }
 t_err() { local msg="$1"; printf '%b\n' "${REDB} ✗ ${msg}${CLR}"; }
 t_head() { local msg="$1"; printf '\n%b\n' "${CYANB}${msg}${CLR}"; SL1; }
 t_url() { local msg="$1"; printf '%b\n' "${BLUU}${msg}${CLR}"; }
-t_db() { local msg="$1"; printf '%b\n' "${MAGENTABL}DEBUG: ${msg}${CLR}; }
+t_db() { local msg="$1"; printf '%b\n' "${MAGENTABL}DEBUG: ${msg}${CLR}"; }
 
 ## Delay, carriage returns, spacing
 SL0() { sleep 0.5; }
