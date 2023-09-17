@@ -133,31 +133,15 @@ SL1; CR2
 
 
 # Check critical packages installed. Exit if not.
-t_info "Running a package update..."
+t_info "Running a package update ... "
 $PMUPD
 SL1; CR2
+t_ok "... done."
 
+
+t_info "Checking script package dependencies ..."
 CHECK_PKG $pkgScript
-
-
-      #=# PLACEHOLDER REMINDER
-#t_info "Checking packages required for script ..."
-#
-#for pkg in $pkgScript; do
-#  command -v "${pkg}" &>/dev/null
-#  if [[ $pkg = 0 ]]; then
-#    t_warn "Package '${pkg}' is not installed!"
-#    pkgMissing=$(( pkgMissing + 1 ))
-#    SL0
-#  fi
-#done
-
-#if [[ $pkgMissing -gt 0 ]]; then
-#  t_err "... Script cannot run without these packages."
-#  GAME_OVER
-#fi
-
-t_ok "Packages okay. Continuing ..."
+t_ok "... done. Continuing ..."
 SL1; CR2
 
 
@@ -166,10 +150,8 @@ SL1; CR2
 # Make deterministic choice of install type
 
 
-t_norm "Choose your install type:"
+t_head "Choose your install type:"
 SL1
-PS3="(1) Upgrade, (2) New, (3) Git, (4) Quit: "
-
 select option in Upgrade New Git Quit
 do
     case $option in
@@ -182,16 +164,12 @@ do
         Git)
             INSTALL=git
             t_err "Git install not supported yet. Try again..."
-            CR2
-            SL1
-            ;;
+            CR2; SL1;;
         Quit)
             GAME_OVER;;
         *)
             t_warn "Invalid option '${REPLY}'. Try again..."
-            CR2
-            SL1
-            ;;
+            CR2; SL1;;
      esac
 done
 CR1; SL1
