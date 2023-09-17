@@ -156,14 +156,16 @@ CHECK_PKG() {
 local list=($@)
 if [[ $PMGR = apt ]]; then
   for service in ${list[@]}; do
-    if ! apt-mark showinstall | grep -e "^$1$" &> /dev/null; then
+    if ! apt-mark showinstall | grep -e "^$service$" &> /dev/null; then
       local missing+=($service)
-    else
+    elif apt-mark showinstall | grep -e "^$service$" &> /dev/null; then
       local found+=($service)
+    else
+      # Perhaps I'll do something more flexible here.
+      t_err "Undetermined fate. Cannot proceed ..."
+      GAME_OVER
     fi
   done
-  #SL2; CR2
-  #SL2; CR2
   if [ ${found} ]; then
       t_ok "The following are installed:"
       t_norm "  ${found[*]}";
