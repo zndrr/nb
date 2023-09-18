@@ -60,15 +60,15 @@ CHECK_PKG_MGR
 
 # Local path variables
       #=# PLACEHOLDER REMINDER : Change these to choices, with defaults.
-ROOT=/opt
-nbRoot=$ROOT/netbox
-bkRoot=$ROOT/nb/backup
+osRoot=/opt
+nbRoot=$osRoot/netbox
+bkRoot=$osRoot/nb/backup
 
       #=# PLACEHOLDER REMINDER : Revisit
       # These I want to suggest. Backups and external files would be best living outside Netbox path.
-#nbMedia=$ROOT/nb/media/
-#nbReports=$ROOT/nb/reports/
-#nbScripts=$ROOT/nb/scripts/
+#nbMedia=$osRoot/nb/media/
+#nbReports=$osRoot/nb/reports/
+#nbScripts=$osRoot/nb/scripts/
 
 nbMedia=$nbRoot/netbox/media/
 nbReports=$nbRoot/netbox/reports/
@@ -89,10 +89,10 @@ major1=3.0.0
 
 
 # URL variables for text output. Update if they change.
-urlU="https://docs.netbox.dev/en/stable/installation/upgrading/"
-urlN="https://docs.netbox.dev/en/stable/installation/"
-urlR="https://github.com/netbox-community/netbox/releases/"
-urlC="https://github.com/netbox-community/"
+urlUpg="https://docs.netbox.dev/en/stable/installation/upgrading/"
+urlNew="https://docs.netbox.dev/en/stable/installation/"
+urlRel="https://github.com/netbox-community/netbox/releases/"
+urlCty="https://github.com/netbox-community/"
 
 
 # Packages in various stages.
@@ -150,13 +150,13 @@ select option in Upgrade New Git Quit
 do
     case $option in
         Upgrade) 
-            INSTALL=upgrade
+            insType=upgrade
             break;;
         New) 
-            INSTALL=new
+            insType=new
             break;;
         Git)
-            INSTALL=git
+            insType=git
             t_err "Git install not supported yet. Try again..."
             CR2; SL1;;
         Quit)
@@ -168,7 +168,7 @@ do
 done
 CR1; SL1
 
-t_info "Will proceed with ${INSTALL} install ..."
+t_info "Will proceed with ${insType} install ..."
 
 SL1
 
@@ -178,9 +178,9 @@ SL1
 
 t_head "----- DOWNLOADING NETBOX RELEASE -----"
 
-t_info "Moving in to ${ROOT} directory ..."
-mkdir -p "${ROOT}"
-cd "${ROOT}"
+t_info "Moving in to ${osRoot} directory ..."
+mkdir -p "${osRoot}"
+cd "${osRoot}"
 
 SL2
 
@@ -191,7 +191,7 @@ COUNT=0
 while true; do
   CR1
   read -p "Please enter desired Netbox release (eg 3.6.0) and press Enter: " -r newVer
-  URLD="https://github.com/netbox-community/netbox/archive/v${newVer}.tar.gz"
+  urlDl="https://github.com/netbox-community/netbox/archive/v${newVer}.tar.gz"
   if ! [[ $newVer =~ $regexVer ]]; then
     if [[ "${COUNT}" -gt 2 ]]; then
       t_err "... Too many incorrect attempts made."
@@ -201,10 +201,10 @@ while true; do
     ((COUNT++))
     SL1
     continue
-  elif [ -e "${ROOT}/v${newVer}.tar.gz" ]; then
+  elif [ -e "${osRoot}/v${newVer}.tar.gz" ]; then
     t_ok "File looks to exist already. Download not required ..."
     break
-  elif [ ! -e "${ROOT}/v${newVer}.tar.gz" ]; then
+  elif [ ! -e "${osRoot}/v${newVer}.tar.gz" ]; then
     if [ $(SW_VER ${newVer}) -lt $(SW_VER ${major1}) ]; then
       t_err "Selection (${newVer}) at least 1 MAJOR release behind project (${major1}) !"
       t_err "Selection too old! Select again ..."
@@ -217,23 +217,23 @@ while true; do
     SL1
     fi
     t_info "Checking availability ..."
-    if wget --spider "${URLD}" 2>/dev/null; then
+    if wget --spider "${urlDl}" 2>/dev/null; then
       t_ok "Release v${newVer} found."
       SL1; CR1
       t_info "Downloading ..."
       SL1
-      wget -q --show-progress "${URLD}" -P "${ROOT}/" --no-check-certificate
+      wget -q --show-progress "${urlDl}" -P "${osRoot}/" --no-check-certificate
       SL1
       t_ok "... Download complete!"
       # Double-checking tarball exists
       t_info "Confirming file present after download ..."
       SL0; CR1
-      if ! [ -e "${ROOT}/v${newVer}.tar.gz" ]; then
+      if [ ! -e "${osRoot}/v${newVer}.tar.gz" ]; then
         t_err "File v${newVer}.tar.gz still doesn't look to exist ..."
         t_err "Manual intervention required ..."
         CR1
         t_info "Path here :"
-        ls -lah "${ROOT}" | grep -E *.tar.gz
+        ls -lah "${osRoot}" | grep -E *.tar.gz
         CR1
         GAME_OVER
       else
@@ -244,16 +244,16 @@ while true; do
       t_err "Netbox v${newVer} either doesn't exist or URL is unavailable ..."
       SL1; CR1
       t_info "Refer to website for Releases:"
-      t_url "  ${urlR}"
-      if [[ $INSTALL = new ]]; then
+      t_url "  ${urlRel}"
+      if [[ $insType = new ]]; then
         t_info "Also refer to the below for new install process ..."
-        t_url "  ${urlN}"
-      elif [[ $INSTALL = upgrade ]]; then
+        t_url "  ${urlNew}"
+      elif [[ $insType = upgrade ]]; then
         t_info "Also refer to the below for upgrade process ..."
-        t_url "  ${urlU}"
+        t_url "  ${urlUpg}"
       fi
       t_info "Or visit Netbox Community here ..."
-      t_url "  ${urlC}"
+      t_url "  ${urlCty}"
       GAME_OVER
     fi
     unset COUNT
@@ -281,7 +281,7 @@ SL1; CR1
 
 t_info "Checking directories ..."
 
-if [[ ! -d $nbRoot ]] && [[ $INSTALL = upgrade ]]; then
+if [[ ! -d $nbRoot ]] && [[ $insType = upgrade ]]; then
   SL1
   t_err "Unexpected outcome. Did you mean to select New install ..."
   GAME_OVER
@@ -323,7 +323,7 @@ if ! [ -d "${nbPath}" ]; then
   t_err "Path ${nbPath} still doesn't look to exist ..."
   t_err "Manual intervention required ..."
   t_norm "Path here :"
-  ls -lah "${ROOT}" | grep netbox
+  ls -lah "${osRoot}" | grep netbox
   CR1
   GAME_OVER
 fi
@@ -337,7 +337,7 @@ SL2; CR2
 
 
      #=# PLACEHOLDER REMINDER : Revise code. Some redundant, at least at this stage.
-#elif [[ $INSTALL = git ]]; then
+#elif [[ $insType = git ]]; then
 #  t_err "Git installs not yet supported. Script cannot continue ..."
 #  GAME_OVER
 
@@ -346,8 +346,8 @@ nbGuni=$nbRoot/gunicorn.py
 nbLReq=$nbRoot/local_requirements.txt
 nbLdap=$nbRoot/netbox/netbox/ldap_config.py
 
-#if [[ $INSTALL = upgrade ]] || [[ $INSTALL = git ]]; then
-if [[ $INSTALL = upgrade ]]; then
+#if [[ $insType = upgrade ]] || [[ $insType = git ]]; then
+if [[ $insType = upgrade ]]; then
   t_head "----- BACKUP FILES AND DATABASE -----"
   SL1; CR2
   
@@ -383,7 +383,7 @@ fi
 #################################################################################################
 
 
-if [[ $INSTALL = upgrade ]]; then
+if [[ $insType = upgrade ]]; then
   t_head "----- UPGRADE COPY : FILES TO NEW NETBOX DIR -----"
   SL1; CR1
   
@@ -425,7 +425,7 @@ SL2
 # look to optimise counter vars
 
 
-if [[ $INSTALL = upgrade ]]; then
+if [[ $insType = upgrade ]]; then
   t_head "----- UPGRADE : STOP NETBOX PROCESSES AND SYMLINK -----"
   t_warn "Caution: This will make Netbox unavailable!"
   SL1; CR1
@@ -468,12 +468,12 @@ if [[ $INSTALL = upgrade ]]; then
   fi
 fi
 
-if [[ $INSTALL = new ]]; then
+if [[ $insType = new ]]; then
   t_warn "New install selected. No processes to stop ..."
-elif [[ $INSTALL = git ]]; then
+elif [[ $insType = git ]]; then
   t_err "Git installs not yet supported. Script cannot continue ..."
   GAME_OVER
-elif [[ $INSTALL = upgrade ]]; then
+elif [[ $insType = upgrade ]]; then
   systemctl stop netbox netbox-rq
   SL1
   CHECK_STOP netbox
@@ -486,7 +486,7 @@ elif [[ $INSTALL = upgrade ]]; then
        # Finish this off
 fi
 
-if [[ $INSTALL = upgrade ]]; then
+if [[ $insType = upgrade ]]; then
   t_info "Symlinking New ${newVer} to ${nbRoot}"
   ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
   SL0
@@ -503,7 +503,7 @@ SL2
 #################################################################################################
 # https://docs.netbox.dev/en/stable/installation/1-postgresql/
 
-if [[ $INSTALL = new ]]; then
+if [[ $insType = new ]]; then
   t_head "----- NEW : SETUP POSTGRESQL -----"
   SL2; CR2
   
@@ -600,7 +600,7 @@ fi
 #################################################################################################
 
 
-if [[ $INSTALL = new ]]; then
+if [[ $insType = new ]]; then
   t_head "----- NEW : SETUP REDIS -----"
   
   WILL_YOU_CONTINUE
@@ -633,7 +633,7 @@ fi
 #################################################################################################
 
 
-if [[ $INSTALL = new ]]; then
+if [[ $insType = new ]]; then
   t_head "----- NEW : NETBOX SETUP -----"
   SL0; CR1
   
@@ -776,7 +776,7 @@ fi
 
 #################################################################################################
 
-if [[ $INSTALL = new ]]; then
+if [[ $insType = new ]]; then
   t_head "----- NEW : GUNICORN SETUP -----"
   SL0; CR1
   
@@ -816,7 +816,7 @@ fi
      # Make this a choice between Nginx and Apache
      # https://docs.netbox.dev/en/stable/installation/5-http-server/
 
-if [[ $INSTALL = new ]]; then
+if [[ $insType = new ]]; then
   nbHost=netbox.local
   webSrv=nginx
 
@@ -895,7 +895,7 @@ SL1; CR2
      # This applies to new/git installs also. Consider conolidating code.
 t_info "Running the Netbox upgrade script..."
      #=# PLACEHOLDER REMINDER : add git types to ifs
-if [[ ! $INSTALL = new ]] || [[ ! $INSTALL = git_new ]]; then
+if [[ ! $insType = new ]] || [[ ! $insType = git_new ]]; then
   t_warn "Likely no going back after this !"
   SL0; CR2
   WILL_YOU_CONTINUE
