@@ -363,43 +363,65 @@ SL2; CR2
 #  t_err "Git installs not yet supported. Script cannot continue ..."
 #  GAME_OVER
 
-nbConfPy=$nbRoot/netbox/netbox/configuration.py
-nbGuni=$nbRoot/gunicorn.py
-nbLReq=$nbRoot/local_requirements.txt
-nbLdap=$nbRoot/netbox/netbox/ldap_config.py
-
-#if [[ $insType = upgrade ]] || [[ $insType = git ]]; then
-if [[ $insType = upgrade ]]; then
-  t_head "----- BACKUP FILES AND DATABASE -----"
-  SL1; CR2
+#if [ ! -e $SCRIPT_ROOT/.NB_BACKUP ]; then
   
-  WILL_YOU_CONTINUE
+  nbConfPy=$nbRoot/netbox/netbox/configuration.py
+  nbGuni=$nbRoot/gunicorn.py
+  nbLReq=$nbRoot/local_requirements.txt
+  nbLdap=$nbRoot/netbox/netbox/ldap_config.py
+  
+  if [[ $insType = upgrade ]]; then
+    t_head "----- BACKUP FILES AND DATABASE -----"
+    SL1; CR2
+    
+    WILL_YOU_CONTINUE
+  
+    t_info "Password needed for Database ..."
+    if [[ -e $bkRoot/.DB_PASS ]]; then
+      t_warn "Password file (.DB_PASS) detected. Loading content ..."
+      DB_PASS=$(cat $bkRoot/.DB_PASS)
+    elif [ $DB_PASS ]; then
+      t_warn "Password already loaded in memory. Nothing to do ..."
+    else
+      read -p "Input password: " -r DB_PASS
+    fi
+    t_info "Password loaded."
+    SL1; CR1
 
-  TIME=$(date +%y-%m-%d_%H-%M)
-  bkPath="${bkRoot}/${TIME}"
-  mkdir -p "${bkPath}"
-  t_info "Copying files to backup dir ..."
-  if [ -f "${nbConfPy}" ]; then
-    cp "${nbConfPy}" "${bkPath}/"
-  else
-    t_warn "Important file 'configuration.py' not found !"
+    bkTime=$(date +%y-%m-%d_%H-%M)
+    bkPath="${bkRoot}/${bkTime}"
+    mkdir -p "${bkPath}"
+    t_info "Copying files to backup dir ..."
+    if [ -f "${nbConfPy}" ]; then
+      cp "${nbConfPy}" "${bkPath}/"
+    else
+      t_warn "Important file 'configuration.py' not found !"
+    fi
+    if [ -f "${nbLReq}" ]; then cp "${nbLReq}" "${bkPath}/"; fi
+    if [ -f "${nbGuni}" ]; then cp "${nbGuni}" "${bkPath}/"; fi
+    if [ -f "${nbLdap}" ]; then cp "${nbLdap}" "${bkPath}/"; fi
+    t_ok "Complete !"
+    SL0; CR1
+    t_info "Backed up files in '${bkPath}': "; SL0
+    ls -lah "${bkPath}"/
+    SL2; CR2
+  
+    # Backup the Database
+    t_info "Database Backup Started"
+    dbStart=$(date +%s)
+    PGPASSWORD=$DB_PASS pg_dump -h localhost -U $DB_USER netbox > ${bkPath}/nb_db_$bkTime.sql
+    dbEnd=$(date +%s)
+    
+    t_info "DB Backup finished in $((dbEnd-dbStart)) seconds."
+    SL1; CR1
+         #=# PLACEHOLDER REMINDER
+    #t_warn "TODO: TAR FILES HERE"
+    #t_warn "TODO: DELETE SOURCE FILES ONCE TAR'd"
+    t_head "----- BACKUP COMPLETE -----"
+    unset bkTime
+    touch $SCRIPT_ROOT/.NB_BACKUP
   fi
-  if [ -f "${nbLReq}" ]; then cp "${nbLReq}" "${bkPath}/"; fi
-  if [ -f "${nbGuni}" ]; then cp "${nbGuni}" "${bkPath}/"; fi
-  if [ -f "${nbLdap}" ]; then cp "${nbLdap}" "${bkPath}/"; fi
-  t_ok "Complete !"
-  SL0; CR1
-  t_info "Backed up files in '${bkPath}': "; SL0
-  ls -lah "${bkPath}"/
-  SL2; CR2
-       #=# PLACEHOLDER REMINDER
-       # Come back to this for database backup etc
-  #t_warn "TODO: DATABASE BACKUP STUFF HERE"
-  #t_warn "TODO: TAR FILES HERE"
-  #t_warn "TODO: DELETE SOURCE FILES ONCE TAR'd"
-  t_head "----- BACKUP COMPLETE -----"
-  unset TIME
-fi
+#fi
 
 
 #################################################################################################
@@ -432,7 +454,7 @@ if [[ $insType = upgrade ]]; then
   SL1; CR1
   t_ok "... done! Files copied."
   SL1; CR1
-  t_head "+++ UPGRADE COPY : COMPLETE +++"
+  t_head "----- UPGRADE COPY : COMPLETE -----"
 fi
 
 SL2
@@ -480,10 +502,6 @@ if [[ $insType = upgrade ]]; then
   fi
   CR1; SL1
   t_info "Comparing current (${oldVer}) to selection (${newVer})"
-       #=# PLACEHOLDER REMINDER : Figure out this syntax. Needs more observation.
-       #https://stackoverflow.com/questions/8654051/how-can-i-compare-two-floating-point-numbers-in-bash
-       #if awk "BEGIN {exit !($newVer >= $oldVer)}"; then
-       #if [[ awk "BEGIN {exit !($newVer >= $oldVer)}" == 1 ]]; then
   if [ $(SW_VER ${oldVer}) -ge $(SW_VER ${newVer}) ]; then
     t_err "Current 'v${oldVer}' same or newer than selected 'v${newVer}' !"
     GAME_OVER
@@ -553,19 +571,20 @@ if [[ $insType = new ]]; then
   
        #=# PLACEHOLDER REMINDER
        # Wrap this up in a loop to allow user to self-generate.
-  DB_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
-  SC_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
+
   
        #=# PLACEHOLDER REMINDER
        # Check for password file before autogeneration.
        # Should cover interrupted or incomplete installs.
   t_info "Displaying password ..."
   SL1; CR1
-  if [[ -e "${bkRoot}/.DB_PASS" ]] || [[ -e "${bkRoot}/.DB_PASS" ]]; then
+  if [[ -e "${bkRoot}/.DB_PASS" ]] || [[ -e "${bkRoot}/.SC_PASS" ]]; then
     t_err "One or more files already exist !"
     t_err "Seems a possible failed or interrupted new install ..."
     WILL_YOU_CONTINUE
   else
+    DB_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
+    SC_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
     mkdir -p "${bkRoot}"
     t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
     SL0; CR1
@@ -952,4 +971,6 @@ SL2
 # FINISHED !!
 endTime=$(date +%s)
 t_ok "Script completed in $(( endTime - startTime )) seconds!"
+
+rm $SCRIPT_ROOT/.NB_BACKUP
 SL2; CR2
