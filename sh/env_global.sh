@@ -110,7 +110,7 @@ fi
 CHECK_ROOT() {
 t_info "Checking root privileges ..."
 SL2
-if ! [ "$(whoami)" = root ]; then
+if [ ! "$(whoami)" = root ]; then
   t_err "Please run this script as root or using sudo ..."
   GAME_OVER
 else
@@ -145,8 +145,10 @@ SL0
 }
 
 ## Quiet commands, no redirection
+      #=# PLACEHOLDER REMINDER : Remove PMGET once dependents are removed. PMADD will replace
 PMUPD(){ ${PMGR} update; }
 PMGET(){ ${PMGR} install -qq -y $1; }
+PMADD(){ ${PMGR} install -qq -y $1; }
 PMREM(){ ${PMGR} remove -qq -y $1; }
 #PMREM(){ ${PMGR} purge -qq -y $1; }
 
