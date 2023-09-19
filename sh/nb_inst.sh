@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Source definitions
-if ! [ -e "env_global.sh" ]; then printf '%b\n' "env .sh Dependency missing! Exiting..." sleep 2; exit; fi
+if [ ! -e "env_global.sh" ]; then printf '%b\n' "env .sh Dependency missing! Exiting..." sleep 2; exit; fi
 source env_global.sh
 
 # Setting a script timer.
@@ -146,27 +146,49 @@ SL1; CR2
 
 t_head "Choose your install type:"
 SL1
-select option in Upgrade New Git Quit
-do
-    case $option in
-        Upgrade) 
-            insType=upgrade
-            break;;
-        New) 
-            insType=new
-            break;;
-        Git)
-            insType=git
-            t_err "Git install not supported yet. Try again..."
-            CR2; SL1;;
-        Quit)
-            GAME_OVER;;
-        *)
-            t_warn "Invalid option '${REPLY}'. Try again..."
-            CR2; SL1;;
-     esac
+while true; do
+  read -p "(u)pgrade | (n)ew | (g)it | (q)uit : " -r -n 1 option
+  CR1
+  case $option in
+    u|U) 
+      insType=upgrade
+      break;;
+    n|N) 
+      insType=new
+      break;;
+    g|G)
+      # Script will reload here; you won't qualify the second condition below.
+      insType=git
+      t_err "Git install not supported yet. Try again ..."
+      START_OVER;;
+    q|Q)
+      GAME_OVER;;
+    *)
+      t_warn "Invalid option '${REPLY}'. Try again ..."; CR1
+  esac
 done
-CR1; SL1
+      #=# PLACEHOLDER REMINDER
+      # This is in place for when I explore git install method.
+if [[ $insType = git ]]; then
+  t_head "What type of Git install?"
+  SL1
+  while true; do
+    read -p "Git - (u)pgrade | (n)ew | (q)uit : " -r -n 1 option2
+    CR1
+    case $option2 in
+      u|U)
+        insType=git-upgrade
+        break;;
+      n|N)
+        insType=git-new
+        break;;
+      q|Q)
+        GAME_OVER;;
+      *)
+        t_warn "Invalid option '${REPLY}'. Try again ..."; CR1
+    esac
+  done
+fi
 
 t_info "Will proceed with ${insType} install ..."
 
@@ -192,7 +214,7 @@ while true; do
   CR1
   read -p "Please enter desired Netbox release (eg 3.6.0) and press Enter: " -r newVer
   urlDl="https://github.com/netbox-community/netbox/archive/v${newVer}.tar.gz"
-  if ! [[ $newVer =~ $regexVer ]]; then
+  if [[ !  $newVer =~ $regexVer ]]; then
     if [[ "${COUNT}" -gt 2 ]]; then
       t_err "... Too many incorrect attempts made."
       GAME_OVER
@@ -319,7 +341,7 @@ fi
 SL1; CR1
 
       #=# PLACEHOLDER REMINDER : As above.
-if ! [ -d "${nbPath}" ]; then
+if [ ! -d "${nbPath}" ]; then
   t_err "Path ${nbPath} still doesn't look to exist ..."
   t_err "Manual intervention required ..."
   t_norm "Path here :"
