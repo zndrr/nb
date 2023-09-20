@@ -405,6 +405,7 @@ SL2; CR2
     t_info "Database Backup Started"
     dbStart=$(date +%s)
     PGPASSWORD=$DB_PASS pg_dump -h localhost -U $DB_USER netbox > ${bkPath}/db_$bkTime.sql
+    PGPASSWORD=$DB_PASS pg_dump -h localhost -U $DB_USER --exclude-table-data=extras_objectchange netbox > ${bkPath}/db_nohist_$bkTime.sql
     dbEnd=$(date +%s)
     t_info "DB Backup finished in $((dbEnd-dbStart)) seconds."
     SL1; CR1
