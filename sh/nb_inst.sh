@@ -416,9 +416,9 @@ SL2; CR2
     t_info "Compressing backup as ${bkPath}.tar.gz and removing source directory ..."
     gzStart=$(date +%s)
     # use 'v' arg for verbose output.
-    tar -czf ${bkRoot}/nb_backup_${bkTime}.tar.gz ${bkPath}
-    #tar -cjf ${bkRoot}/nb_backup_${bkTime}.tar.bz2 ${bkPath}/ # bzip instead of gzip
-    if [[ -f ${bkPath} ]]; then rm -r ${bkPath}; fi
+    tar -czf "${bkRoot}/nb_backup_v${oldVer}_${bkTime}.tar.gz" "${bkPath}"
+    #tar -cjf "${bkRoot}/nb_backup_${bkTime}.tar.bz2" "${bkPath}" # bzip instead of gzip
+    if [[ -d ${bkPath} ]]; then rm -r "${bkPath}"; fi
     gzEnd=$(date +%s)
     SL1
     t_info "Backup compression done in $((gzEnd-gzStart)) seconds"
