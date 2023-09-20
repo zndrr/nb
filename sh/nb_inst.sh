@@ -414,6 +414,11 @@ SL2; CR2
     
     t_info "DB Backup finished in $((dbEnd-dbStart)) seconds."
     SL1; CR1
+
+    t_info "Backed up files in '${bkPath}': "; SL0
+    ls -lah "${bkPath}"/
+    SL2; CR2
+    
          #=# PLACEHOLDER REMINDER
     #t_warn "TODO: TAR FILES HERE"
     #t_warn "TODO: DELETE SOURCE FILES ONCE TAR'd"
@@ -501,10 +506,12 @@ if [[ $insType = upgrade ]]; then
     done
   fi
   CR1; SL1
-  t_info "Comparing current (${oldVer}) to selection (${newVer})"
+  t_info "Comparing current '${oldVer}' to selection '${newVer}'"
   if [ $(SW_VER ${oldVer}) -ge $(SW_VER ${newVer}) ]; then
     t_err "Current 'v${oldVer}' same or newer than selected 'v${newVer}' !"
     GAME_OVER
+  else
+    t_ok "Selection '${newVer}' confirmed valid upgrade from '$oldVer'"
   fi
 fi
 
@@ -520,19 +527,11 @@ elif [[ $insType = upgrade ]]; then
   CHECK_STOP netbox-rq
   
   SL1
-  ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
-  t_db "Backed up files here: "
-       #=# PLACEHOLDER REMINDER
-       # Finish this off
-fi
-
-if [[ $insType = upgrade ]]; then
   t_info "Symlinking New ${newVer} to ${nbRoot}"
   ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
   SL0
   t_ok "... done."
 fi
-
 
 SL2
 t_head "----- NETBOX SYMLINKING COMPLETE -----"
@@ -662,7 +661,9 @@ if [[ $insType = new ]]; then
        #=# PLACEHOLDER REMINDER
        # Add auto-validation to capture the PONG to the ping. Consider intervention if not.
   redis-server -v
+  CR1
   redis-cli ping
+  CR1
   t_ok "... done"
   SL2; CR2
   
