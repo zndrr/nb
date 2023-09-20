@@ -412,13 +412,16 @@ SL2; CR2
     t_info "Backed up files in '${bkPath}': "; SL0
     ls -lah "${bkPath}"/
     SL2; CR2
-
+    
     t_info "Compressing backup as ${bkPath}.tar.gz and removing source directory ..."
+    gzStart=$(date +%s)
     # use 'v' arg for verbose output.
-    tar -czf ${bkRoot}/${bkPath}.tar.gz ${bkPath}
-    #tar -cjf ${bkRoot}/${bkPath}.tar.bz2 ${bkPath}/ # bzip instead of gzip
+    tar -czf ${bkRoot}/nb_backup_${bkTime}.tar.gz ${bkPath}
+    #tar -cjf ${bkRoot}/nb_backup_${bkTime}.tar.bz2 ${bkPath}/ # bzip instead of gzip
     if [[ -f ${bkPath} ]]; then rm -r ${bkPath}; fi
-    t_ok "... done!"
+    gzEnd=$(date +%s)
+    SL1; CR1
+    t_info "Backup compression done in $((gzEnd-gzStart)) seconds"
 
     unset bkTime
     touch $SCRIPT_ROOT/.NB_UPG_BACKUP
