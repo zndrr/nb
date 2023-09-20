@@ -511,7 +511,7 @@ if [[ $insType = upgrade ]]; then
     t_err "Current 'v${oldVer}' same or newer than selected 'v${newVer}' !"
     GAME_OVER
   else
-    t_ok "Selection '${newVer}' confirmed valid upgrade from '$oldVer'"
+    t_ok "Selection '${newVer}' confirmed valid upgrade from '${oldVer}'"
   fi
 fi
 
