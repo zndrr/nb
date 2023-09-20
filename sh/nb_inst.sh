@@ -420,7 +420,7 @@ SL2; CR2
     #tar -cjf ${bkRoot}/nb_backup_${bkTime}.tar.bz2 ${bkPath}/ # bzip instead of gzip
     if [[ -f ${bkPath} ]]; then rm -r ${bkPath}; fi
     gzEnd=$(date +%s)
-    SL1; CR1
+    SL1
     t_info "Backup compression done in $((gzEnd-gzStart)) seconds"
 
     unset bkTime
