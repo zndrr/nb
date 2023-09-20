@@ -260,23 +260,23 @@ while true; do
         CR1
         GAME_OVER
       else
-        t_ok "File v${newVer}.tar.gz is available in $(pwd)"
+        t_ok "File v${newVer}.tar.gz is available in ${osRoot}"
       fi
     else
       SL1
       t_err "Netbox v${newVer} either doesn't exist or URL is unavailable ..."
       SL1; CR1
       t_info "Refer to website for Releases:"
-      t_url "  ${urlRel}"
+      t_url "${urlRel}"
       if [[ $insType = new ]]; then
         t_info "Also refer to the below for new install process ..."
-        t_url "  ${urlNew}"
+        t_url "${urlNew}"
       elif [[ $insType = upgrade ]]; then
         t_info "Also refer to the below for upgrade process ..."
-        t_url "  ${urlUpg}"
+        t_url "${urlUpg}"
       fi
       t_info "Or visit Netbox Community here ..."
-      t_url "  ${urlCty}"
+      t_url "${urlCty}"
       GAME_OVER
     fi
     unset COUNT
@@ -360,9 +360,6 @@ SL2; CR2
 
 
      #=# PLACEHOLDER REMINDER : Revise code. Some redundant, at least at this stage.
-#elif [[ $insType = git ]]; then
-#  t_err "Git installs not yet supported. Script cannot continue ..."
-#  GAME_OVER
 
 #if [ ! -e $SCRIPT_ROOT/.NB_UPG_BACKUP ]; then
   
@@ -371,7 +368,7 @@ SL2; CR2
   nbLReq=$nbRoot/local_requirements.txt
   nbLdap=$nbRoot/netbox/netbox/ldap_config.py
   
-  if [[ $insType = upgrade ]]; then
+  if [[ $insType = upgrade ]] || [[ $insType = git-upgrade ]]; then
     t_head "----- BACKUP FILES AND DATABASE -----"
     SL1; CR2
     
@@ -403,26 +400,25 @@ SL2; CR2
     if [ -f "${nbLdap}" ]; then cp "${nbLdap}" "${bkPath}/"; fi
     t_ok "Complete !"
     SL0; CR1
-    t_info "Backed up files in '${bkPath}': "; SL0
-    ls -lah "${bkPath}"/
-    SL2; CR2
-  
+
     # Backup the Database
     t_info "Database Backup Started"
     dbStart=$(date +%s)
-    PGPASSWORD=$DB_PASS pg_dump -h localhost -U $DB_USER netbox > ${bkPath}/nb_db_$bkTime.sql
+    PGPASSWORD=$DB_PASS pg_dump -h localhost -U $DB_USER netbox > ${bkPath}/db_$bkTime.sql
     dbEnd=$(date +%s)
-    
     t_info "DB Backup finished in $((dbEnd-dbStart)) seconds."
     SL1; CR1
 
     t_info "Backed up files in '${bkPath}': "; SL0
     ls -lah "${bkPath}"/
     SL2; CR2
-    
-         #=# PLACEHOLDER REMINDER
-    #t_warn "TODO: TAR FILES HERE"
-    #t_warn "TODO: DELETE SOURCE FILES ONCE TAR'd"
+
+    t_info "Compressing backup as ${bkPath}.tar.gz and removing source directory ..."
+    # use 'v' arg for verbose output.
+    tar -czf ${bkRoot}/${bkPath}.tar.gz ${bkPath}
+    #tar -cjf ${bkRoot}/${bkPath}.tar.bz2 ${bkPath}/ # bzip instead of gzip
+    if [[ -f ${bkPath} ]]; then rm -r ${bkPath}; fi
+    t_ok "... done!"
 
     unset bkTime
     touch $SCRIPT_ROOT/.NB_UPG_BACKUP
