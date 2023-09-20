@@ -167,28 +167,29 @@ while true; do
       t_warn "Invalid option '${REPLY}'. Try again ..."; CR1
   esac
 done
+
       #=# PLACEHOLDER REMINDER
-      # This is in place for when I explore git install method.
-if [[ $insType = git ]]; then
-  t_head "What type of Git install?"
-  SL1
-  while true; do
-    read -p "Git - (u)pgrade | (n)ew | (q)uit : " -r -n 1 option2
-    CR1
-    case $option2 in
-      u|U)
-        insType=git-upgrade
-        break;;
-      n|N)
-        insType=git-new
-        break;;
-      q|Q)
-        GAME_OVER;;
-      *)
-        t_warn "Invalid option '${REPLY}'. Try again ..."; CR1
-    esac
-  done
-fi
+##### This is in place for when I explore git install method.
+#! if [[ $insType = git ]]; then
+#!   t_head "What type of Git install?"
+#!   SL1
+#!   while true; do
+#!     read -p "Git - (u)pgrade | (n)ew | (q)uit : " -r -n 1 option2
+#!     CR1
+#!     case $option2 in
+#!       u|U)
+#!         insType=git-upgrade
+#!         break;;
+#!       n|N)
+#!         insType=git-new
+#!         break;;
+#!       q|Q)
+#!         GAME_OVER;;
+#!       *)
+#!         t_warn "Invalid option '${REPLY}'. Try again ..."; CR1
+#!     esac
+#!   done
+#! fi
 
 t_info "Will proceed with ${insType} install ..."
 
@@ -240,7 +241,7 @@ while true; do
     fi
     t_info "Checking availability ..."
     if wget --spider "${urlDl}" 2>/dev/null; then
-      t_ok "Release v${newVer} found."
+      t_ok "Release v${newVer} download found."
       SL1; CR1
       t_info "Downloading ..."
       SL1
@@ -284,8 +285,8 @@ while true; do
 done
 SL1
 
-
 CR2
+touch $SCRIPT_ROOT/.NB_DOWNLOAD
 t_head "----- DOWNLOAD COMPLETE -----"
 SL2; CR2
 
@@ -306,7 +307,7 @@ t_info "Checking directories ..."
 if [[ ! -d $nbRoot ]] && [[ $insType = upgrade ]]; then
   SL1
   t_err "Unexpected outcome. Did you mean to select New install ..."
-  GAME_OVER
+  START_OVER
 elif [[ -d $nbRoot ]]; then
   if [[ -e $nbRoot/.git ]]; then
          #=# PLACEHOLDER REMINDER
@@ -363,7 +364,7 @@ SL2; CR2
 #  t_err "Git installs not yet supported. Script cannot continue ..."
 #  GAME_OVER
 
-#if [ ! -e $SCRIPT_ROOT/.NB_BACKUP ]; then
+#if [ ! -e $SCRIPT_ROOT/.NB_UPG_BACKUP ]; then
   
   nbConfPy=$nbRoot/netbox/netbox/configuration.py
   nbGuni=$nbRoot/gunicorn.py
@@ -422,45 +423,48 @@ SL2; CR2
          #=# PLACEHOLDER REMINDER
     #t_warn "TODO: TAR FILES HERE"
     #t_warn "TODO: DELETE SOURCE FILES ONCE TAR'd"
-    t_head "----- BACKUP COMPLETE -----"
+
     unset bkTime
-    touch $SCRIPT_ROOT/.NB_BACKUP
+    touch $SCRIPT_ROOT/.NB_UPG_BACKUP
+    t_head "----- BACKUP COMPLETE -----"
   fi
 #fi
 
 
 #################################################################################################
 
-
-if [[ $insType = upgrade ]]; then
-  t_head "----- UPGRADE COPY : FILES TO NEW NETBOX DIR -----"
-  SL1; CR1
-  
-  WILL_YOU_CONTINUE
-  
-  t_info "Copying configuration files to new install ..."
-  if [ -f "${nbConfPy}" ]; then
-    cp "${nbConfPy}" "${nbRoot}-${newVer}/netbox/netbox/"
-  else
-    t_err "Important file 'configuration.py' not found !"
-    t_warn "Manual intervention likely required. Chance of failure!"
-    t_warn "Use the time at prompt to search ..."; SL0
+#if [[ ! -e $SCRIPT_ROOT/.NB_UPG_COPY ]]; then
+  if [[ $insType = upgrade ]]; then
+    t_head "----- UPGRADE COPY : FILES TO NEW NETBOX DIR -----"
+    SL1; CR1
+    
     WILL_YOU_CONTINUE
+    
+    t_info "Copying configuration files to new install ..."
+    if [ -f "${nbConfPy}" ]; then
+      cp "${nbConfPy}" "${nbRoot}-${newVer}/netbox/netbox/"
+    else
+      t_err "Important file 'configuration.py' not found !"
+      t_warn "Manual intervention likely required. Chance of failure!"
+      t_warn "Use the time at prompt to search ..."; SL0
+      WILL_YOU_CONTINUE
+    fi
+    if [ -f "${nbLReq}" ]; then cp "${nbLReq}" "${nbRoot}-${newVer}/"; fi
+    if [ -f "${nbGuni}" ]; then cp "${nbGuni}" "${nbRoot}-${newVer}/"; fi
+    if [ -f "${nbLdap}" ]; then cp "${nbLdap}" "${nbRoot}-${newVer}/netbox/netbox/"; fi
+          #=# PLACEHOLDER REMINDER
+          # Look to make this conditional on user folder choice.
+          # If outside Netbox Root, then no need to move around.
+    if [ -d "${nbRoot}-${oldVer}/netbox/scripts/" ]; then cp -r "${nbRoot}-${oldVer}/netbox/scripts/" "${nbRoot}/netbox/"; fi
+    if [ -d "${nbRoot}-${oldVer}/netbox/reports/" ]; then cp -r "${nbRoot}-${oldVer}/netbox/reports/" "${nbRoot}/netbox/"; fi  
+    if [ -d "${nbRoot}-${oldVer}/netbox/media/" ]; then cp -pr "${nbRoot}-${oldVer}/netbox/media/" "${nbRoot}/netbox/"; fi
+    SL1; CR1
+    t_ok "... done! Files copied."
+    SL1; CR1
+    touch $SCRIPT_ROOT/.NB_UPG_COPY
+    t_head "----- UPGRADE COPY : COMPLETE -----"
   fi
-  if [ -f "${nbLReq}" ]; then cp "${nbLReq}" "${nbRoot}-${newVer}/"; fi
-  if [ -f "${nbGuni}" ]; then cp "${nbGuni}" "${nbRoot}-${newVer}/"; fi
-  if [ -f "${nbLdap}" ]; then cp "${nbLdap}" "${nbRoot}-${newVer}/netbox/netbox/"; fi
-        #=# PLACEHOLDER REMINDER
-        # Look to make this conditional on user folder choice.
-        # If outside Netbox Root, then no need to move around.
-  if [ -d "${nbRoot}-${oldVer}/netbox/scripts/" ]; then cp -r "${nbRoot}-${oldVer}/netbox/scripts/" "${nbRoot}/netbox/"; fi
-  if [ -d "${nbRoot}-${oldVer}/netbox/reports/" ]; then cp -r "${nbRoot}-${oldVer}/netbox/reports/" "${nbRoot}/netbox/"; fi  
-  if [ -d "${nbRoot}-${oldVer}/netbox/media/" ]; then cp -pr "${nbRoot}-${oldVer}/netbox/media/" "${nbRoot}/netbox/"; fi
-  SL1; CR1
-  t_ok "... done! Files copied."
-  SL1; CR1
-  t_head "----- UPGRADE COPY : COMPLETE -----"
-fi
+#fi
 
 SL2
 
@@ -473,384 +477,394 @@ SL2
 # look to change to a while loop
 # look to optimise counter vars
 
-
-if [[ $insType = upgrade ]]; then
-  t_head "----- UPGRADE : STOP NETBOX PROCESSES AND SYMLINK -----"
-  t_warn "Caution: This will make Netbox unavailable!"
-  SL1; CR1
-  
-  WILL_YOU_CONTINUE
-
-  oldVer=$(ls -ld ${nbRoot} | awk -F"${nbRoot}-" '{print $2}' | cut -d / -f 1)
-  if [[ ! $oldVer =~ $regexVer ]]; then
-    t_warn "Discovered '${oldVer}' doesn't look to be valid (eg 3.6.0) ..."
+#if [[ ! -e $SCRIPT_ROOT/.NB_UPG_SYMLINK ]]; then
+  if [[ $insType = upgrade ]]; then
+    t_head "----- UPGRADE : STOP NETBOX PROCESSES AND SYMLINK -----"
+    t_warn "Caution: This will make Netbox unavailable!"
     SL1; CR1
-    t_info "Directory list here:"
-    ls -ld "${nbRoot}" | grep netbox
-    while true; do
-      COUNT=0
-      read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " -r oldVer
-      if [[ ! $oldVer =~ $regexVer ]]; then
-        if [[ "${COUNT}" -gt 2 ]]; then
-          t_err "... Three incorrect attempts made."
-          GAME_OVER
-        fi
-        t_warn "Selection '${oldVer}' format STILL not valid (eg 3.6.0). Try again ..."
-        ((COUNT++))
-        SL1
-        continue
-      elif [[ $oldVer =~ $regexVer ]]; then
-        t_ok "Selection '${oldVer}' looks to be valid ..."
-        break
-      fi
-    done
-  fi
-  CR1; SL1
-  t_info "Comparing current '${oldVer}' to selection '${newVer}'"
-  if [ $(SW_VER ${oldVer}) -ge $(SW_VER ${newVer}) ]; then
-    t_err "Current 'v${oldVer}' same or newer than selected 'v${newVer}' !"
-    GAME_OVER
-  else
-    t_ok "Selection '${newVer}' confirmed valid upgrade from '${oldVer}'"
-  fi
-fi
-
-if [[ $insType = new ]]; then
-  t_warn "New install selected. No processes to stop ..."
-elif [[ $insType = git ]]; then
-  t_err "Git installs not yet supported. Script cannot continue ..."
-  GAME_OVER
-elif [[ $insType = upgrade ]]; then
-  systemctl stop netbox netbox-rq
-  SL1
-  CHECK_STOP netbox
-  CHECK_STOP netbox-rq
+    
+    WILL_YOU_CONTINUE
   
-  SL1
-  t_info "Symlinking New ${newVer} to ${nbRoot}"
-  ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
-  SL0
-  t_ok "... done."
-fi
-
-SL2
-t_head "----- NETBOX SYMLINKING COMPLETE -----"
-SL2
+    oldVer=$(ls -ld ${nbRoot} | awk -F"${nbRoot}-" '{print $2}' | cut -d / -f 1)
+    if [[ ! $oldVer =~ $regexVer ]]; then
+      t_warn "Discovered '${oldVer}' doesn't look to be valid (eg 3.6.0) ..."
+      SL1; CR1
+      t_info "Directory list here:"
+      ls -ld "${nbRoot}" | grep netbox
+      while true; do
+        COUNT=0
+        read -p "Please manually enter existing Netbox release (eg 3.6.0) and press Enter: " -r oldVer
+        if [[ ! $oldVer =~ $regexVer ]]; then
+          if [[ "${COUNT}" -gt 2 ]]; then
+            t_err "... Three incorrect attempts made."
+            GAME_OVER
+          fi
+          t_warn "Selection '${oldVer}' format STILL not valid (eg 3.6.0). Try again ..."
+          ((COUNT++))
+          SL1
+          continue
+        elif [[ $oldVer =~ $regexVer ]]; then
+          t_ok "Selection '${oldVer}' looks to be valid ..."
+          break
+        fi
+      done
+    fi
+    CR1; SL1
+    t_info "Comparing current '${oldVer}' to selection '${newVer}'"
+    if [ $(SW_VER ${oldVer}) -ge $(SW_VER ${newVer}) ]; then
+      t_err "Current 'v${oldVer}' same or newer than selected 'v${newVer}' !"
+      GAME_OVER
+    else
+      t_ok "Selection '${newVer}' confirmed valid upgrade from '${oldVer}'"
+    fi
+  fi
+  
+  if [[ $insType = new ]]; then
+    t_warn "New install selected. No processes to stop ..."
+  elif [[ $insType = git ]]; then
+    t_err "Git installs not yet supported. Script cannot continue ..."
+    GAME_OVER
+  elif [[ $insType = upgrade ]]; then
+    systemctl stop netbox netbox-rq
+    SL2
+    CHECK_STOP netbox
+    CHECK_STOP netbox-rq
+    
+    SL1
+    t_info "Symlinking New ${newVer} to ${nbRoot}"
+    ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
+    SL0
+    t_ok "... done."
+  fi
+  
+  SL2
+  touch $SCRIPT_ROOT/.NB_UPG_SYMLINK
+  t_head "----- NETBOX SYMLINKING COMPLETE -----"
+  SL2
+#fi
 
 #################################################################################################
 
 #################################################################################################
 # https://docs.netbox.dev/en/stable/installation/1-postgresql/
 
-if [[ $insType = new ]]; then
-  t_head "----- NEW : SETUP POSTGRESQL -----"
-  SL2; CR2
-  
-  t_info "Setting up Database ..."
-  SL0
-  
-  WILL_YOU_CONTINUE
-
-  t_info "Checking package dependencies for PostgreSQL ..."
-  CHECK_PKG $pkgPsql
-        #=# PLACEHOLDER REMINDER
-  #$PMGET $pkgPsql
-  t_ok "... done !"
-  SL0; CR2
-  
-  set -e
-  SL1; CR1
-  
-  # These options are here, but highly recommended to stick with the static vars.
-  #read -p "Enter owner database name (suggested: 'netbox'): " -r DB_USER
-  #read -p "Enter database name (suggested: 'netbox'): " -r DB_NAME
-       #=# PLACEHOLDER REMINDER : Will make this a choice later.
-  DB_USER=netbox
-  DB_NAME=netbox
-  
-       #=# PLACEHOLDER REMINDER
-       # Wrap this up in a loop to allow user to self-generate.
-
-  
-       #=# PLACEHOLDER REMINDER
-       # Check for password file before autogeneration.
-       # Should cover interrupted or incomplete installs.
-  t_info "Displaying password ..."
-  SL1; CR1
-  if [[ -e "${bkRoot}/.DB_PASS" ]] || [[ -e "${bkRoot}/.SC_PASS" ]]; then
-    t_err "One or more files already exist !"
-    t_err "Seems a possible failed or interrupted new install ..."
-    WILL_YOU_CONTINUE
-  else
-    DB_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
-    SC_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
-    mkdir -p "${bkRoot}"
-    t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
-    SL0; CR1
-    t_info "Database Password"
-      t_norm "$DB_PASS" | tee "${bkRoot}/.DB_PASS"
-    t_info "Netbox Secret Password"
-      t_norm "$SC_PASS" | tee "${bkRoot}/.SC_PASS"
-    SL0; CR1
-    t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
-    SL0; CR1
-    t_ok "Password files '.DB_PASS' and '.SC_PASS' in '${bkRoot}' dir"
+#if [[ ! -e $SCRIPT_ROOT/.NB_NEW_POSTGRES ]]; then
+  if [[ $insType = new ]]; then
+    t_head "----- NEW : SETUP POSTGRESQL -----"
     SL2; CR2
-  fi
-       #=# PLACEHOLDER REMINDER
-       # Validate database creation, just in case another install is made.       
-  t_info "Modifying database."
-  su postgres <<EOF
+    
+    t_info "Setting up Database ..."
+    SL0
+    
+    WILL_YOU_CONTINUE
+  
+    t_info "Checking package dependencies for PostgreSQL ..."
+    CHECK_PKG $pkgPsql
+          #=# PLACEHOLDER REMINDER
+    #$PMGET $pkgPsql
+    t_ok "... done !"
+    SL0; CR2
+    
+    set -e
+    SL1; CR1
+    
+    # These options are here, but highly recommended to stick with the static vars.
+    #read -p "Enter owner database name (suggested: 'netbox'): " -r DB_USER
+    #read -p "Enter database name (suggested: 'netbox'): " -r DB_NAME
+         #=# PLACEHOLDER REMINDER : Will make this a choice later.
+    DB_USER=netbox
+    DB_NAME=netbox
+    
+         #=# PLACEHOLDER REMINDER
+         # Wrap this up in a loop to allow user to self-generate.
+         # Need some validation logic for password length, per Netbox requirements.
+         # Have to consider escaping special characters for SED as well, or explore alternatives.
+  
+    t_info "Displaying password ..."
+    SL1; CR1
+    if [[ -e "${bkRoot}/.DB_PASS" ]] || [[ -e "${bkRoot}/.SC_PASS" ]]; then
+      t_err "One or more files already exist !"
+      t_err "Seems a possible failed or interrupted new install ..."
+      WILL_YOU_CONTINUE
+    else
+      DB_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
+      SC_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 61 ; echo '')
+      mkdir -p "${bkRoot}"
+      t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
+      SL0; CR1
+      t_info "Database Password"
+        t_norm "$DB_PASS" | tee "${bkRoot}/.DB_PASS"
+      t_info "Netbox Secret Password"
+        t_norm "$SC_PASS" | tee "${bkRoot}/.SC_PASS"
+      SL0; CR1
+      t_warn "STORE PASSWORD SECURELY. DO NOT LOSE."
+      SL0; CR1
+      t_ok "Password files '.DB_PASS' and '.SC_PASS' in '${bkRoot}' dir"
+      SL2; CR2
+    fi
+         #=# PLACEHOLDER REMINDER
+         # Validate database creation, just in case another install is made.       
+    t_info "Modifying database."
+    su postgres <<EOF
 psql -c "CREATE DATABASE $DB_NAME;"
 psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
 psql -c "ALTER DATABASE $DB_NAME OWNER TO $DB_USER;"
 EOF
-       #=# PLACEHOLDER REMINDER
-       # Work on version syntax to qualify this.  
-  if [[ $POSTGRES = fifteeeeen ]]; then
-    ##The next two commands are needed on PostgreSQL 15 and later
-    su postgres <<EOF
+         #=# PLACEHOLDER REMINDER
+         # Work on version syntax to qualify this.  
+    if [[ $POSTGRES = fifteeeeen ]]; then
+      ##The next two commands are needed on PostgreSQL 15 and later
+      su postgres <<EOF
 psql -c "\connect $DB_USER";
 psql -c "GRANT CREATE ON SCHEMA public TO $DB_USER";
 EOF
-    SL1;CR1
+      SL1;CR1
+  
+       #=# PLACEHOLDER REMINDER
+       # Perhaps integrate this in to script.
 
-     #=# PLACEHOLDER REMINDER
-     # Perhaps integrate this in to script.
-
-## TO VERIFY
-   # $ psql --username netbox --password --host localhost netbox
-   # Password for user netbox: 
-   # psql (12.5 (Ubuntu 12.5-0ubuntu0.20.04.1))
-   # SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
-   # Type "help" for help.
-   # 
-   # netbox=> \conninfo
-   # You are connected to database "netbox" as user "netbox" on host "localhost" (address "127.0.0.1") at port "5432".
-   # SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
-   # netbox=> \q
+  ## TO VERIFY
+     # $ psql --username netbox --password --host localhost netbox
+     # Password for user netbox: 
+     # psql (12.5 (Ubuntu 12.5-0ubuntu0.20.04.1))
+     # SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
+     # Type "help" for help.
+     # 
+     # netbox=> \conninfo
+     # You are connected to database "netbox" as user "netbox" on host "localhost" (address "127.0.0.1") at port "5432".
+     # SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
+     # netbox=> \q
+    fi
+    t_ok "... done !"
+    SL1; CR1
+  
+    touch $SCRIPT_ROOT/.NB_NEW_POSTGRES
+    t_head "----- POSTGRES SETUP COMPLETE -----"
+    SL2
   fi
-  t_ok "... done !"
-  SL1; CR1
+#fi
 
-  t_head "----- POSTGRES SETUP COMPLETE -----"
-  SL2
-fi
+#################################################################################################
+
+#if [[ ! -e $SCRIPT_ROOT/.NB_NEW_REDIS ]]; then
+  if [[ $insType = new ]]; then
+    t_head "----- NEW : SETUP REDIS -----"
+    
+    WILL_YOU_CONTINUE
+    
+    t_info "Checking package dependencies for Redis ..."
+    CR1
+    CHECK_PKG $pkgRedis
+          #=# PLACEHOLDER REMINDER
+    #$PMGET $pkgRedis
+    SL0; CR1
+    
+    t_ok "... done !"
+    SL0; CR1
+    
+    t_info "Redis checks..."
+    SL1; CR1
+    
+         #=# PLACEHOLDER REMINDER
+         # Add auto-validation to capture the PONG to the ping. Consider intervention if not.
+    redis-server -v
+    CR1
+    redis-cli ping
+    CR1
+    t_ok "... done"
+    SL2; CR2
+    
+    touch $SCRIPT_ROOT/.NB_NEW_REDIS
+    t_head "----- REDIS SETUP DONE -----"
+    SL2; CR2
+  fi
+#fi
+
 
 #################################################################################################
 
 
-if [[ $insType = new ]]; then
-  t_head "----- NEW : SETUP REDIS -----"
+#if [[ ! -e $SCRIPT_ROOT/.NB_NEW_SETUP ]]; then
+  if [[ $insType = new ]]; then
+    t_head "----- NEW : NETBOX SETUP -----"
+    SL0; CR1
+    
+    WILL_YOU_CONTINUE
+    SL0; CR2
+    
+    t_info "Checking package dependencies for Netbox ..."
+    CHECK_PKG $pkgNetbox
+          #=# PLACEHOLDER REMINDER
+    #$PMGET $pkgNetbox
+    SL0; CR1
+    t_ok "... done !"
+    
+    ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
   
-  WILL_YOU_CONTINUE
+    t_info "Setting permissions on dirs ..."
+         #=# PLACEHOLDER REMINDER
+         # Make more robust I guess
+    if [[ $PMGR = apt ]]; then
+      adduser --system --group netbox
+      chown --recursive netbox $nbMedia
+      chown --recursive netbox $nbReports
+      chown --recursive netbox $nbScripts
+    elif [[ $PMGR = yum ]]; then
+      groupadd --system netbox
+      adduser --system -g netbox netbox
+      chown --recursive netbox /opt/netbox/netbox/media/
+      chown --recursive netbox /opt/netbox/netbox/reports/
+      chown --recursive netbox /opt/netbox/netbox/scripts/
+    else
+      t_err "Exception. Distro not determined"
+      GAME_OVER
+    fi
+    SL1; CR1
+    t_ok "... done !"
   
-  t_info "Checking package dependencies for Redis ..."
-  CR1
-  CHECK_PKG $pkgRedis
-        #=# PLACEHOLDER REMINDER
-  #$PMGET $pkgRedis
-  SL0; CR1
+    
+    cd "${nbRoot}/netbox/netbox/"
+    cp configuration_example.py configuration.py
+    
+         #=# PLACEHOLDER REMINDER :
+         # Validate files before editing (for concurrent runs).
+         #
+         # Also evaluate making this user input choice using the likes of nano.
+         
+    t_info "Updating configuration.py ..."
+    SL1; CR1
+    
+    t_info "Before : ALLOWED_HOSTS"
+    printf '%b\n' "$(cat configuration.py | grep -F "ALLOWED_HOSTS = [" | grep -v Example)"
+      sed -i "s|ALLOWED_HOSTS = \[\]|ALLOWED_HOSTS = \['*'\]|g" configuration.py
+    t_info "After : ALLOWED_HOSTS"
+    printf '%b\n' "$(cat configuration.py | grep -F "ALLOWED_HOSTS = [" | grep -v Example)"
+    SL1; CR1
   
-  t_ok "... done !"
-  SL0; CR1
+    t_info "Before : Netbox Database User"
+    printf '%b\n' "$(cat configuration.py | grep -F "'USER': '")"
+      sed -i "s|'USER': '',|'USER': '$DB_USER',|g" configuration.py
+    t_info "After : Netbox Database User"
+    printf '%b\n' "$(cat configuration.py | grep -F "'USER': '")"
+    SL1; CR1
   
-  t_info "Redis checks..."
-  SL1; CR1
+    t_info "Before : Password for User"
+    printf '%b\n' "$(cat configuration.py | grep -F "'PASSWORD': '" | grep -F "PostgreSQL")"
+      sed -i "s|'PASSWORD': '',           # PostgreSQL password|'PASSWORD': '$DB_PASS',           # PostgreSQL password|g" configuration.py
+    t_info "After : Password for User"
+    printf '%b\n' "$(cat configuration.py | grep -F "'PASSWORD': '" | grep -F "PostgreSQL")"
+    SL1; CR1
   
-       #=# PLACEHOLDER REMINDER
-       # Add auto-validation to capture the PONG to the ping. Consider intervention if not.
-  redis-server -v
-  CR1
-  redis-cli ping
-  CR1
-  t_ok "... done"
-  SL2; CR2
+    t_info "Before : Secret Pass for Netbox"
+    printf '%b\n' "$(cat configuration.py | grep -F "SECRET_KEY = '")"
+      sed -i "s|SECRET_KEY = ''|SECRET_KEY = '$SC_PASS'|g" configuration.py
+    t_info "After : Secret Pass for Netbox"
+    printf '%b\n' "$(cat configuration.py | grep -F "SECRET_KEY = '")"
+    SL1; CR2
+    t_ok "... done"
+    SL0; CR2
+    
+    # Hint: Square brackets '[]' need escaping '\[\]'. Possibly others.
+    # sed -i "s|VARIABLE1|VARIABLE2|g" file.txt
+    
+         #=# PLACEHOLDER REMINDER
+         # Come back to this to possibly do conditionals/prompts
+    
+    ## OPTIONAL : This will change the media, reports and scripts paths. Here for reference. Might make it a choice later.
+    
+    #printf '%b\n' "$(cat configuration.py | grep -F "MEDIA_ROOT")"
+      #sed -i "s|# MEDIA_ROOT = '/opt/netbox/netbox/media'|MEDIA_ROOT = '$nbMedia'|g" configuration.py
+    #printf '%b\n' "$(cat configuration.py | grep -F "MEDIA_ROOT")"
+    #
+    #printf '%b\n' "$(cat configuration.py | grep -F "REPORTS_ROOT")"
+      #sed -i "s|# REPORTS_ROOT = '/opt/netbox/netbox/reports'|REPORTS_ROOT = '$nbReports'|g" configuration.py
+    #printf '%b\n' "$(cat configuration.py | grep -F "REPORTS_ROOT")"
+    #
+    #printf '%b\n' "$(cat configuration.py | grep -F "SCRIPTS_ROOT")"
+      #sed -i "s|# SCRIPTS_ROOT = '/opt/netbox/netbox/scripts'|SCRIPTS_ROOT = '$nbScripts'|g" configuration.py
+    #printf '%b\n' "$(cat configuration.py | grep -F "SCRIPTS_ROOT")"
+    
+    #t_warn "Clearing DB_PASS variable. Temporarily stored as file .DB_PASS in $(pwd)"
+    #unset DB_PASS
   
-  t_head "----- REDIS SETUP DONE -----"
-  SL2; CR2
-fi
-
-
-#################################################################################################
-
-
-if [[ $insType = new ]]; then
-  t_head "----- NEW : NETBOX SETUP -----"
-  SL0; CR1
-  
-  WILL_YOU_CONTINUE
-  SL0; CR2
-  
-  t_info "Checking package dependencies for Netbox ..."
-  CHECK_PKG $pkgNetbox
-        #=# PLACEHOLDER REMINDER
-  #$PMGET $pkgNetbox
-  SL0; CR1
-  t_ok "... done !"
-  
-  ln -sfn "${nbRoot}-${newVer}"/ "${nbRoot}"
-
-  t_info "Setting permissions on dirs ..."
-       #=# PLACEHOLDER REMINDER
-       # Make more robust I guess
-  if [[ $PMGR = apt ]]; then
-    adduser --system --group netbox
-    chown --recursive netbox $nbMedia
-    chown --recursive netbox $nbReports
-    chown --recursive netbox $nbScripts
-  elif [[ $PMGR = yum ]]; then
-    groupadd --system netbox
-    adduser --system -g netbox netbox
-    chown --recursive netbox /opt/netbox/netbox/media/
-    chown --recursive netbox /opt/netbox/netbox/reports/
-    chown --recursive netbox /opt/netbox/netbox/scripts/
-  else
-    t_err "Exception. Distro not determined"
-    GAME_OVER
-  fi
-  SL1; CR1
-  t_ok "... done !"
-
-  
-  cd "${nbRoot}/netbox/netbox/"
-  cp configuration_example.py configuration.py
-  
-       #=# PLACEHOLDER REMINDER :
-       # Validate files before editing (for concurrent runs).
-       #
-       # Also evaluate making this user input choice using the likes of nano.
-       
-  t_info "Updating configuration.py ..."
-  SL1; CR1
-  
-  t_info "Before : ALLOWED_HOSTS"
-  printf '%b\n' "$(cat configuration.py | grep -F "ALLOWED_HOSTS = [" | grep -v Example)"
-    sed -i "s|ALLOWED_HOSTS = \[\]|ALLOWED_HOSTS = \['*'\]|g" configuration.py
-  t_info "After : ALLOWED_HOSTS"
-  printf '%b\n' "$(cat configuration.py | grep -F "ALLOWED_HOSTS = [" | grep -v Example)"
-  SL1; CR1
-
-  t_info "Before : Netbox Database User"
-  printf '%b\n' "$(cat configuration.py | grep -F "'USER': '")"
-    sed -i "s|'USER': '',|'USER': '$DB_USER',|g" configuration.py
-  t_info "After : Netbox Database User"
-  printf '%b\n' "$(cat configuration.py | grep -F "'USER': '")"
-  SL1; CR1
-
-  t_info "Before : Password for User"
-  printf '%b\n' "$(cat configuration.py | grep -F "'PASSWORD': '" | grep -F "PostgreSQL")"
-    sed -i "s|'PASSWORD': '',           # PostgreSQL password|'PASSWORD': '$DB_PASS',           # PostgreSQL password|g" configuration.py
-  t_info "After : Password for User"
-  printf '%b\n' "$(cat configuration.py | grep -F "'PASSWORD': '" | grep -F "PostgreSQL")"
-  SL1; CR1
-
-  t_info "Before : Secret Pass for Netbox"
-  printf '%b\n' "$(cat configuration.py | grep -F "SECRET_KEY = '")"
-    sed -i "s|SECRET_KEY = ''|SECRET_KEY = '$SC_PASS'|g" configuration.py
-  t_info "After : Secret Pass for Netbox"
-  printf '%b\n' "$(cat configuration.py | grep -F "SECRET_KEY = '")"
-  SL1; CR2
-  t_ok "... done"
-  SL0; CR2
-  
-  # Hint: Square brackets '[]' need escaping '\[\]'. Possibly others.
-  # sed -i "s|VARIABLE1|VARIABLE2|g" file.txt
-  
-       #=# PLACEHOLDER REMINDER
-       # Come back to this to possibly do conditionals/prompts
-  
-  ## OPTIONAL : This will change the media, reports and scripts paths. Here for reference. Might make it a choice later.
-  
-  #printf '%b\n' "$(cat configuration.py | grep -F "MEDIA_ROOT")"
-    #sed -i "s|# MEDIA_ROOT = '/opt/netbox/netbox/media'|MEDIA_ROOT = '$nbMedia'|g" configuration.py
-  #printf '%b\n' "$(cat configuration.py | grep -F "MEDIA_ROOT")"
-  #
-  #printf '%b\n' "$(cat configuration.py | grep -F "REPORTS_ROOT")"
-    #sed -i "s|# REPORTS_ROOT = '/opt/netbox/netbox/reports'|REPORTS_ROOT = '$nbReports'|g" configuration.py
-  #printf '%b\n' "$(cat configuration.py | grep -F "REPORTS_ROOT")"
-  #
-  #printf '%b\n' "$(cat configuration.py | grep -F "SCRIPTS_ROOT")"
-    #sed -i "s|# SCRIPTS_ROOT = '/opt/netbox/netbox/scripts'|SCRIPTS_ROOT = '$nbScripts'|g" configuration.py
-  #printf '%b\n' "$(cat configuration.py | grep -F "SCRIPTS_ROOT")"
-  
-  #t_warn "Clearing DB_PASS variable. Temporarily stored as file .DB_PASS in $(pwd)"
-  #unset DB_PASS
-
-  # Redundant since we do our own
-  # t_info "Generate a secret key"
-  # python3 ../generate_secret_key.py | tee .NB_PASS
-  # SL1; CR2
-  
-       #=# PLACEHOLDER REMINDER
-       # Code duplicity with upgrade section above. Look to consolidate
-  t_info "Run Netbox upgrade script ..."
-  SL2; CR2
-  bash "${nbRoot}/upgrade.sh"
-  SL2; CR2
-  t_ok "... done"
-  SL0; CR1
-  
-  t_info "Create Superuser"
-  nbmgr createsuperuser
-  SL1; CR1
-  t_ok "... done"
-       #=# PLACEHOLDER REMINDER
-       # Evaluate this not being missed on a 3.4+ to 3.6 upgrade.
-       # Will need to pull it out of the if conditional.
-  if [[ $(echo "${newVer} 3.6.0" | awk '{print ($1 >= $2)}') == 1 ]]; then
-    t_info "Selection (${newVer}) or newer than 3.6.0 requires Dulwich for Git data source function."
-    t_info "Adding dulwich to local_requirements.txt"
-    echo 'dulwich' >> "${nbRoot}/local_requirements.txt"
+    # Redundant since we do our own
+    # t_info "Generate a secret key"
+    # python3 ../generate_secret_key.py | tee .NB_PASS
+    # SL1; CR2
+    
+         #=# PLACEHOLDER REMINDER
+         # Code duplicity with upgrade section above. Look to consolidate
+    t_info "Run Netbox upgrade script ..."
+    SL2; CR2
+    bash "${nbRoot}/upgrade.sh"
+    SL2; CR2
+    t_ok "... done"
+    SL0; CR1
+    
+    t_info "Create Superuser"
+    nbmgr createsuperuser
     SL1; CR1
     t_ok "... done"
-  fi
+         #=# PLACEHOLDER REMINDER
+         # Evaluate this not being missed on a 3.4+ to 3.6 upgrade.
+         # Will need to pull it out of the if conditional.
+    if [[ $(echo "${newVer} 3.6.0" | awk '{print ($1 >= $2)}') == 1 ]]; then
+      t_info "Selection (${newVer}) or newer than 3.6.0 requires Dulwich for Git data source function."
+      t_info "Adding dulwich to local_requirements.txt"
+      echo 'dulwich' >> "${nbRoot}/local_requirements.txt"
+      SL1; CR1
+      t_ok "... done"
+    fi
+      
+    t_info "Adding Housekeeping to cron tasks"
+    ln -s "${nbRoot}/contrib/netbox-housekeeping.sh" /etc/cron.daily/netbox-housekeeping
+    SL0
+    t_ok "... done"
     
-  t_info "Adding Housekeeping to cron tasks"
-  ln -s "${nbRoot}/contrib/netbox-housekeeping.sh" /etc/cron.daily/netbox-housekeeping
-  SL0
-  t_ok "... done"
-  
-  t_head "----- NETBOX SETUP DONE -----"
-  SL2
-fi
-
+    touch $SCRIPT_ROOT/.NB_NEW_SETUP
+    t_head "----- NETBOX SETUP DONE -----"
+    SL2
+  fi
+#fi
 
 #################################################################################################
 
-if [[ $insType = new ]]; then
-  t_head "----- NEW : GUNICORN SETUP -----"
-  SL0; CR1
+
+#if [[ ! -e $SCRIPT_ROOT/.NB_NEW_GUNI ]]; then
+  if [[ $insType = new ]]; then
+    t_head "----- NEW : GUNICORN SETUP -----"
+    SL0; CR1
+    
+    WILL_YOU_CONTINUE
+    SL0; CR1
   
-  WILL_YOU_CONTINUE
-  SL0; CR1
-
-  t_info "Copying files to set Netbox as service ..."
-  cp "${nbRoot}/contrib/gunicorn.py" "${nbRoot}/gunicorn.py"
-  cp -v "${nbRoot}/contrib/"*".service" "/etc/systemd/system/"
-  SL1; CR1
-  t_ok "... done"
-  SL0; CR2
-
-  t_info "Starting Netbox processes..."
-  systemctl daemon-reload
-  systemctl start netbox netbox-rq
-  systemctl enable netbox netbox-rq
-  # systemctl status netbox.service
-  SL1; CR1
-  CHECK_START netbox
-  CHECK_START netbox-rq
-  CHECK_URL $(hostname -i)
-
+    t_info "Copying files to set Netbox as service ..."
+    cp "${nbRoot}/contrib/gunicorn.py" "${nbRoot}/gunicorn.py"
+    cp -v "${nbRoot}/contrib/"*".service" "/etc/systemd/system/"
+    SL1; CR1
+    t_ok "... done"
+    SL0; CR2
   
-  SL2; CR1
-  t_ok "...done."
-  SL1; CR1
+    t_info "Starting Netbox processes..."
+    systemctl daemon-reload
+    systemctl start netbox netbox-rq
+    systemctl enable netbox netbox-rq
+    # systemctl status netbox.service
+    SL1; CR1
+    CHECK_START netbox
+    CHECK_START netbox-rq
+    CHECK_URL $(hostname -i)
   
-  t_head "----- GUNICORN SETUP DONE -----"
-  SL2
-fi
-
+    
+    SL2; CR1
+    t_ok "...done."
+    SL1; CR1
+    
+    touch $SCRIPT_ROOT/.NB_NEW_GUNI
+    t_head "----- GUNICORN SETUP DONE -----"
+    SL2
+  fi
+#fi
 
 #################################################################################################
 
@@ -858,69 +872,73 @@ fi
      # Make this a choice between Nginx and Apache
      # https://docs.netbox.dev/en/stable/installation/5-http-server/
 
-if [[ $insType = new ]]; then
-  nbHost=netbox.local
-  webSrv=nginx
-
-  t_info "Checking package dependencies for ${webSrv} ..."
-  CHECK_PKG $pkgWww
-        #=# PLACEHOLDER REMINDER
-  #$PMGET $pkgWww
-  SL0; CR1
-  t_ok "... done !"
-  SL1; CR1
-
-  if [[ "${webSrv}" = nginx ]]; then
-    t_head "----- SETUP NGINX -----"
-    SL0
-
-    WILL_YOU_CONTINUE
+#if [[ ! -e $SCRIPT_ROOT/.NB_NEW_NGINX ]]; then
+  if [[ $insType = new ]]; then
+    nbHost=netbox.local
+    webSrv=nginx
   
-       #=# PLACEHOLDER REMINDER
-       # Place options, including use certbot to properly do this
-    t_info "Creating certs..."
-    SL2; CR1
-
-    openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
-    -subj "/C=NZ/ST=Denial/L=RiverIn/O=Ejypt/CN=${nbHost}" \
-    -keyout /etc/ssl/private/netbox.key \
-    -out /etc/ssl/certs/netbox.crt
-
-    t_ok "... done"
+    t_info "Checking package dependencies for ${webSrv} ..."
+    CHECK_PKG $pkgWww
+          #=# PLACEHOLDER REMINDER
+    #$PMGET $pkgWww
+    SL0; CR1
+    t_ok "... done !"
     SL1; CR1
   
-    cp $nbRoot/contrib/nginx.conf /etc/nginx/sites-available/netbox
+    if [[ "${webSrv}" = nginx ]]; then
+      t_head "----- SETUP NGINX -----"
+      SL0
   
-       #=# PLACEHOLDER REMINDER
-       # Make this interactive. Consider defining with others at start and then having a match conditional here.
-    t_info "Adjusting ${webSrv} config server name"
-    SL0; CR1
-
-    t_info "Before:"
-    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
-      sed -i "s|netbox.example.com|$nbHost|g" /etc/nginx/sites-available/netbox
-    SL1
-    t_info "After:"
-    printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
-    SL0; CR1
-    t_ok "... done"
-    SL1; CR2
-
-    t_info "Cleaning up..."
-    rm /etc/nginx/sites-enabled/default
-    ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
-
-    #=# PLACEHOLDER REMINDER
-    # Add start validation
-    systemctl restart nginx
-    SL1; CR1
+      WILL_YOU_CONTINUE
     
-    CHECK_START nginx
-    CHECK_URL $(hostname -i)
+         #=# PLACEHOLDER REMINDER
+         # Place options, including use certbot to properly do this
+      t_info "Creating certs..."
+      SL2; CR1
+  
+      openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
+      -subj "/C=NZ/ST=Denial/L=RiverIn/O=Ejypt/CN=${nbHost}" \
+      -keyout /etc/ssl/private/netbox.key \
+      -out /etc/ssl/certs/netbox.crt
+  
+      t_ok "... done"
+      SL1; CR1
+    
+      cp $nbRoot/contrib/nginx.conf /etc/nginx/sites-available/netbox
+    
+         #=# PLACEHOLDER REMINDER
+         # Make this interactive. Consider defining with others at start and then having a match conditional here.
+      t_info "Adjusting ${webSrv} config server name"
+      SL0; CR1
+  
+      t_info "Before:"
+      printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
+        sed -i "s|netbox.example.com|$nbHost|g" /etc/nginx/sites-available/netbox
+      SL1
+      t_info "After:"
+      printf '%b\n' "$(cat /etc/nginx/sites-available/netbox | grep -F server_name)"
+      SL0; CR1
+      t_ok "... done"
+      SL1; CR2
+  
+      t_info "Cleaning up..."
+      rm /etc/nginx/sites-enabled/default
+      ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
+  
+      #=# PLACEHOLDER REMINDER
+      # Add start validation
+      systemctl restart nginx
+      SL1; CR1
+      
+      CHECK_START nginx
+      CHECK_URL $(hostname -i)
+    fi
+    touch $SCRIPT_ROOT/.NB_NEW_NGINX
+    t_head "----- NGINX SETUP DONE -----"
+    SL2
   fi
-  t_head "----- NGINX SETUP DONE -----"
-  SL2
-fi
+#fi
+
 
 #################################################################################################
 
@@ -971,7 +989,17 @@ SL2
 
 # FINISHED !!
 endTime=$(date +%s)
+
+
+if [[ -e $SCRIPT_ROOT/.NB_DOWNLOAD ]]; then rm $SCRIPT_ROOT/.NB_DOWNLOAD; fi
+if [[ -e $SCRIPT_ROOT/.NB_UPG_SYMLINK ]]; then rm $SCRIPT_ROOT/.NB_UPG_SYMLINK; fi
+if [[ -e $SCRIPT_ROOT/.NB_NEW_REDIS ]]; then rm $SCRIPT_ROOT/.NB_NEW_REDIS; fi
+if [[ -e $SCRIPT_ROOT/.NB_NEW_SETUP ]]; then rm $SCRIPT_ROOT/.NB_NEW_SETUP; fi
+if [[ -e $SCRIPT_ROOT/.NB_NEW_GUNI ]]; then rm $SCRIPT_ROOT/.NB_NEW_GUNI; fi
+if [[ -e $SCRIPT_ROOT/.NB_NEW_NGINX ]]; then rm $SCRIPT_ROOT/.NB_NEW_NGINX; fi
+if [[ -e $SCRIPT_ROOT/.NB_UPG_COPY ]]; then rm $SCRIPT_ROOT/.NB_UPG_COPY; fi
+if [[ -e $SCRIPT_ROOT/.NB_UPG_BACKUP ]]; then rm $SCRIPT_ROOT/.NB_UPG_BACKUP; fi
+
 t_ok "Script completed in $(( endTime - startTime )) seconds!"
 
-rm $SCRIPT_ROOT/.NB_BACKUP
 SL2; CR2
