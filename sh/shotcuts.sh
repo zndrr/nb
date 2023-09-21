@@ -8,15 +8,14 @@ if [[ ! -e ~/.bash_netbox ]]; then
   cat <<"EOF" >> ~/.bash_netbox
 nbv() { source /opt/netbox/venv/bin/activate; }
 nbvd() { deactivate; }
-nbmgr() { source /opt/netbox/venv/bin/activate; python3 /opt/netbox/netbox/manage.py "$1"; }
+nbmg() { userIn=$@; source /opt/netbox/venv/bin/activate; python3 /opt/netbox/netbox/manage.py $userIn; }
 nbs() { source /opt/netbox/venv/bin/activate; python3 /opt/netbox/netbox/manage.py nbshell; }
 nbcmd() {
 printf '\n%b\n\n' "List of Netbox shorcuts here:"
-printf '%b\n' "  nbv - Netbox Python3 venv"
-printf '%b\n' " nbvd - Deactivate Netbox venv"
-printf '%b\n' "nbmgr - Netbox manage.py (in venv)"
-printf '%b\n' "  nbs - Netbox nbshell"
-printf '%b\n\n' "nbcmd - Print available Netbox shortcuts"
+printf '%b\n' " nbv - Netbox Python3 venv"
+printf '%b\n' " nbd - Deactivate Netbox venv"
+printf '%b\n' "nbmg - Netbox manage.py (in venv)"
+printf '%b\n' " nbs - Netbox nbshell"
 }
 EOF
 printf '%b\n\n' "... done!"
