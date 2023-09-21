@@ -561,7 +561,7 @@ SL2
     t_info "Checking package dependencies for PostgreSQL ..."
     CHECK_PKG $pkgPsql
           #=# PLACEHOLDER REMINDER
-    #$PMGET $pkgPsql
+    #$PMADD $pkgPsql
     t_ok "... done !"
     SL0; CR2
     
@@ -656,7 +656,7 @@ EOF
     CR1
     CHECK_PKG $pkgRedis
           #=# PLACEHOLDER REMINDER
-    #$PMGET $pkgRedis
+    #$PMADD $pkgRedis
     SL0; CR1
     
     t_ok "... done !"
@@ -695,7 +695,7 @@ EOF
     t_info "Checking package dependencies for Netbox ..."
     CHECK_PKG $pkgNetbox
           #=# PLACEHOLDER REMINDER
-    #$PMGET $pkgNetbox
+    #$PMADD $pkgNetbox
     SL0; CR1
     t_ok "... done !"
     
@@ -880,7 +880,7 @@ EOF
     t_info "Checking package dependencies for ${webSrv} ..."
     CHECK_PKG $pkgWww
           #=# PLACEHOLDER REMINDER
-    #$PMGET $pkgWww
+    #$PMADD $pkgWww
     SL0; CR1
     t_ok "... done !"
     SL1; CR1
@@ -979,6 +979,7 @@ systemctl start netbox netbox-rq
 SL0; CR1
 CHECK_START netbox
 CHECK_START netbox-rq
+SL2
 CHECK_URL $(hostname -i)
 t_ok "Processes started"
 SL2
